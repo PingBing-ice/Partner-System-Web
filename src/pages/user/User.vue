@@ -1,7 +1,6 @@
 <template>
   <template v-if="user">
-
-      <van-cell :title="userName.avatarUrl"  @click="avatarFile">
+      <van-cell :title="userName.avatarUrl">
         <van-uploader :after-read="afterRead">
         <van-image
             round
@@ -12,20 +11,20 @@
         </van-uploader>
       </van-cell>
 
-    <van-cell :title="userName.username" is-link :value="user.username"
-              @click="toEdit('username',userName.username,user.username)"/>
-    <van-cell :title="userName.userAccount" :value="user.userAccount"/>
-    <van-cell :title="userName.gender" is-link :value="user.gender"
-              @click="toEdit('gender',userName.gender,user.gender)"/>
+    <van-cell :title="userName.username" is-link :value="user?.username"
+              @click="toEdit('username',userName.username,user?.username)"/>
+    <van-cell :title="userName.userAccount" :value="user?.userAccount"/>
+    <van-cell :title="userName.gender" is-link :value="user?.gender"
+              @click="toEdit('gender',userName.gender,user?.gender)"/>
     <van-cell title="标签" @click="show = true">
       <template #right-icon>
-            <van-tag plain  v-for="tag in user.tags" type="primary"   size="large" >{{tag}}</van-tag>
+            <van-tag plain  v-for="tag in user?.tags" type="primary"   size="large" >{{tag}}</van-tag>
       </template>
     </van-cell>
-    <van-cell :title="userName.tel" is-link :value="user.tel" @click="toEdit('tel',userName.tel,user.tel)"/>
-    <van-cell :title="userName.email" is-link :value="user.email" @click="toEdit('email',userName.email,user.email)"/>
-    <van-cell :title="userName.planetCode" :value="user.planetCode"/>
-    <van-cell :title="userName.createTime" :value="user.createTime"/>
+    <van-cell :title="userName.tel" is-link :value="user?.tel" @click="toEdit('tel',userName.tel,user?.tel)"/>
+    <van-cell :title="userName.email" is-link :value="user?.email" @click="toEdit('email',userName.email,user?.email)"/>
+    <van-cell :title="userName.planetCode" :value="user?.planetCode"/>
+    <van-cell :title="userName.createTime" :value="user?.createTime"/>
     <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">注销</van-button>
   </template>
   <van-popup

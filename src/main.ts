@@ -15,20 +15,24 @@ const router = VueRouter.createRouter({
     history: VueRouter.createWebHashHistory(),
     routes, // `routes: routes` 的缩写
 })
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to, from,next) => {
     const user = await getCurrentUser();
     // 检查用户是否已登录
     // ❗️ 避免无限重定向
+    console.log(to)
     if (user == null && to.path !== '/' && to.path !== '/register') {
         // 将用户重定向到登录页面
         return {path: '/'}
+    }else {
+        next()
     }
     if (user != null) {
-        if (to.path === '/') {
+        if (to.path === '/' ||to.path !== '/register' ) {
             return {path: '/index'}
         }
     }
 })
+
 //整个应用支持路由。
 app.use(router)
 app.mount('#app')

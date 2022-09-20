@@ -95,9 +95,15 @@ onMounted(async ()=>{
       teamId: teamID,
     }
   })
+  console.log(response)
   // @ts-ignore
-  if (response.code) {
+  if (response.code === 200) {
     teamChatRecord.value = response.data;
+  }else if (response.code === 40000) {
+    Toast.fail("你已被踢出该队伍...")
+    await router.push({
+      path: '/team'
+    })
   }
   getOnMessage();
   userId.value = user.id;
@@ -201,6 +207,7 @@ const onClickRightTeam = () => {
     path: '/userTeam',
     query: {
       teamID: teamID,
+      teamName: teamNane,
     }
   })
 }

@@ -124,7 +124,7 @@ onMounted(async () => {
     }
 
   } else {
-    Toast.fail("请先登录!!");
+    Toast.fail("请先登录...");
   }
   await nextTick(() => {
     // @ts-ignore

@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import {TeamType} from "../models/team";
-import {teamStateEnum} from "../constants/team";
+import {teamStateEnum} from "../states/team";
 import {ref} from "vue";
 import UserCardList from "./UserCardList.vue";
 import myAxios from "../plugins/myAxios";

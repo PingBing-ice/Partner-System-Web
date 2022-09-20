@@ -13,14 +13,19 @@
                  @click-right="onClickRight"
     >
       <template #left>
-        <van-icon name="friends-o" size="18" />
+        <van-image
+            round
+            width="25px"
+            height="25px"
+            :src="user?.avatarUrl"
+        />
       </template>
       <template #right>
         <van-icon name="search" size="18"/>
       </template>
     </van-nav-bar>
 
-    <van-nav-bar v-else-if="route.path!=='/chatTeam' &&route.path!=='/toChat' "
+    <van-nav-bar v-else-if="route.path!=='/chatTeam' &&route.path!=='/toChat '&&route.path!== '/userTeam' "
         :title="route.path==='/user'? '用户中心': '搜索'"
         left-arrow
         @click-left="onClickLeft"
@@ -54,12 +59,17 @@ import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import UserLogin from "../pages/user/UserLogin.vue";
 import UserRegister from "../pages/user/UserRegister.vue";
+import {getCurrentUser} from "../services/users";
 
 const router = useRouter();
 const route = useRoute();
+const user = ref();
 const onChange = (index) =>{
 
 }
+onMounted(async () => {
+  user.value = await getCurrentUser();
+})
 const findUser = () => {
   router.push({
     path: "/user"

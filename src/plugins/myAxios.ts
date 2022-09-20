@@ -1,17 +1,21 @@
 // Set config defaults when creating the instance
 import axios from "axios";
 import {Toast} from "vant";
+import {useRoute, useRouter} from "vue-router";
 
 const myAxios = axios.create({
     baseURL: 'http://localhost:8088',
     withCredentials: true,
 });
 // myAxios.defaults.withCredentials = true;
+const router = useRouter();
+const route = useRoute();
 /**
  * 全局响应拦截器
  */
 // 添加请求拦截器
 myAxios.interceptors.request.use(function (config) {
+    console.log(config)
     // 在发送请求之前做些什么
     return config;
 }, function (error) {
@@ -21,7 +25,10 @@ myAxios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 myAxios.interceptors.response.use(function (response) {
-    if (response.data.code != 200) {
+     if (response.data.code != 200) {
+        if (response.data.description) {
+            Toast.fail(response.data.description)
+        }
     }
     // 对响应数据做点什么
     return response.data;

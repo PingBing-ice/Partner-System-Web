@@ -1,8 +1,8 @@
 <template>
-  <van-notice-bar
+  <van-notice-bar v-if="notice"
       left-icon="volume-o"
       scrollable
-      text="如有bug 请发邮箱 => 2412639351@QQ.COM"
+      :text="notice"
   />
   <van-tabs v-model:active="active" @click-tab="onClickTab">
     <van-tab title="用户">
@@ -11,12 +11,24 @@
           <user-card-list :user-list="userList"/>
         </van-tab>
         <van-tab v-for="tag in tagList" :title="tag" :name="tag">
-          <user-card-list :user-list="tagUserList"/>
+          <user-card-list v-if=" tagUserList || tagUserList.length>0" :user-list="tagUserList"/>
+          <van-empty v-if=" !tagUserList || tagUserList.length<1" description="空空如也"/>
         </van-tab>
       </van-tabs>
-        <van-empty v-if=" !tagUserList || tagUserList.length<1" description="空空如也"/>
+
     </van-tab>
     <van-tab title="队伍">
+      <van-search
+          v-model="searchTxt"
+          show-action
+          placeholder="请输入搜索关键词"
+          @search="onSearch"
+          @clear="onClear()"
+      >
+        <template #action>
+          <div @click="onClickButton">搜索</div>
+        </template>
+      </van-search>
         <team-card-list v-if="teamList && teamList.length>0" :teamList="teamList"/>
         <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
     </van-tab>
@@ -39,16 +51,26 @@ const teamList = ref([]);
 const tagList = ref([]);
 const tagUserList = ref([]);
 const activeName=ref('a')
+const notice=ref('')
+const searchTxt=ref('')
 
 const onTest = () => {
 }
 onMounted( async () => {
+  const response = await myAxios.get('/api/userNotice/getNotice', {
+    params: {
+      region: 1,
+    }
+  })
+  if (response.code === 200) {
+    notice.value = response.data;
+  }
   const userListData = await myAxios.get('/api/user/recommend', {
     params: {
       current: 1,
       size: 500
     }
-  })
+  });
   if (userListData.code === 200 && userListData.data) {
     userListData.data.items.forEach(user => {
       if (user.tags) {
@@ -70,19 +92,7 @@ onMounted( async () => {
 // 切换 tab
 const onClickTab = async () => {
   if (active.value === 1) {
-    const res =await myAxios.get("/partner/team/list");
-    if (res.code === 200) {
-      teamList.value = res.data;
-      teamList.value.forEach(team => {
-        team.expireTime = team.expireTime.split(" ")[0];
-        if (team.userVo&&team.userVo.length>0)
-          team.userVo.forEach(user=>{
-            if (user.tags) {
-              user.tags = JSON.parse(user.tags)
-            }
-          })
-      })
-    }
+    await getTeamList()
   }
 }
 const onClickTag = async () => {
@@ -100,6 +110,40 @@ const onClickTag = async () => {
     })
     tagUserList.value = userList;
   }
+}
+const getTeamList =async (searchTxt) => {
+  const res =await myAxios.get("/partner/team/list",{
+    params:{
+      searchTxt: searchTxt,
+    }
+  });
+  if (res.code === 200) {
+    teamList.value = res.data;
+    teamList.value.forEach(team => {
+      team.expireTime = team.expireTime.split(" ")[0];
+      if (team.userVo&&team.userVo.length>0)
+        team.userVo.forEach(user=>{
+          if (user.tags) {
+            user.tags = JSON.parse(user.tags)
+          }
+        })
+    })
+  }
+}
+const onSearch = () => {
+  if (searchTxt.value === '') {
+    return;
+  }
+  getTeamList(searchTxt.value);
+}
+const onClickButton = () => {
+  if (searchTxt.value === '') {
+    return;
+  }
+  getTeamList(searchTxt.value);
+}
+const onClear = () => {
+  Toast.success("关闭")
 }
 </script>
 
