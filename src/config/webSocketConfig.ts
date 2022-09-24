@@ -64,7 +64,7 @@ const sendSocket = async (msg: string) => {
     } else {
         socket = getSocket();
         // 异步调用需要设置延时
-        // 三秒后再重新发送
+        
         setTimeout( () => {
             // 重新连接
             socket.send(msg);

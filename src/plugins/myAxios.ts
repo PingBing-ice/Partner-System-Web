@@ -2,14 +2,14 @@
 import axios from "axios";
 import {Toast} from "vant";
 import {useRoute, useRouter} from "vue-router";
+import {getMessages} from "../services/MeesageUtils";
 
 const myAxios = axios.create({
     baseURL: 'http://localhost:8088',
     withCredentials: true,
 });
 // myAxios.defaults.withCredentials = true;
-const router = useRouter();
-const route = useRoute();
+
 /**
  * 全局响应拦截器
  */
