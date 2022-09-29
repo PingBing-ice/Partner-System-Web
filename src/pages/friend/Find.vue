@@ -31,8 +31,8 @@
         <template #title>
           <van-image
               round
-              width="40px"
-              height="40px"
+              width="1.8rem"
+              height="1.8rem"
               :src="userList.avatarUrl"
           />
         </template>
@@ -113,6 +113,10 @@ const addFriend = async (id) => {
 }
 
 const showPopup = () => {
+  if (!friendUserList.value||friendUserList.value.length<=0) {
+    Toast.fail("没有好友申请")
+    return;
+  }
   show.value = true;
 };
 

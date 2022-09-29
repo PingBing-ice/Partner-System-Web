@@ -28,9 +28,12 @@
           </div>
         </div>
 
+
       </div>
       <!--      </div>-->
+
     </div>
+
   </div>
   <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"/>
   <van-cell-group inset>
@@ -45,6 +48,9 @@
       </template>
     </van-field>
   </van-cell-group>
+<!--  <van-sticky :offset-bottom="50" position="bottom">-->
+<!--&lt;!&ndash;    <van-button type="primary">吸底距离</van-button>&ndash;&gt;-->
+<!--  </van-sticky>-->
 </template>
 
 
@@ -61,7 +67,7 @@ import MyAxios from "../../plugins/myAxios";
 
 const route=useRoute()
 const router=useRouter()
-const testData = ref([]);
+const testData:any = ref([]);
 const userList = ref([]);
 const teamChatRecord = ref([]);
 const messages = ref("");
@@ -90,13 +96,11 @@ onMounted(async ()=>{
   // 获取队伍的队员信息
 
   // 查看队伍的聊天信息
-  const response = await MyAxios.get("/partner/teamChatRecord/getTeam",{
+  const response:any = await MyAxios.get("/partner/teamChatRecord/getTeam",{
     params: {
       teamId: teamID,
     }
   })
-  console.log(response)
-  // @ts-ignore
   if (response.code === 200) {
     teamChatRecord.value = response.data;
   }else if (response.code === 40000) {
@@ -109,7 +113,6 @@ onMounted(async ()=>{
   userId.value = user.id;
   userName.value=user.userAccount
   avatarUrl.value = user.avatarUrl;
-
 
   if (teamChatRecord.value.length > 0) {
       teamChatRecord.value.forEach(teamChat => {
@@ -170,27 +173,20 @@ const getOnMessage = () => {
     webSocketConfig.initSocket()
     socket = webSocketConfig.getSocket()
   }
-  socket.onmessage=(msg:string)=>{
+  socket.onmessage=(msg:any)=>{
 
-    // @ts-ignore
     const messages:messageType =JSON.parse(msg.data);
-
     if (messages.type === 2) {
-      userList.value.forEach(user => {
+      userList.value.forEach((user: { id: string | undefined; userAccount: any; avatarUrl: any; }) => {
         const chat =messages.chatRecord;
-        // @ts-ignore
         if (chat.userId == user.id){
           let userData = {
-            // @ts-ignore
             id: user.id,
-            // @ts-ignore
             name: user.userAccount,
-            // @ts-ignore
             images: user.avatarUrl,
             message: chat.message,
           }
 
-          // @ts-ignore
           testData.value.push(userData);
         }
       })
@@ -220,7 +216,7 @@ body {
 }
 
 #chat {
-  height: 100%;
+  height: calc(100vh - 200px);
   overflow-y: auto;
   display: flex;
   flex-direction: column-reverse;
@@ -269,7 +265,7 @@ body {
 
 #chat .chatInfo {
   width: 94%;
-  height: 650px;
+  height: 100%;
   margin:  auto;
   overflow: auto;
   display: flex;

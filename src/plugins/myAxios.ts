@@ -4,6 +4,7 @@ import {Toast} from "vant";
 import {useRoute, useRouter} from "vue-router";
 import {getMessages} from "../services/MeesageUtils";
 
+
 const myAxios = axios.create({
     baseURL: 'http://localhost:8088',
     withCredentials: true,
@@ -15,7 +16,6 @@ const myAxios = axios.create({
  */
 // 添加请求拦截器
 myAxios.interceptors.request.use(function (config) {
-    console.log(config)
     // 在发送请求之前做些什么
     return config;
 }, function (error) {
@@ -28,6 +28,8 @@ myAxios.interceptors.response.use(function (response) {
      if (response.data.code != 200) {
         if (response.data.description) {
             Toast.fail(response.data.description)
+        }else {
+            Toast.fail(response.data.message)
         }
     }
     // 对响应数据做点什么

@@ -40,7 +40,7 @@
             name="datetimePicker"
             label="选择过期时间"
             placeholder="点击选择时间"
-            @click="showPicker = true"
+            @click="showPicker.value = true"
         />
         <van-popup v-model:show="showPicker" position="bottom">
           <van-datetime-picker
@@ -48,7 +48,7 @@
               type="date"
               title="选择过期时间"
               @confirm="onConfirm"
-              @cancel="showPicker=false"
+              @cancel="showPicker.value=false"
               :min-date="minDate"
           />
         </van-popup>

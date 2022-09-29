@@ -21,9 +21,9 @@
       </van-uploader>
     </van-cell>
     <van-cell :title="teamName.name" is-link :value="team.name"/>
-    <van-cell :title="teamName.description" :value="team?.description"/>
-    <van-cell :title="teamName.maxNum" is-link :value="team?.maxNum"/>
-    <van-cell :title="teamName.status" is-link :value="team?.status"/>
+    <van-cell :title="teamName.description" is-link @click="toEdit(teamName.description,team?.description,'description')" :value="team?.description"/>
+    <van-cell :title="teamName.maxNum" is-link @click="toEdit(teamName.maxNum,team?.maxNum,'maxNum')"  :value="team?.maxNum"/>
+    <van-cell :title="teamName.status" is-link :value="teamStateEnum[team?.status]" @click="toEdit(teamName.status,team?.status,'status')"/>
     <van-cell :title="teamName.userVo" is-link @click="isShow"/>
     <van-cell :title="teamName.expireTime" :value="team?.expireTime"/>
     <van-cell :title="teamName.createTime" :value="team?.createTime"/>
@@ -73,6 +73,7 @@ import myAxios from "../../plugins/myAxios";
 import UserCardList from "../../components/UserCardList.vue";
 import {getCurrentUser} from "../../services/users";
 import {Dialog, Toast} from "vant";
+import {teamStateEnum} from "../../states/team";
 
 
 const editState = ref(false);
@@ -163,6 +164,10 @@ const edit =  () => {
       });
 }
 const isShow = () => {
+  if (!userVo || userVo.value.length <= 0) {
+    Toast.fail("人员为空，请邀请好友");
+    return;
+  }
   show.value = true;
 
 }
@@ -232,6 +237,17 @@ const afterRead = (file) => {
   }).catch(() => {
 
   });
+}
+const toEdit = (teamName,txt,editKey) => {
+    router.push({
+      path: '/userTeam/add',
+      query:{
+        teamID,
+        txt,
+        teamName,
+        editKey
+      }
+    })
 }
 </script>
 

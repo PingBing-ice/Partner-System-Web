@@ -18,7 +18,7 @@
       </div>
     </template>
     <template #footer>
-      <van-button size="mini" plain type="primary" @click="isShow(team.id)">查看详情</van-button>
+      <van-button size="mini" plain type="primary" @click="isShow(team.id,team.status)">查看详情</van-button>
     </template>
 
   </van-card>
@@ -58,22 +58,24 @@ const teamID = ref("")
  * 加入队伍
  */
 const addTeam =async () => {
-  const res=await myAxios.post("/partner/team/join",{
+  const res:any =await myAxios.post("/partner/team/join",{
     teamId: teamID.value
   })
-  // @ts-ignore
   if (res?.code == 200) {
     Toast.success("加入成功");
   }else {
-    // @ts-ignore
     Toast.fail(res.description);
   }
 }
 
-const isShow = (id: string) => {
+const isShow = (id: string,status:number) => {
+
+  if (status === 2) {
+    console.log("=====================")
+  }
   show.value = true;
   for (let i = 0; i < props.teamList.length; i++) {
-    const team= props.teamList[i]
+    const team= props.teamList[i];
     if (team.id == id) {
       teamID.value = id
       userListVo.value = [];

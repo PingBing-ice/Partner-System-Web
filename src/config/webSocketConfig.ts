@@ -3,10 +3,11 @@ import {getCurrentUser} from "../services/users";
 import {getMessages} from "../services/MeesageUtils";
 import {Notify, Toast} from "vant";
 import {useRouter} from "vue-router";
-import {getCurrentUserState} from "../states/user";
 
 import {chatStateEnum} from "../states/chat";
+import {messageType} from "../services/MessageType";
 const socketList:any = ref([])
+const message = ref('')
 let socket: any;
 let cloneTime: any;
 const router = useRouter();
@@ -17,9 +18,7 @@ const initSocket = async () => {
         router.back();
         return;
     }
-    // @ts-ignore
     const userId = user.id;
-
     socket =getSocket();
     socket.onopen = () => {
         // 构建发给服务器的消息体
@@ -33,14 +32,10 @@ const initSocket = async () => {
         // 定时发送心跳包
         try {
             cloneTime =setInterval(() => {
-                const userState = getCurrentUserState();
-                if (!userState.id) {
-                    clearInterval(cloneTime)
-                }
                 keepalive();
             }, 10000);
         } catch (e){
-            // @ts-ignore
+
             initSocket()
         }
     };
@@ -55,6 +50,23 @@ const initSocket = async () => {
         clearInterval(cloneTime)
         socket = null;
     };
+    socket.onmessage=(msg:any) => {
+        const chatRecord: messageType = JSON.parse(msg.data);
+        if (chatRecord.type === 2){
+
+        }else if (chatRecord.type === 1) {
+
+        }
+        if (chatRecord.chatRecord.message != null) {
+            message.value = chatRecord.chatRecord.message;
+            Notify({
+                message: message.value,
+                color: '#333',
+                background: '#FFFAFA',
+            });
+        }
+
+    }
 
 }
 
@@ -64,7 +76,6 @@ const sendSocket = async (msg: string) => {
     } else {
         socket = getSocket();
         // 异步调用需要设置延时
-        
         setTimeout( () => {
             // 重新连接
             socket.send(msg);

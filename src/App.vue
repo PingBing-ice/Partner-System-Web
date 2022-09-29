@@ -1,14 +1,17 @@
-<script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
-import BasicLayout from "./layouts/BasicLayout.vue";
-</script>
-
 <template>
-  <BasicLayout/>
+  <BasicLayout v-if="isRouterActive"/>
 </template>
-
+<script lang="ts" setup>
+import BasicLayout from "./layouts/BasicLayout.vue";
+import { ref, provide, nextTick } from 'vue'
+const isRouterActive = ref(true)
+provide('reload', () => {
+  isRouterActive.value = false
+  nextTick(() => {
+    isRouterActive.value = true
+  })
+})
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

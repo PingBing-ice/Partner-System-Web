@@ -14,7 +14,7 @@ export type UserType = {
     role?: number;
     planetCode?: string;
     isDelete?: string;
-    tags?: string[];
+    tags?: string;
     createTime?: datetime;
 
 };

@@ -1,34 +1,28 @@
 import {UserType} from "../models/user";
 import {getCurrentUser} from "../services/users";
 
-let currentUser: UserType;
-let ChatUserState: any[] = [];
+let chatUserState: UserType[] = [];
 
-const setCurrentUserState = (user: UserType) => {
-    currentUser = user
-}
-const getCurrentUserState = (): UserType => {
-    return currentUser;
-};
-const removeCurrentUserState = () => {
-    currentUser = {};
-};
-const setChatUserState = (userState: string) => {
-    ChatUserState.push(userState);
+
+const setChatUserState = (userState: UserType) => {
+    if (!chatUserState || chatUserState.length != 1) {
+        chatUserState.push(userState);
+    }
+
 }
 const getChatUserState = () => {
-    return ChatUserState;
+    let userData:UserType;
+    chatUserState.forEach(user =>{
+        userData = user;
+    });
+    // @ts-ignore
+    return userData;
 }
-const removeChatUser = (userName: string) => {
-    ChatUserState = ChatUserState.filter(name => {
-        return userName !== name;
-    })
+const removeChatUser = () => {
+    chatUserState = [];
 }
 export {
-    setCurrentUserState,
-    getCurrentUserState,
     setChatUserState,
     getChatUserState,
     removeChatUser,
-    removeCurrentUserState
 };

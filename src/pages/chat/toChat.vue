@@ -71,7 +71,7 @@ const AvatarUrl = ref("")
 const current = ref("")
 const recordList = ref([]);
 let socket: any = null;
-const testData = ref([])
+const testData:any = ref([])
 
 onMounted(async () => {
   const user = await getCurrentUser()
@@ -85,39 +85,34 @@ onMounted(async () => {
     getOnMessage(userId.value);
 
     //  加载聊天记录
-    const response = await myAxios.get("/partner/record/getList", {
+    const response:any = await myAxios.get("/partner/record/getList", {
       params: {
         userId: userId.value,
         friendId: friendId,
       }
     })
-    // @ts-ignore
+
     if (response.code === 200 && response.data) {
-      // @ts-ignore
       recordList.value = response.data;
-      recordList.value.forEach(record => {
-        // @ts-ignore
+      recordList.value.forEach((record:any) => {
         if (record.userId == userId.value) {
           let userData = {
             id: userId.value,
             name: userName.value,
             images: AvatarUrl.value,
-            // @ts-ignore
             message: record.message,
           };
-          // @ts-ignore
+
           testData.value.push(userData);
         }
-        // @ts-ignore
+
         if (record.userId == friendId) {
           let FriendData = {
             id: friendId,
             name: friendName,
             images: FriendNameAvatarUrl,
-            // @ts-ignore
             message: record.message,
           };
-          // @ts-ignore
           testData.value.push(FriendData,);
         }
       })
@@ -138,27 +133,26 @@ const getOnMessage = (id: string) => {
     socket = webSocketConfig.getSocket()
   }
 
-  socket.onmessage = (msg: string) => {
+  socket.onmessage = (msg: any) => {
 
-
-    // @ts-ignore
     const chatRecord:messageType = JSON.parse(msg.data)
+    const friend = chatRecord.chatRecord.message;
     if (chatRecord.type === 1) {
-      // @ts-ignore
-      const friend = chatRecord.chatRecord.message
-      let userData = {
-        id: friendId,
-        name: friendName,
-        images: FriendNameAvatarUrl,
-        message: friend,
+      if (route.path === '/toChat') {
+
+        let userData = {
+          id: friendId,
+          name: friendName,
+          images: FriendNameAvatarUrl,
+          message: friend,
+        }
+        testData.value.push(userData)
+        nextTick(() => {
+          // @ts-ignore
+          document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+        })
       }
-      // @ts-ignore
-      testData.value.push(userData)
     }
-     nextTick(() => {
-      // @ts-ignore
-      document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
-    })
   }
 }
 
@@ -174,7 +168,6 @@ const getSend = () => {
     images: AvatarUrl.value,
     message: messages.value
   }
-  // @ts-ignore
   testData.value.push(userData)
   if (userId.value == null) {
     Toast("userId 为空")
@@ -208,7 +201,7 @@ body {
 }
 
 #chat {
-  height: 100%;
+  height: calc(100vh - 200px);
   overflow-y: auto;
   display: flex;
   flex-direction: column-reverse;
@@ -257,7 +250,7 @@ body {
 
 #chat .chatInfo {
   width: 94%;
-  height: 650px;
+  height: 100%;
   margin:  auto;
   overflow: auto;
   display: flex;

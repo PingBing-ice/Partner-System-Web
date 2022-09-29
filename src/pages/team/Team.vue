@@ -26,7 +26,7 @@
 import {useRouter} from "vue-router";
 import {teamStateEnum} from "../../states/team";
 
-import {onMounted, ref} from "vue";
+import {inject, onMounted, ref} from "vue";
 import myAxios from "../../plugins/myAxios";
 import {getCurrentUser} from "../../services/users";
 import {Toast} from "vant";

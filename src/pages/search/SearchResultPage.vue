@@ -46,8 +46,6 @@ onMounted(async () => {
       }
     })
     userList.value = userListData;
-  } else {
-    Toast.fail("未登录");
   }
 })
 

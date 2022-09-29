@@ -1,5 +1,5 @@
 <template>
-  <van-card v-for="user in props.userList"
+  <van-card v-if="props.userList&& props.userList.length>0" v-for="user in props.userList"
             :desc="user.profile"
             :title="user.userAccount"
             :thumb="user.avatarUrl"
@@ -14,34 +14,48 @@
     </template>
 
   </van-card>
+  <van-empty v-if="!props.userList||props.userList.length<=0" description="数据为空" />
 </template>
 
 <script setup lang="ts">
 import {UserType} from "../models/user";
 import myAxios from "../plugins/myAxios";
-import {Toast} from "vant";
+import {Dialog, Toast} from "vant";
 import {TeamType} from "../models/team";
+import {onMounted} from "vue";
 
 interface UserCardListType{
   userList: UserType[];
 }
 const props=withDefaults(defineProps<UserCardListType>(),{
   // @ts-ignore
-  userList: [] as TeamType[],
+  userList: [] as UserType[],
 })
-const sendFriendRequest = async (id:string) => {
-  const res = await myAxios.get("/partner/friend/userFriend/friendUser", {
-    params: {
-      toUserId: id,
-    }
+
+const sendFriendRequest =  (id:string) => {
+  Dialog.confirm({
+    title: '确认添加好友吗？',
   })
-  // @ts-ignore
-  if (res.code == 200) {
-    Toast.success("添加成功")
-  }else {
-    // @ts-ignore
-    Toast.fail(res.description)
-  }
+      .then(async() => {
+        const res:any = await myAxios.get("/partner/friend/userFriend/friendUser", {
+          params: {
+            toUserId: id,
+          }
+        })
+        // @ts-ignore
+        if (res.code == 200) {
+          Toast.success("以发送")
+        }else {
+          // @ts-ignore
+          if (res.description) {
+            Toast.fail(res.description);
+          }
+        }
+      })
+      .catch(() => {
+        // on cancel
+      });
+
 }
 
 </script>

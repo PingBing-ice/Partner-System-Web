@@ -4,8 +4,8 @@
         <van-uploader :after-read="afterRead">
         <van-image
             round
-            width="30px"
-            height="30px"
+            width="1.8rem"
+            height="1.8rem"
             :src="avatar"
         />
         </van-uploader>
@@ -25,7 +25,7 @@
     <van-cell :title="userName.email" is-link :value="user?.email" @click="toEdit('email',userName.email,user?.email)"/>
     <van-cell :title="userName.planetCode" :value="user?.planetCode"/>
     <van-cell :title="userName.createTime" :value="user?.createTime"/>
-    <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">注销</van-button>
+    <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">退出登录</van-button>
   </template>
   <van-popup
       v-model:show="show"
@@ -46,9 +46,7 @@
         <van-tag plain    type="primary" @click="addTag(tag)"  size="medium" >{{tag}}</van-tag>
       </van-col>
     </van-row>
-    <van-button round block type="primary" @click="toTag" native-type="submit" style="margin-top: 50px">
-      提交
-    </van-button>
+    <van-button round block type="primary" @click="toTag" native-type="submit" style="margin-top: 50px">提交</van-button>
   </van-popup>
 <!--  <van-overlay :show="show" @click="show = false" >-->
 <!--    <div class="wrapper">-->
@@ -62,12 +60,13 @@
 
 <script setup >
 
-import {onMounted, ref} from "vue";
+import {inject, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {getCurrentUser} from "../../services/users";
 import myAxios from "../../plugins/myAxios";
-import {removeCurrentUserState, setCurrentUserState} from "../../states/user";
+import {removeChatUser} from "../../states/user";
 import {Dialog, Toast} from "vant";
+const reload = inject('reload')
 
 const editState = ref(false);
 const show = ref(false);
@@ -83,7 +82,7 @@ const userName = {
   userAccount: '账号',
   avatarUrl: '头像',
   gender: '性别',
-  tel: '号码',
+  tel: '电话号码',
   email: '邮箱',
   planetCode: '编号',
   createTime: '创建时间'
@@ -104,6 +103,9 @@ onMounted(async () => {
       users.tags = JSON.parse(users.tags)
       tagList.value = users.tags
     }
+    if (users.createTime) {
+      users.createTime = users.createTime.split('T')[0]
+    }
     user.value = users;
     avatar.value = user.value.avatarUrl
 
@@ -116,7 +118,7 @@ const edit = async () => {
   // @ts-ignore
   if (res.code === 200) {
     editState.value = false;
-    removeCurrentUserState();
+    removeChatUser();
     await router.push({path: '/'})
   }
 }
@@ -188,6 +190,7 @@ const afterRead = (file) => {
     const res = await myAxios.post("/oss/file/upload",param);
     if (res.code === 200) {
       avatar.value = res.data;
+      reload()
       Toast.success('修改成功...');
     }else {
       Toast.fail(res.description);
@@ -196,6 +199,8 @@ const afterRead = (file) => {
 
   });
 }
+
+
 </script>
 
 <style>
