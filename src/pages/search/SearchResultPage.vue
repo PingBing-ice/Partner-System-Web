@@ -1,6 +1,5 @@
 <template>
   <UserCardList :user-list="userList"/>
-  <van-empty v-if="!userList || userList.length<1" description="空空如也"/>
 </template>
 
 <script setup>
@@ -12,20 +11,23 @@ import {Toast} from "vant";
 import UserCardList from "../../components/UserCardList.vue";
 
 const route = useRoute();
-const tags = route.query.tags;
+let tags = route.query.tags;
+const searchTest = route.query.searchTest;
 
 const userList = ref([]);
 
 // 页面加载完成之后执行
 onMounted(async () => {
+  if (tags === ''|| searchTest==='') {
+    return;
+  }
+  if (tags.length <= 0) {
+    tags = [];
+  }
 // 上面的请求也可以这样做
-  const userListData = await myAxios.get('/api/user/search/tags', {
-    params: {
-      tagNameList: tags
-    },
-    paramsSerializer: params => {
-      return qs.stringify(params, {indices: false});
-    }
+  const userListData = await myAxios.post('/api/user/search/tags/txt', {
+    'tagNameList': tags,
+    'searchTxt': searchTest,
   }).then((response) => {
     Toast.success("查找成功")
     const res = response.data

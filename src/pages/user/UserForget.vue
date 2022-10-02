@@ -1,54 +1,48 @@
 <template>
   <div class="title">
     <h1 class="one">
-      用户注册
+      修改密码
     </h1>
   </div>
-<div class="content">
+  <div class="content">
 
-  <van-form @submit="onSubmit">
-    <van-cell-group inset>
-      <van-field
-          v-model="userAccount"
-          name="userAccount"
-          label="用户名"
-          required
-          placeholder="请输入用户名"
-          :class="{'apply-shake':userAccountClass}"
-      />
-      <van-field
-          v-model="password"
-          type="password"
-          required
-          name="password"
-          label="密码"
-          placeholder="请填写密码"
-          :class="{'apply-shake':passwordClass}"
-      />
-      <van-field
-          v-model="checkPassword"
-          type="password"
-          required
-          name="checkPassword"
-          label="确认密码"
-          placeholder="请输确认密码"
-          :class="{'apply-shake':checkPasswordClass}"
-      />
-      <van-field
-          v-model="email"
-          name="email"
-          label="邮箱"
-          placeholder="请输入你的邮箱"
-          required
-          :error-message="formatEmail"
-          :class="{'apply-shake':emailClass}"
-      />
+    <van-form @submit="onSubmit">
+      <van-cell-group inset>
+        <van-field
+            v-model="userAccount"
+            name="userAccount"
+            label="账户"
+            placeholder="请输入要修改的账户"
+            :class="{'apply-shake':userAccountClass}"
+        />
+        <van-field
+            v-model="password"
+            type="password"
+            name="password"
+            label="密码"
+            placeholder="密码"
+            :class="{'apply-shake':passwordClass}"
+        />
+        <van-field
+            v-model="checkPassword"
+            type="password"
+            name="checkPassword"
+            label="确认密码"
+            placeholder="确认密码"
+            :class="{'apply-shake':checkPasswordClass}"
+        />
+        <van-field
+            v-model="email"
+            name="email"
+            label="邮箱"
+            placeholder="输入账户绑定的邮箱"
+            :class="{'apply-shake':emailClass}"
+        />
         <van-field
             v-model="code"
             center
             clearable
             label="邮箱验证码"
-            required
             placeholder="请输入邮箱验证码"
             :class="{'apply-shake':codeClass}"
         >
@@ -58,24 +52,24 @@
           </template>
         </van-field>
 
-    </van-cell-group>
-    <div  class="submit">
-      <van-button round :loading="buttonLoading" :disabled="buttonLoading"  loading-text="注册中..." block type="primary" native-type="submit">
-        注册
-      </van-button>
-    </div>
-    <div class="submit">
-      <van-button plain round block type="primary" @click="toLogin">
-        登录
-      </van-button>
-    </div>
+      </van-cell-group>
+      <div  class="submit">
+        <van-button round :loading="buttonLoading" :disabled="buttonLoading"  loading-text="修改中..." block type="primary" native-type="submit">
+          修改
+        </van-button>
+      </div>
+      <div class="submit">
+        <van-button plain round block type="primary" @click="toLogin">
+          登录
+        </van-button>
+      </div>
 
-  </van-form>
-</div>
+    </van-form>
+  </div>
 </template>
 
-<script setup>
-import {ref, watchEffect} from "vue";
+<script setup lang="ts">
+import {ref} from "vue";
 import {useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
 import {Toast} from "vant";
@@ -96,21 +90,10 @@ const isTime = ref( false);
 
 const router = useRouter();
 const userAccount = ref('');
-const formatEmail = ref('');
 const code = ref('');
 const password = ref('');
 const email = ref('');
 const checkPassword = ref('');
-
-watchEffect(()=>{
-  formatEmail.value =''
-  if (email.value !== '') {
-    const pattern = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/;
-    if (!pattern.test(email.value)) {
-      formatEmail.value ='邮箱格式错误'
-    }
-  }
-})
 const onSubmit =async () => {
 
   tx();
@@ -128,21 +111,21 @@ const onSubmit =async () => {
   }
   if (!userAccount.value || userAccount.value === ''||!password.value || password.value === ''||!checkPassword.value
       || checkPassword.value === ''
-  ||!email.value || email.value === ''|| !code.value || code.value === ''){
+      ||!email.value || email.value === ''|| !code.value || code.value === ''){
     return;
   }
   buttonLoading.value = true;
-    const res = await myAxios.post('/api/user/Register',{
-      userAccount: userAccount.value,
-      password: password.value,
-      checkPassword: checkPassword.value,
-      email: email.value,
-      code: code.value
-    });
+  const res = await myAxios.post('/api/user/forget',{
+    userAccount: userAccount.value,
+    password: password.value,
+    checkPassword: checkPassword.value,
+    email: email.value,
+    code: code.value
+  });
   if (res.code === 200) {
     buttonLoading.value = false;
-    Toast.success("注册成功");
-     await router.push({path: '/'})
+    Toast.success("修改成功");
+    await router.push({path: '/'})
   }else {
     buttonLoading.value = false;
     if (res.description) {
@@ -193,8 +176,9 @@ const sendEmail =async () => {
     return;
   }
   subValue.value = true;
-  const response = await myAxios.post('/oss/send', {
-    email: email.value
+  const response = await myAxios.post('/oss/sendForget', {
+    email: email.value,
+    userAccount: userAccount.value
   });
   if (response.code === 200) {
     subValue.value = false;

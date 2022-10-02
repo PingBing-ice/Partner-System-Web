@@ -27,17 +27,37 @@
       round
       position="bottom"
   >
-    <van-divider>{{'队伍最大人数: '+ max }}</van-divider>
+    <van-divider>{{ '队伍最大人数: ' + max }}</van-divider>
     <van-button plain type="primary" round block @click="addTeam">加入队伍</van-button>
     <van-divider>队员</van-divider>
     <user-card-list :userList="userListVo"/>
   </van-action-sheet>
+
+
+  <van-popup v-model:show="addPasswordTeam" :style="{width: '100%'}">
+    <van-form @submit="addTeam">
+      <van-cell-group inset>
+        <van-field
+            v-model="teamPassword"
+            name="password"
+            label="队伍密码"
+            placeholder="队伍密码"
+            :rules="[{ required: true, message: '请填写密码' }]"
+        />
+      </van-cell-group>
+      <div style="margin: 16px;">
+        <van-button round block type="primary" native-type="submit">
+          加入队伍
+        </van-button>
+      </div>
+    </van-form>
+  </van-popup>
 </template>
 
 <script setup lang="ts">
 import {TeamType} from "../models/team";
 import {teamStateEnum} from "../states/team";
-import {ref} from "vue";
+import {ref, watchEffect} from "vue";
 import UserCardList from "./UserCardList.vue";
 import myAxios from "../plugins/myAxios";
 import {Toast} from "vant";
@@ -51,31 +71,62 @@ const props = withDefaults(defineProps<TeamCardListType>(), {
   teamList: [] as TeamType[],
 })
 const show = ref(false)
+const addPasswordTeam = ref(false)
 const max = ref(0)
 const userListVo = ref([])
 const teamID = ref("")
+const teamStatus = ref(0);
+const teamPassword = ref('');
+watchEffect(()=>{
+  if (addPasswordTeam.value === false) {
+    teamPassword.value = '';
+  }
+})
 /**
  * 加入队伍
  */
-const addTeam =async () => {
-  const res:any =await myAxios.post("/partner/team/join",{
-    teamId: teamID.value
-  })
+const addTeam = async () => {
+  if (teamStatus.value === 2) {
+    addPasswordTeam.value = true;
+    if (teamPassword.value === '' || !teamPassword.value) return;
+    const res: any = await myAxios.post("/partner/team/join", {
+      teamId: teamID.value,
+      password: teamPassword.value,
+    });
+    if (res?.code == 200) {
+      Toast.success("加入成功");
+    } else {
+      Toast.fail(res.description);
+    }
+  }else {
+    addPasswordTeam.value = false;
+    const res: any = await myAxios.post("/partner/team/join", {
+      teamId: teamID.value,
+    });
+    if (res?.code == 200) {
+      Toast.success("加入成功");
+    } else {
+      Toast.fail(res.description);
+    }
+  }
+  const res: any = await myAxios.post("/partner/team/join", {
+    teamId: teamID.value,
+    password: teamPassword.value,
+  });
   if (res?.code == 200) {
     Toast.success("加入成功");
-  }else {
+  } else {
     Toast.fail(res.description);
   }
+  addPasswordTeam.value = false;
 }
 
-const isShow = (id: string,status:number) => {
+const isShow = (id: string, status: number) => {
 
-  if (status === 2) {
-    console.log("=====================")
-  }
+  teamStatus.value = status;
   show.value = true;
   for (let i = 0; i < props.teamList.length; i++) {
-    const team= props.teamList[i];
+    const team = props.teamList[i];
     if (team.id == id) {
       teamID.value = id
       userListVo.value = [];
@@ -88,5 +139,10 @@ const isShow = (id: string,status:number) => {
 </script>
 
 <style scoped>
-
+.van-popup--center {
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  transform: translate3d(-50%, -50%, 0);
+}
 </style>

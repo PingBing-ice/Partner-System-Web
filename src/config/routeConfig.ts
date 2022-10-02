@@ -9,6 +9,7 @@ import SearchPage from "../pages/search/SearchPage.vue";
 import UserEditPage from "../pages/user/UserEditPage.vue";
 import SearchResultPage from "../pages/search/SearchResultPage.vue";
 import userLogin from "../pages/user/UserLogin.vue";
+import UserForget from "../pages/user/UserForget.vue";
 import Register from "../pages/user/UserRegister.vue";
 import Find from "../pages/friend/Find.vue";
 import Show from "../pages/friend/Show.vue";
@@ -32,6 +33,7 @@ const routes = [
     {path: '/user/list',title: '搜索', component: SearchResultPage},
     {path: '/user/edit',title: '修改信息', component: UserEditPage},
     {path: '/', component: userLogin},
+    {path: '/forget', component: UserForget},
     {path: '/register', component: Register},
     {path: '/find',title: '伙伴管理', component: Find},
     {path: '/find/show',title: '伙伴管理', component: Show},
@@ -46,11 +48,11 @@ const router = VueRouter.createRouter({
     routes, // `routes: routes` 的缩写
 })
 router.beforeEach(async (to, from,next) => {
-    if (to.path !== '/' && to.path !== '/register') {
+    if (to.path !== '/' && to.path !== '/register'&& to.path!=='/forget') {
         const user = await getCurrentUser();
         // 检查用户是否已登录
         // ❗️ 避免无限重定向
-        if (user == null && to.path !== '/' && to.path !== '/register') {
+        if (user == null && to.path !== '/' && to.path !== '/register'&& to.path!=='/forget') {
             console.log(to.path)
             // 将用户重定向到登录页面
             next('/');

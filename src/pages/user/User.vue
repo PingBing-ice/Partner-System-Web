@@ -23,6 +23,8 @@
     </van-cell>
     <van-cell :title="userName.tel" is-link :value="user?.tel" @click="toEdit('tel',userName.tel,user?.tel)"/>
     <van-cell :title="userName.email" is-link :value="user?.email" @click="toEdit('email',userName.email,user?.email)"/>
+    <van-cell :title="userName.description" is-link :value="user?.profile"
+              @click="toEdit('profile',userName.description,user?.profile)"/>
     <van-cell :title="userName.planetCode" :value="user?.planetCode"/>
     <van-cell :title="userName.createTime" :value="user?.createTime"/>
     <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">退出登录</van-button>
@@ -40,10 +42,10 @@
       </van-col>
     </van-row>
     <div v-if="tagList.length ===0 " style="color: #42b983; text-align: center">请选择标签</div>
-    <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">选择标签</van-divider>
+    <van-divider :style="{ color: '#1989fa', borderColor: '#fa0723', padding: '0 16px' }">选择标签</van-divider>
     <van-row gutter="4" justify="center" v-if="SelectTagList.length>0">
       <van-col span="5" v-for="tag in SelectTagList">
-        <van-tag plain    type="primary" @click="addTag(tag)"  size="medium" >{{tag}}</van-tag>
+        <van-tag plain    type="danger" @click="addTag(tag)"  size="medium" >{{tag}}</van-tag>
       </van-col>
     </van-row>
     <van-button round block type="primary" @click="toTag" native-type="submit" style="margin-top: 50px">提交</van-button>
@@ -84,6 +86,7 @@ const userName = {
   gender: '性别',
   tel: '电话号码',
   email: '邮箱',
+  description: '描述',
   planetCode: '编号',
   createTime: '创建时间'
 }
@@ -110,6 +113,7 @@ onMounted(async () => {
     avatar.value = user.value.avatarUrl
 
   }
+
 })
 // 注销
 const edit = async () => {

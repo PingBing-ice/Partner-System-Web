@@ -159,23 +159,26 @@ const getOnMessage = (id: string) => {
 
 const getSend = () => {
   if (messages.value === "") {
-    Toast('请输入咨询信息')
     return
   }
+  if (userId.value == null) {
+    Toast("未登录")
+    router.back();
+    return;
+  }
+  let  mss =messages.value
+  messages.value = "";
   let userData = {
     id: userId.value,
     name: userName.value,
     images: AvatarUrl.value,
-    message: messages.value
+    message: mss
   }
   testData.value.push(userData)
-  if (userId.value == null) {
-    Toast("userId 为空")
-  }
-  // const message = getMessage(1, userId.value, friendId, messages.value, null);
-  const message = getMessages(1, userId.value,friendId, messages.value);
+
+  const message = getMessages(1, userId.value,friendId, mss);
   webSocketConfig.sendSocket(JSON.stringify(message));
-  messages.value = "";
+
   nextTick(() => {
     // @ts-ignore
     document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight

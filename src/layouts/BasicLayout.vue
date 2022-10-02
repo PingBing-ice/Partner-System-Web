@@ -6,7 +6,10 @@
   <div v-if="route.path==='/register'">
     <UserRegister/>
   </div>
-  <div v-if="route.path!=='/'&& route.path!=='/register'">
+  <div v-if="route.path==='/forget'">
+    <UserForget/>
+  </div>
+  <div v-if="route.path!=='/'&& route.path!=='/register'&& route.path!=='/forget'">
     <van-nav-bar v-if="route.path==='/index'|| route.path==='/team'|| route.path==='/find'"
                  :title="title"
                  @click-left="findUser"
@@ -62,6 +65,7 @@ import UserLogin from "../pages/user/UserLogin.vue";
 import UserRegister from "../pages/user/UserRegister.vue";
 import {getCurrentUser} from "../services/users";
 import routeConfig from "../config/routeConfig";
+import UserForget from "../pages/user/UserForget.vue";
 
 
 const router = useRouter();

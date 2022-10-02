@@ -6,7 +6,7 @@
       @click-right="onClickRightTeam"
   >
     <template #right>
-      <van-icon name="friends-o" size="18" />
+      <van-icon name="friends-o" size="18"/>
     </template>
   </van-nav-bar>
   <div id="chat">
@@ -18,7 +18,7 @@
             <van-image round width="2.5rem" height="2.5rem"
                        :src="item.images"/>
           </div>
-          <div class="chatUser-info" ref= "chatRoom">
+          <div class="chatUser-info" ref="chatRoom">
             <div class="chatUser-info-name" :class="userId===item.id?'chatUser-info-name1':'chatUser-info-name'">
               <span>{{ item.name }}</span><span class="nowDate">{{ item.time }}</span>
             </div>
@@ -27,11 +27,7 @@
             </div>
           </div>
         </div>
-
-
       </div>
-      <!--      </div>-->
-
     </div>
 
   </div>
@@ -44,13 +40,11 @@
         placeholder="善语结善缘"
     >
       <template #button>
-        <van-button size="small" type="primary" @click="getSend" >发送</van-button>
+        <van-button size="small" type="primary" @click="getSend">发送</van-button>
       </template>
     </van-field>
   </van-cell-group>
-<!--  <van-sticky :offset-bottom="50" position="bottom">-->
-<!--&lt;!&ndash;    <van-button type="primary">吸底距离</van-button>&ndash;&gt;-->
-<!--  </van-sticky>-->
+
 </template>
 
 
@@ -65,29 +59,29 @@ import {getMessages} from "../../services/MeesageUtils";
 import MyAxios from "../../plugins/myAxios";
 
 
-const route=useRoute()
-const router=useRouter()
-const testData:any = ref([]);
+const route = useRoute()
+const router = useRouter()
+const testData: any = ref([]);
 const userList = ref([]);
 const teamChatRecord = ref([]);
 const messages = ref("");
 const userId = ref("");
 const userName = ref("")
 const avatarUrl = ref("")
-const teamID = route.query.teamID+""
+const teamID = route.query.teamID + ""
 const teamNane = route.query.teamNane
 let socket: any = null;
-onMounted(async ()=>{
+onMounted(async () => {
 
   // 获取用户人的信息,获取socket连接
   const user = await getCurrentUser();
-  const res = await MyAxios.get("/partner/userTeam/get",{
+  const res = await MyAxios.get("/partner/userTeam/get", {
     params: {
       teamId: teamID,
     }
   })
   // @ts-ignore
-  if (res.code === 200){
+  if (res.code === 200) {
     userList.value = res.data;
   }
   await webSocketConfig.initSocket();
@@ -96,14 +90,14 @@ onMounted(async ()=>{
   // 获取队伍的队员信息
 
   // 查看队伍的聊天信息
-  const response:any = await MyAxios.get("/partner/teamChatRecord/getTeam",{
+  const response: any = await MyAxios.get("/partner/teamChatRecord/getTeam", {
     params: {
       teamId: teamID,
     }
   })
   if (response.code === 200) {
     teamChatRecord.value = response.data;
-  }else if (response.code === 40000) {
+  } else if (response.code === 40000) {
     Toast.fail("你已被踢出该队伍...")
     await router.push({
       path: '/team'
@@ -111,33 +105,33 @@ onMounted(async ()=>{
   }
   getOnMessage();
   userId.value = user.id;
-  userName.value=user.userAccount
+  userName.value = user.userAccount
   avatarUrl.value = user.avatarUrl;
 
   if (teamChatRecord.value.length > 0) {
-      teamChatRecord.value.forEach(teamChat => {
-        userList.value.forEach(user => {
-          // @ts-ignore
-          if (user.id == teamChat.userId) {
-            let userData = {
-              // @ts-ignore
-              id: user.id,
-              // @ts-ignore
-              name: user.userAccount,
-              // @ts-ignore
-              images: user.avatarUrl,
-              // @ts-ignore
-              message: teamChat.message,
-            };
+    teamChatRecord.value.forEach(teamChat => {
+      userList.value.forEach(user => {
+        // @ts-ignore
+        if (user.id == teamChat.userId) {
+          let userData = {
             // @ts-ignore
-            testData.value.push(userData);
-          }
-        })
+            id: user.id,
+            // @ts-ignore
+            name: user.userAccount,
+            // @ts-ignore
+            images: user.avatarUrl,
+            // @ts-ignore
+            message: teamChat.message,
+          };
+          // @ts-ignore
+          testData.value.push(userData);
+        }
       })
+    })
   }
   await nextTick(() => {
     // @ts-ignore
-    document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
   })
 
 })
@@ -145,26 +139,30 @@ onMounted(async ()=>{
 const getSend = () => {
 
   if (messages.value === "") {
-    Toast('请输入咨询信息')
     return
   }
+
   if (userId.value == null) {
-    Toast("userId 为空")
+    Toast("未登录");
+    router.back();
+    return;
   }
+  let mes = messages.value;
+  messages.value = "";
   let userData = {
     id: userId.value,
     name: userName.value,
     images: avatarUrl.value,
-    message: messages.value
+    message: mes
   }
   // @ts-ignore
   testData.value.push(userData);
-  const sendMessage = getMessages(2, userId.value, teamID, messages.value);
+  const sendMessage = getMessages(2, userId.value, teamID, mes);
   webSocketConfig.sendSocket(JSON.stringify(sendMessage));
-  messages.value = "";
-   nextTick(() => {
+
+  nextTick(() => {
     // @ts-ignore
-    document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
   })
 
 }
@@ -173,13 +171,13 @@ const getOnMessage = () => {
     webSocketConfig.initSocket()
     socket = webSocketConfig.getSocket()
   }
-  socket.onmessage=(msg:any)=>{
+  socket.onmessage = (msg: any) => {
 
-    const messages:messageType =JSON.parse(msg.data);
+    const messages: messageType = JSON.parse(msg.data);
     if (messages.type === 2) {
       userList.value.forEach((user: { id: string | undefined; userAccount: any; avatarUrl: any; }) => {
-        const chat =messages.chatRecord;
-        if (chat.userId == user.id){
+        const chat = messages.chatRecord;
+        if (chat.userId == user.id) {
           let userData = {
             id: user.id,
             name: user.userAccount,
@@ -239,7 +237,6 @@ body {
 }
 
 
-
 #chat .chatBox-infoDesk {
   width: 100%;
   height: 10rem;
@@ -266,7 +263,7 @@ body {
 #chat .chatInfo {
   width: 94%;
   height: 100%;
-  margin:  auto;
+  margin: auto;
   overflow: auto;
   display: flex;
   flex-direction: column;

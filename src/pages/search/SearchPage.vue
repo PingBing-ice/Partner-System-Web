@@ -3,7 +3,7 @@
     <van-search
         v-model="searchTest"
         show-action
-        placeholder="请输入标签"
+        placeholder="请输入要搜索的伙伴"
         input-align="center"
         @search="onSearch"
         @cancel="onCancel"
@@ -70,13 +70,14 @@ onMounted(async () =>{
 })
 
 const onSearch = () => {
+  console.log(searchTest.value)
   // 将数据扁平化处理 , 过滤搜索栏里面包含选择的标签
-  tagList.value = InitTagList.value.map(parentTag => {
-    const tempChildren = [...parentTag.children]
-    const tempParenTag = {...parentTag}
-    tempParenTag.children = tempChildren.filter(item => item.text.includes(searchTest.value));
-    return tempParenTag;
-  })
+  // tagList.value = InitTagList.value.map(parentTag => {
+  //   const tempChildren = [...parentTag.children]
+  //   const tempParenTag = {...parentTag}
+  //   tempParenTag.children = tempChildren.filter(item => item.text.includes(searchTest.value));
+  //   return tempParenTag;
+  // })
 }
 const onCancel = () => {
   searchTest.value = '';
@@ -91,17 +92,20 @@ const doClose = (tag) => {
   })
 };
 const doSearchResult = () => {
-  if (activeIds.value.length === 0 || searchTest.value === '') {
+  console.log(searchTest.value);
+  if (!activeIds.value||activeIds.value.length<=0 && !searchTest.value|| searchTest.value === '') {
     shakeTxtName.value = true
     setTimeout(() => {
       shakeTxtName.value = false;
     }, 820);
     return;
   }
+
   router.push({
     path: "/user/list",
     query: {
       tags: activeIds.value,
+      searchTest: searchTest.value,
     }
   });
 }
@@ -121,15 +125,15 @@ const activeIndex = ref(0);
   }
 
   20%, 80% {
-    transform: translate3d(2px, 0, 0);
+    transform: translate3d(1px, 0, 0);
   }
 
   30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
+    transform: translate3d(-2px, 0, 0);
   }
 
   40%, 60% {
-    transform: translate3d(4px, 0, 0);
+    transform: translate3d(2px, 0, 0);
   }
 }
 

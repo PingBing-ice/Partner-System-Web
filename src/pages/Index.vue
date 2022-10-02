@@ -18,7 +18,6 @@
         </van-tab>
         <van-tab v-for="tag in tagList" :title="tag" :name="tag">
           <user-card-list v-if=" tagUserList || tagUserList.length>0" :user-list="tagUserList"/>
-          <van-empty v-if=" !tagUserList || tagUserList.length<1" description="空空如也"/>
         </van-tab>
       </van-tabs>
 
@@ -28,7 +27,7 @@
         <van-search
             v-model="searchTxt"
             show-action
-            placeholder="请输入搜索关键词"
+            placeholder="请输入队伍关键词"
             @search="onSearch"
             @clear="onClear()"
 
@@ -43,6 +42,13 @@
       <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
     </van-tab>
   </van-tabs>
+  <van-overlay :show="isMatchModeLoading" >
+    <div class="wrapper" @click.stop>
+      <van-loading color="#0094ff" text-color="#0094ff" vertical >加载中...</van-loading>
+    </div>
+
+  </van-overlay>
+
 
 </template>
 
@@ -88,7 +94,6 @@ onMounted(async () => {
 const loadData = async () => {
   if (isMatchMode.value) {
     isMatchModeLoading.value = true;
-
     const response =await myAxios.get("/api/user/match", {
       params: {
         num: 3
@@ -101,13 +106,8 @@ const loadData = async () => {
           user.tags = JSON.parse(user.tags)
         }
       });
-      isMatchModeLoading.value = false;
-    }else {
-      isMatchModeLoading.value = false;
     }
-
   } else {
-    isMatchModeLoading.value = true;
     const userListData = await myAxios.get('/api/user/recommend', {
       params: {
         current: 1,
@@ -121,11 +121,9 @@ const loadData = async () => {
           user.tags = JSON.parse(user.tags)
         }
       });
-      isMatchModeLoading.value = false;
-    }else {
-      isMatchModeLoading.value = false;
     }
   }
+  isMatchModeLoading.value = false;
   if (userList.value.length === 0||!userList.value) {
     description.value = "空空如也";
   }
@@ -133,7 +131,9 @@ const loadData = async () => {
 
 }
 watchEffect(() => {
+
   loadData();
+
 })
 
 // 切换 tab
@@ -159,6 +159,7 @@ const onClickTag = async () => {
   }
 }
 const getTeamList = async (searchTxt) => {
+  console.log(searchTxt)
   const res = await myAxios.get("/partner/team/list", {
     params: {
       searchTxt: searchTxt,
@@ -166,15 +167,18 @@ const getTeamList = async (searchTxt) => {
   });
   if (res.code === 200) {
     teamList.value = res.data;
-    teamList.value.forEach(team => {
-      team.expireTime = team.expireTime.split(" ")[0];
-      if (team.userVo && team.userVo.length > 0)
-        team.userVo.forEach(user => {
-          if (user.tags) {
-            user.tags = JSON.parse(user.tags)
-          }
-        })
-    })
+    if (teamList.value.length >= 0) {
+      teamList.value.forEach(team => {
+        team.expireTime = team.expireTime.split(" ")[0];
+        if (team.userVo && team.userVo.length > 0)
+          team.userVo.forEach(user => {
+            if (user.tags) {
+              user.tags = JSON.parse(user.tags)
+            }
+          })
+      });
+    }
+
   }
 }
 
@@ -201,23 +205,29 @@ const onClear = () => {
 /* Standard syntax */
 @keyframes shake {
   10%, 90% {
-    transform: translate3d(-1px, 0, 0);
+    transform: translate3d(-3px, 0, 0);
   }
 
   20%, 80% {
-    transform: translate3d(2px, 0, 0);
+    transform: translate3d(4px, 0, 0);
   }
 
   30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
+    transform: translate3d(-6px, 0, 0);
   }
 
   40%, 60% {
-    transform: translate3d(4px, 0, 0);
+    transform: translate3d(6px, 0, 0);
   }
 }
 
 .apply-shake {
   animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+}
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 </style>

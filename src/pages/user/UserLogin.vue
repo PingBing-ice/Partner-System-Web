@@ -18,9 +18,9 @@
           <van-field
               v-model="password"
               type="password"
-              name="密码"
+              name="password"
               label="密码"
-              placeholder="密码"
+              placeholder="请输入密码"
               :class="{'apply-shake':userPasswordClass}"
           />
         </van-cell-group>
@@ -43,7 +43,12 @@
             登录
           </van-button>
         </div>
-        <span style="color: #1989fa; font-size: 5px; margin-left: 69%;" @click="RegisterUser">注册账号</span>
+
+          <span style="color: #1989fa; font-size: 5px; " @click="ForgetUser">忘记密码</span>
+        <span style="color: #1989fa; font-size: 5px;margin-left: 69%;" @click="RegisterUser">注册账号</span>
+
+
+
       </van-form>
     </div>
   </div>
@@ -139,7 +144,11 @@ const RegisterUser = () => {
     path: '/register'
   })
 }
-
+const ForgetUser = () => {
+  router.push({
+    path: '/forget'
+  })
+}
 </script>
 
 <style scoped>
@@ -162,19 +171,19 @@ div.parent {
 /* Standard syntax */
 @keyframes shake {
   10%, 90% {
-    transform: translate3d(-1px, 0, 0);
+    transform: translate3d(-3px, 0, 0);
   }
 
   20%, 80% {
-    transform: translate3d(2px, 0, 0);
+    transform: translate3d(4px, 0, 0);
   }
 
   30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
+    transform: translate3d(-6px, 0, 0);
   }
 
   40%, 60% {
-    transform: translate3d(4px, 0, 0);
+    transform: translate3d(6px, 0, 0);
   }
 }
 
