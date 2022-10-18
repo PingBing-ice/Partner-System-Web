@@ -56,6 +56,7 @@ const friendUserListLength = ref();
 const user = ref();
 const activeNames = ref(['1']);
 const list = ref([]);
+const reload = inject('reload')
 
 onMounted(async () => {
   user.value = getCurrentUser()
@@ -107,7 +108,7 @@ const addFriend = async (id) => {
       }
     })
     friendUserListLength.value -= 1;
-    await router.push({path: '/find'})
+    reload();
     Toast.success("添加成功!");
   }
 }

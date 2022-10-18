@@ -99,7 +99,8 @@ const getSocket = () => {
     }
     if (socketList.value.length === 0) {
         // socket = new WebSocket("ws://localhost:9001/ws");
-        const sockets = new WebSocket("ws://localhost:9001/ws");
+        // const sockets = new WebSocket("ws://localhost:9001/ws");
+        const sockets = new WebSocket("ws://47.92.124.72:9001/ws");
         socketList.value.push(sockets)
     }
     socket = socketList.value[0];

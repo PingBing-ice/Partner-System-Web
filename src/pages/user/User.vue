@@ -157,8 +157,8 @@ const toTag = () => {
         await router.push({
           path: '/user'
         })
-        Toast.success("修改成功...");
-
+        Toast.success("修改成功");
+        reload();
       }else {
         Toast.fail(res.description);
       }

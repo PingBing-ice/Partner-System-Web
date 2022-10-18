@@ -55,8 +55,8 @@
 </template>
 
 <script setup>
-import {reactive, ref} from 'vue';
-import {useRouter} from "vue-router";
+import {inject, reactive, ref} from 'vue';
+import {useRoute, useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
 import {Toast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
@@ -64,14 +64,16 @@ import {setChatUserState} from "../../states/user";
 
 import md5 from "md5";
 import ImageCode from "../../components/imageCode.vue";
+
 const router = useRouter()
+const route = useRoute()
 const userNameClass = ref(false);
 const userPasswordClass = ref(false);
 const codeClass = ref(false);
 const buttonLoading = ref(false);
 const userAccount = ref('');
 const password = ref('');
-
+const indexUser = inject('indexUser')
 // 验证码
 const resCode = ref('')
 const sms = ref('')
@@ -126,8 +128,11 @@ const onSubmit = async () => {
     buttonLoading.value = false;
     setChatUserState(res.data)
     await webSocketConfig.initSocket();
+
+    indexUser();
     Toast.success("登录成功");
-    await router.push({path: '/index'})
+    const redirect = route.query?.redirect ?? '/index'
+    await router.replace({path: redirect})
   } else {
     buttonLoading.value = false;
     if (res.description) {
@@ -137,7 +142,7 @@ const onSubmit = async () => {
     }
 
   }
-
+  buttonLoading.value = false;
 }
 const RegisterUser = () => {
   router.push({

@@ -1,4 +1,6 @@
-export function formatDate (time:Date, type = 'YYYY-MM-DD') { //
+import {UnwrapRef} from "vue";
+
+export function formatDate(time: UnwrapRef<string>, type = 'YYYY-MM-DD') { //
     const y = formatNumber(time.getFullYear())
     const m = formatNumber(time.getMonth() + 1)
     const d = formatNumber(time.getDate())

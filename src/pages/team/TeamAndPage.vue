@@ -38,9 +38,9 @@
             is-link
             readonly
             name="datetimePicker"
-            label="选择过期时间"
+            label="过期时间"
             placeholder="点击选择时间"
-            @click="showPicker.value = true"
+            @click="showPicker = true"
         />
         <van-popup v-model:show="showPicker" position="bottom">
           <van-datetime-picker
@@ -48,7 +48,7 @@
               type="date"
               title="选择过期时间"
               @confirm="onConfirm"
-              @cancel="showPicker.value=false"
+              @cancel="showPicker=false"
               :min-date="minDate"
           />
         </van-popup>
@@ -72,13 +72,13 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref, watchEffect} from "vue";
 import myAxios from "../../plugins/myAxios";
 import {Toast} from "vant";
 import {useRouter} from "vue-router";
 import {formatDate} from "../../services/dataUtils";
 
-const currentDate = ref('');
+const currentDate = ref("");
 const showPicker = ref(false);
 const minDate = new Date();
 const router=useRouter();
@@ -90,6 +90,14 @@ const initFromData = {
   "password": "",
   "status": 0
 }
+
+watchEffect(()=>{
+  if (currentDate.value &&currentDate.value.length > 20) {
+    currentDate.value = '';
+
+
+  }
+})
 const addTeamFrom = ref({...initFromData})
 const onSubmit =async () => {
   const postData =  {

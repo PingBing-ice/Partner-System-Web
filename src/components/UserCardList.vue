@@ -14,7 +14,7 @@
     </template>
 
   </van-card>
-  <van-empty v-if="!props.userList||props.userList.length<=0" description="数据为空" />
+  <van-empty v-if="!props.userList||props.userList.length<=0" description="数据为空"/>
 </template>
 
 <script setup lang="ts">
@@ -24,37 +24,46 @@ import {Dialog, Toast} from "vant";
 import {TeamType} from "../models/team";
 import {onMounted} from "vue";
 
-interface UserCardListType{
+interface UserCardListType {
   userList: UserType[];
 }
-const props=withDefaults(defineProps<UserCardListType>(),{
+
+const props = withDefaults(defineProps<UserCardListType>(), {
   // @ts-ignore
   userList: [] as UserType[],
 })
 
-const sendFriendRequest =  (id:string) => {
-  Dialog.confirm({
-    title: '确认添加好友吗？',
-  })
-      .then(async() => {
-        const res:any = await myAxios.get("/partner/friend/userFriend/friendUser", {
-          params: {
-            toUserId: id,
-          }
-        })
-        // @ts-ignore
-        if (res.code == 200) {
-          Toast.success("以发送")
-        }else {
+const sendFriendRequest =async (id: string) => {
+  const res: any = await myAxios.post("/partner/friend/userFriend/friendUser", {
+            toUserId:id})
           // @ts-ignore
-          if (res.description) {
-            Toast.fail(res.description);
+          if (res.code == 200) {
+            Toast.success("发送成功")
+          } else {
+            // @ts-ignore
+            if (res.description) {
+              Toast.fail(res.description);
+            }
           }
-        }
-      })
-      .catch(() => {
-        // on cancel
-      });
+  // Dialog.confirm({
+  //   title: '确认添加好友吗？',
+  // })
+  //     .then(async () => {
+  //       const res: any = await myAxios.post("/partner/friend/userFriend/friendUser", {
+  //         toUserId:id})
+  //       // @ts-ignore
+  //       if (res.code == 200) {
+  //         Toast.success("发送成功")
+  //       } else {
+  //         // @ts-ignore
+  //         if (res.description) {
+  //           Toast.fail(res.description);
+  //         }
+  //       }
+  //     })
+  //     .catch(() => {
+  //       // on cancel
+  //     });
 
 }
 

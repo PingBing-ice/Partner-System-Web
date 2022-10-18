@@ -125,14 +125,15 @@ onMounted(async () => {
           };
           // @ts-ignore
           testData.value.push(userData);
+           nextTick(() => {
+            // @ts-ignore
+            document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
+          })
         }
       })
     })
   }
-  await nextTick(() => {
-    // @ts-ignore
-    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
-  })
+
 
 })
 // 发送信息
@@ -186,6 +187,10 @@ const getOnMessage = () => {
           }
 
           testData.value.push(userData);
+          nextTick(() => {
+            // @ts-ignore
+            document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+          })
         }
       })
     }

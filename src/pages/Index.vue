@@ -75,8 +75,7 @@ const isMatchModeLoading = ref(false)
 
 
 onMounted(async () => {
-  const indexUser = inject('indexUser')
-  indexUser();
+
   const response = await myAxios.get('/api/userNotice/getNotice', {
     params: {
       region: 1,
@@ -100,30 +99,42 @@ const loadData = async () => {
       }
     })
     if (response.code === 200 && response.data) {
+      isMatchModeLoading.value = false;
       userList.value = response.data;
+      if (userList.value.length <= 0) {
+        return;
+      }
       userList.value.forEach(user => {
         if (user.tags) {
           user.tags = JSON.parse(user.tags)
         }
       });
+    }else {
+      isMatchModeLoading.value = false;
     }
   } else {
     const userListData = await myAxios.get('/api/user/recommend', {
       params: {
         current: 1,
-        size: 500
+        size: 10000
       }
     });
     if (userListData.code === 200 && userListData.data) {
       userList.value = userListData.data.items;
+      isMatchModeLoading.value = false;
+      if (userList.value.length <= 0) {
+        return;
+      }
       userList.value.forEach(user => {
         if (user.tags) {
           user.tags = JSON.parse(user.tags)
         }
       });
+    }else {
+      isMatchModeLoading.value = false;
     }
   }
-  isMatchModeLoading.value = false;
+
   if (userList.value.length === 0||!userList.value) {
     description.value = "空空如也";
   }

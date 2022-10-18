@@ -75,7 +75,6 @@ const DEFAULT_TITLE = "伙伴系统";
 const title = ref(DEFAULT_TITLE);
 
 router.beforeEach(async (to,from)=>{
-
   if (to.path === '/index' || to.path === '/team' || to.path === '/find') {
     if (!user.value || user.value.avatarUrl.length <= 0) {
       user.value = await getCurrentUser();
@@ -94,8 +93,7 @@ router.beforeEach(async (to,from)=>{
 provide('indexUser', async () => {
   // 防止每次执行
   if (!user.value || user.value.avatarUrl.length <= 0) {
-
-    // user.value = await getCurrentUser();
+    user.value = await getCurrentUser();
   }
 
 });

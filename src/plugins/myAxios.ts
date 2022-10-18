@@ -6,7 +6,8 @@ import {getMessages} from "../services/MeesageUtils";
 
 
 const myAxios = axios.create({
-    baseURL: 'http://localhost:8088',
+    // baseURL: 'http://47.92.124.72/py',
+    baseURL: 'http://localhost/py',
     withCredentials: true,
 });
 // myAxios.defaults.withCredentials = true;
@@ -25,7 +26,7 @@ myAxios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 myAxios.interceptors.response.use(function (response) {
-     if (response.data.code != 200) {
+     if (response?.data?.code != 200) {
         if (response.data.description) {
             Toast.fail(response.data.description)
         }else {

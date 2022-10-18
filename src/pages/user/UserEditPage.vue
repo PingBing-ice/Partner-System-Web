@@ -155,6 +155,7 @@ const onSubmit = async () => {
   const res = await myAxios.post("/api/user/update", {
     "id": currentUser.id,
     [editUser.value.editKey]: editUser.value.currentValue,
+    "code": emailCode.value,
   });
 
   if (res.code === 200 && res.data > 0) {
