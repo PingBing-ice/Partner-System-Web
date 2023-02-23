@@ -50,13 +50,7 @@
     </van-row>
     <van-button round block type="primary" @click="toTag" native-type="submit" style="margin-top: 50px">提交</van-button>
   </van-popup>
-<!--  <van-overlay :show="show" @click="show = false" >-->
-<!--    <div class="wrapper">-->
-<!--      <div class="block" >-->
-<!--        -->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </van-overlay>-->
+
 
 </template>
 

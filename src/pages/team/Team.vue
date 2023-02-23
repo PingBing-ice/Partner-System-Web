@@ -7,7 +7,6 @@
     我的队伍
   </van-divider>
   <van-cell :value="team.name" v-for="team in teamList" center @click="toChat(team?.teamId,team?.name)">
-    <!-- 使用 title 插槽来自定义标题 -->
     <template #title>
       <van-image
           round

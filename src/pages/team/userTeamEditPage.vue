@@ -2,7 +2,6 @@
   <van-form @submit="onSubmit">
     <van-cell-group inset v-if="editTeam.teamName==='状态'">
       <van-cell :title="editTeam.teamName">
-        <!-- 使用 right-icon 插槽来自定义右侧图标 -->
         <template #right-icon>
           <van-checkbox-group v-model="checked" :max="2" direction="horizontal">
             <van-checkbox name="0">公开</van-checkbox>
@@ -14,9 +13,7 @@
       <van-field v-if="isPassword" v-model="password" type="password" label="密码" />
       <van-field v-if="isPassword" v-model="confirmPassword" type="password" label="确认密码" />
     </van-cell-group>
-<!--    <van-field v-model="password" type="password" label="密码" />-->
     <van-cell-group v-else inset>
-      <!-- 通过 pattern 进行正则校验 -->
       <van-field
           v-model="editTeam.teamValue"
           :name="editTeam.editKey"

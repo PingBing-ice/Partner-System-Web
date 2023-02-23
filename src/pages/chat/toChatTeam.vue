@@ -57,6 +57,7 @@ import webSocketConfig from "../../config/webSocketConfig";
 import {messageType} from "../../services/MessageType";
 import {getMessages} from "../../services/MeesageUtils";
 import MyAxios from "../../plugins/myAxios";
+import {chatStateEnum} from "../../states/chat";
 
 
 const route = useRoute()
@@ -158,7 +159,7 @@ const getSend = () => {
   }
   // @ts-ignore
   testData.value.push(userData);
-  const sendMessage = getMessages(2, userId.value, teamID, mes);
+  const sendMessage = getMessages(chatStateEnum.DW, userId.value, teamID, mes);
   webSocketConfig.sendSocket(JSON.stringify(sendMessage));
 
   nextTick(() => {

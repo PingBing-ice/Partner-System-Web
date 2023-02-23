@@ -1,7 +1,6 @@
 <template>
   <van-form @submit="onSubmit">
     <van-cell-group inset v-if="editUser.editKey==='email' && currentValue===''">
-      <!-- 通过 pattern 进行正则校验 -->
       <van-field
           v-model="editUser.currentValue"
           :name="editUser.editKey"

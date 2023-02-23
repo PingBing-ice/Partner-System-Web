@@ -21,8 +21,7 @@
 import {UserType} from "../models/user";
 import myAxios from "../plugins/myAxios";
 import {Dialog, Toast} from "vant";
-import {TeamType} from "../models/team";
-import {onMounted} from "vue";
+
 
 interface UserCardListType {
   userList: UserType[];
@@ -33,37 +32,26 @@ const props = withDefaults(defineProps<UserCardListType>(), {
   userList: [] as UserType[],
 })
 
-const sendFriendRequest =async (id: string) => {
-  const res: any = await myAxios.post("/partner/friend/userFriend/friendUser", {
-            toUserId:id})
+const sendFriendRequest = (id: string) => {
+  Dialog.confirm({
+    title: '确认添加好友吗？',
+  })
+      .then(async () => {
+        const res: any = await myAxios.post("/partner/friend/userFriend/friendUser", {
+          toUserId:id})
+        // @ts-ignore
+        if (res.code == 200) {
+          Toast.success("发送成功")
+        } else {
           // @ts-ignore
-          if (res.code == 200) {
-            Toast.success("发送成功")
-          } else {
-            // @ts-ignore
-            if (res.description) {
-              Toast.fail(res.description);
-            }
+          if (res.description) {
+            Toast.fail(res.description);
           }
-  // Dialog.confirm({
-  //   title: '确认添加好友吗？',
-  // })
-  //     .then(async () => {
-  //       const res: any = await myAxios.post("/partner/friend/userFriend/friendUser", {
-  //         toUserId:id})
-  //       // @ts-ignore
-  //       if (res.code == 200) {
-  //         Toast.success("发送成功")
-  //       } else {
-  //         // @ts-ignore
-  //         if (res.description) {
-  //           Toast.fail(res.description);
-  //         }
-  //       }
-  //     })
-  //     .catch(() => {
-  //       // on cancel
-  //     });
+        }
+      })
+      .catch(() => {
+        // on cancel
+      });
 
 }
 

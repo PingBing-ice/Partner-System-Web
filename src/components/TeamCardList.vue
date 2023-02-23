@@ -33,25 +33,15 @@
     <user-card-list :userList="userListVo"/>
   </van-action-sheet>
 
-
-  <van-popup v-model:show="addPasswordTeam" :style="{width: '100%'}">
-    <van-form @submit="JoinTeam">
-      <van-cell-group inset>
+  <van-dialog v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
         <van-field
             v-model="teamPassword"
             name="password"
             label="队伍密码"
-            placeholder="队伍密码"
-            :rules="[{ required: true, message: '请填写密码' }]"
+            placeholder="请输入密码"
         />
-      </van-cell-group>
-      <div style="margin: 16px;">
-        <van-button round block type="primary" native-type="submit">
-          加入队伍
-        </van-button>
-      </div>
-    </van-form>
-  </van-popup>
+  </van-dialog>
+
 
 </template>
 
@@ -71,6 +61,7 @@ const userListVo = ref([])
 const teamID = ref("")
 const teamStatus = ref(0);
 const teamPassword = ref('');
+const VanDialog  =Dialog.Component
 interface TeamCardListType {
   teamList: TeamType[];
 }
@@ -82,6 +73,7 @@ const props = withDefaults(defineProps<TeamCardListType>(), {
 
 const JoinTeam =async () => {
   if (teamPassword.value === '' || !teamPassword.value || teamID.value==='') {
+    Toast.fail("请输入密码")
     return;
   }
   const res: any = await myAxios.post("/partner/team/join", {

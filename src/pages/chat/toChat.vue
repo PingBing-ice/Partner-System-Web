@@ -6,31 +6,29 @@
       @click-right="onClickRightTeam"
   >
     <template #right>
-      <van-icon name="friends-o" size="18" />
+      <van-icon name="friends-o" size="18"/>
     </template>
   </van-nav-bar>
   <div id="chat">
     <div class="chatBox">
-<!--      <div class="chatBox-middle">-->
-        <div class="chatInfo" id="chatInfo">
-          <div class="chatUser-box" v-for="(item,index) in testData" :key="index"
-               :class="userId===item.id?'chatUser-box1':'chatUser-box'">
-            <div class="chatUser-box-img">
-              <van-image round width="2.5rem" height="2.5rem"
-                         :src="item.images"/>
+      <div class="chatInfo" id="chatInfo">
+        <div class="chatUser-box" v-for="(item,index) in testData" :key="index"
+             :class="userId===item.id?'chatUser-box1':'chatUser-box'">
+          <div class="chatUser-box-img">
+            <van-image round width="2.5rem" height="2.5rem"
+                       :src="item.images"/>
+          </div>
+          <div class="chatUser-info" ref="chatRoom">
+            <div class="chatUser-info-name" :class="userId===item.id?'chatUser-info-name1':'chatUser-info-name'">
+              <span>{{ item.name }}</span><span class="nowDate">{{ item.time }}</span>
             </div>
-            <div class="chatUser-info" ref= "chatRoom">
-              <div class="chatUser-info-name" :class="userId===item.id?'chatUser-info-name1':'chatUser-info-name'">
-                <span>{{ item.name }}</span><span class="nowDate">{{ item.time }}</span>
-              </div>
-              <div class="chatUser-info-text" :class="userId===item.id?'chatUser-info-text1':'chatUser-info-text'">
-                <span>{{ item.message }}</span>
-              </div>
+            <div class="chatUser-info-text" :class="userId===item.id?'chatUser-info-text1':'chatUser-info-text'">
+              <span>{{ item.message }}</span>
             </div>
           </div>
-
         </div>
-      <!--      </div>-->
+
+      </div>
     </div>
   </div>
   <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"/>
@@ -42,7 +40,7 @@
         placeholder="善语结善缘"
     >
       <template #button>
-        <van-button size="small" type="primary" @click="getSend" >发送</van-button>
+        <van-button size="small" type="primary" @click="getSend">发送</van-button>
       </template>
     </van-field>
   </van-cell-group>
@@ -58,11 +56,12 @@ import myAxios from "../../plugins/myAxios";
 import webSocketConfig from "../../config/webSocketConfig";
 import {getMessages} from "../../services/MeesageUtils";
 import {messageType} from "../../services/MessageType";
+import {chatStateEnum} from "../../states/chat";
 
 const messages = ref("")
 const route = useRoute()
 const router = useRouter()
-const friendId = route.query.friendId+""
+const friendId = route.query.friendId + ""
 const friendName = route.query.username
 const FriendNameAvatarUrl = route.query.avatarUrl
 const userId = ref("")
@@ -71,8 +70,7 @@ const AvatarUrl = ref("")
 const current = ref("")
 const recordList = ref([]);
 let socket: any = null;
-const testData:any = ref([])
-
+const testData: any = ref([])
 onMounted(async () => {
   const user = await getCurrentUser()
   if (user != null) {
@@ -85,7 +83,7 @@ onMounted(async () => {
     getOnMessage(userId.value);
 
     //  加载聊天记录
-    const response:any = await myAxios.get("/partner/record/getList", {
+    const response: any = await myAxios.get("/partner/record/getList", {
       params: {
         userId: userId.value,
         friendId: friendId,
@@ -94,7 +92,10 @@ onMounted(async () => {
 
     if (response.code === 200 && response.data) {
       recordList.value = response.data;
-      recordList.value.forEach((record:any) => {
+      console.log(recordList.value)
+
+      recordList.value.forEach((record: any) => {
+
         if (record.userId == userId.value) {
           let userData = {
             id: userId.value,
@@ -123,7 +124,7 @@ onMounted(async () => {
   }
   await nextTick(() => {
     // @ts-ignore
-    document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
   })
 })
 
@@ -135,9 +136,10 @@ const getOnMessage = (id: string) => {
 
   socket.onmessage = (msg: any) => {
 
-    const chatRecord:messageType = JSON.parse(msg.data)
+    const chatRecord: messageType = JSON.parse(msg.data)
+    console.log(chatRecord)
     const friend = chatRecord.chatRecord.message;
-    if (chatRecord.type === 1) {
+    if (chatRecord.type === chatStateEnum.HY||chatRecord.type===chatStateEnum.SYSTEM) {
       if (route.path === '/toChat') {
 
         let userData = {
@@ -149,7 +151,7 @@ const getOnMessage = (id: string) => {
         testData.value.push(userData)
         nextTick(() => {
           // @ts-ignore
-          document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+          document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
         })
       }
     }
@@ -166,7 +168,7 @@ const getSend = () => {
     router.back();
     return;
   }
-  let  mss =messages.value
+  let mss = messages.value
   messages.value = "";
   let userData = {
     id: userId.value,
@@ -175,13 +177,17 @@ const getSend = () => {
     message: mss
   }
   testData.value.push(userData)
-
-  const message = getMessages(1, userId.value,friendId, mss);
+  let message;
+  if (friendId == "1") {
+    message = getMessages(chatStateEnum.SYSTEM, userId.value, friendId, mss);
+  } else {
+    message = getMessages(chatStateEnum.HY, userId.value, friendId, mss);
+  }
   webSocketConfig.sendSocket(JSON.stringify(message));
 
   nextTick(() => {
     // @ts-ignore
-    document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
   })
 }
 
@@ -192,7 +198,7 @@ const onClickRightTeam = () => {
   router.push({
     path: '/find/show',
     query: {
-      friendId:friendId
+      friendId: friendId
     },
   })
 }
@@ -227,7 +233,6 @@ body {
 }
 
 
-
 #chat .chatBox-infoDesk {
   width: 100%;
   height: 10rem;
@@ -254,7 +259,7 @@ body {
 #chat .chatInfo {
   width: 94%;
   height: 100%;
-  margin:  auto;
+  margin: auto;
   overflow: auto;
   display: flex;
   flex-direction: column;

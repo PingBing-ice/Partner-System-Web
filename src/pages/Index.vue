@@ -3,12 +3,80 @@
                   left-icon="volume-o"
                   scrollable
                   :text="notice"
+                  color="#1989fa" background="#ecf9ff"
   />
   <van-tabs v-model:active="active" @click-tab="onClickTab">
+    <van-action-bar>
+      <van-action-bar-icon icon="chat-o" text="客服" @click=""/>
+      <van-action-bar-icon icon="cart-o" text="购物车" @click=""/>
+      <van-action-bar-icon icon="shop-o" text="店铺" @click=""/>
+      <van-action-bar-button type="danger" text="立即购买" @click="onClickButton"/>
+    </van-action-bar>
+    <van-tab title="贴吧">
+      <van-list style="">
+        <div v-for="post in postList" style="width: auto;height: auto;">
+          <div style="padding: 16px;background-color: #f0f2f5">
+            <div style="display:flex;max-width: 100%;height: auto">
+              <div style="margin-right: 10px">
+                <van-image
+                    round
+                    width="1.7rem"
+                    height="1.7rem"
+                    :src="post.userAvatarVo.avatarUrl"
+                />
+              </div>
+              <div style="flex: 1.0;width: 0 ;color:rgb(0 0 0 / 85%)">
+                <p style="margin-bottom: 12px;color: #567895;font-size: 15px;line-height: 24px;margin-top: 3px">
+                  {{ post.userAvatarVo.username }}</p>
+              </div>
+              <p>
+              </p>
+            </div>
+            <div style="margin-top: -13px">
+              <h6>你好</h6>
+            </div>
+            <p style="width: auto;height: auto;font-size:15px">
+              {{ post.content }}
+            </p>
+            <div style="display: flex">
+              <van-icon class="icon" v-if="post.hasThumb" name="like-o" style="color: red" @click="isThumb(post.id)">
+                {{ post.thumb }}
+              </van-icon>
+              <van-icon class="icon" v-if="!post.hasThumb" name="like-o" @click="isThumb(post.id)">{{ post.thumb }}
+              </van-icon>
+              <van-icon class="icon" name="comment-o" @click="isComment=!isComment"/>
+              <van-icon class="icon" name="star-o" @click=""/>
+            </div>
+            <div>
+            </div>
+
+            <div style="margin-top:12px" v-if="isComment">
+              <van-cell-group inset class="comment">
+                <van-field class="comment"
+                           v-model="sms"
+                           center
+                           clearable
+                >
+                  <template #button>
+                    <van-button round size="small" type="primary">回复</van-button>
+                  </template>
+                </van-field>
+              </van-cell-group>
+            </div>
+          </div>
+
+          <br>
+        </div>
+
+      </van-list>
+
+    </van-tab>
+
+
     <van-tab title="用户">
       <van-cell center :title="isMatchMode? '推荐模式':'普通模式'">
         <template #right-icon>
-          <van-switch v-model="isMatchMode" size="24" :loading="isMatchModeLoading" />
+          <van-switch v-model="isMatchMode" size="24" :loading="isMatchModeLoading"/>
         </template>
       </van-cell>
       <van-tabs v-if="userList||userList.length>0 && tagUserList|| tagUserList.length>0" v-model:active="activeName"
@@ -42,9 +110,9 @@
       <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
     </van-tab>
   </van-tabs>
-  <van-overlay :show="isMatchModeLoading" >
+  <van-overlay :show="isMatchModeLoading">
     <div class="wrapper" @click.stop>
-      <van-loading color="#0094ff" text-color="#0094ff" vertical >加载中...</van-loading>
+      <van-loading color="#0094ff" text-color="#0094ff" vertical>加载中...</van-loading>
     </div>
 
   </van-overlay>
@@ -73,14 +141,30 @@ const searchTeamName = ref(false)
 const isMatchMode = ref(false)
 const isMatchModeLoading = ref(false)
 
-
+const postList = ref([]);
+const commentValue = ref("");
+const isComment = ref(false);
+const isHasThumb = ref(false);
 onMounted(async () => {
+
+  const resp = await myAxios.post("/post/getPost", {
+    content: "",
+    pageNum: 1,
+    pageSize: 10,
+    sorted: 0,
+    tagId: "",
+    userId: ""
+  })
+  if (resp.code === 200) {
+    postList.value = resp.data.records;
+    console.log(postList.value)
+  }
 
   const response = await myAxios.get('/api/userNotice/getNotice', {
     params: {
       region: 1,
     }
-  })
+  });
   if (response.code === 200) {
     notice.value = response.data;
   }
@@ -93,7 +177,7 @@ onMounted(async () => {
 const loadData = async () => {
   if (isMatchMode.value) {
     isMatchModeLoading.value = true;
-    const response =await myAxios.get("/api/user/match", {
+    const response = await myAxios.get("/api/user/match", {
       params: {
         num: 3
       }
@@ -109,14 +193,14 @@ const loadData = async () => {
           user.tags = JSON.parse(user.tags)
         }
       });
-    }else {
+    } else {
       isMatchModeLoading.value = false;
     }
   } else {
     const userListData = await myAxios.get('/api/user/recommend', {
       params: {
         current: 1,
-        size: 10000
+        size: 500
       }
     });
     if (userListData.code === 200 && userListData.data) {
@@ -130,12 +214,12 @@ const loadData = async () => {
           user.tags = JSON.parse(user.tags)
         }
       });
-    }else {
+    } else {
       isMatchModeLoading.value = false;
     }
   }
 
-  if (userList.value.length === 0||!userList.value) {
+  if (userList.value.length === 0 || !userList.value) {
     description.value = "空空如也";
   }
 
@@ -192,7 +276,8 @@ const getTeamList = async (searchTxt) => {
 
   }
 }
-
+const isThumb = (id) => {
+}
 const onSearch = () => {
   if (searchTxt.value === '') {
     Toast.fail("请输入内容")
@@ -213,6 +298,14 @@ const onClear = () => {
 </script>
 
 <style scoped>
+.icon {
+  margin-right: 15px;
+}
+
+.comment {
+  height: 30px;
+}
+
 /* Standard syntax */
 @keyframes shake {
   10%, 90% {
@@ -235,6 +328,7 @@ const onClear = () => {
 .apply-shake {
   animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
 }
+
 .wrapper {
   display: flex;
   align-items: center;

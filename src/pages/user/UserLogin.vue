@@ -1,5 +1,5 @@
 <template>
-  <div class="parent">
+  <div class="parent" id="demo">
     <div class="title">
       <h1 class="one">
         用户登录
@@ -43,12 +43,8 @@
             登录
           </van-button>
         </div>
-
           <span style="color: #1989fa; font-size: 5px; " @click="ForgetUser">忘记密码</span>
         <span style="color: #1989fa; font-size: 5px;margin-left: 69%;" @click="RegisterUser">注册账号</span>
-
-
-
       </van-form>
     </div>
   </div>
@@ -61,7 +57,6 @@ import myAxios from "../../plugins/myAxios";
 import {Toast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
 import {setChatUserState} from "../../states/user";
-
 import md5 from "md5";
 import ImageCode from "../../components/imageCode.vue";
 
@@ -120,29 +115,34 @@ const onSubmit = async () => {
     return;
   }
   buttonLoading.value = true;
-  const res = await myAxios.post("/api/user/Login", {
-    userAccount: userAccount.value,
-    password: password.value,
-  });
-  if (res.code === 200 && res.data) {
-    buttonLoading.value = false;
-    setChatUserState(res.data)
-    await webSocketConfig.initSocket();
+  try {
+    const res = await myAxios.post("/api/user/Login", {
+      userAccount: userAccount.value,
+      password: password.value,
+    });
+    if (res.code === 200 && res.data) {
+      buttonLoading.value = false;
+      setChatUserState(res.data)
+      await webSocketConfig.initSocket();
 
-    indexUser();
-    Toast.success("登录成功");
-    const redirect = route.query?.redirect ?? '/index'
-    await router.replace({path: redirect})
-  } else {
-    buttonLoading.value = false;
-    if (res.description) {
-      Toast.fail(res.description)
+      indexUser();
+      Toast.success("登录成功");
+      const redirect = route.query?.redirect ?? '/index'
+      await router.replace({path: redirect})
     } else {
-      Toast.fail("登录失败,请重试!");
+      if (res.description) {
+        Toast.fail(res.description)
+      } else {
+        Toast.fail("登录失败,请重试");
+      }
     }
+    buttonLoading.value = false;
 
+  }catch (e){
+    buttonLoading.value = false;
   }
-  buttonLoading.value = false;
+
+
 }
 const RegisterUser = () => {
   router.push({

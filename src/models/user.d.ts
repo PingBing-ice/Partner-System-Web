@@ -10,11 +10,6 @@ export type UserType = {
     tel?: string;
     email?: string;
     profile?: string;
-    userStatus?: number;
-    role?: number;
     planetCode?: string;
-    isDelete?: string;
     tags?: string;
-    createTime?: datetime;
-
 };

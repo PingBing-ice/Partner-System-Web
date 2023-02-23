@@ -1,7 +1,7 @@
 <template>
   <div class="title">
     <h1 class="one">
-      修改密码
+      忘记密码
     </h1>
   </div>
   <div class="content">

@@ -25,18 +25,20 @@ myAxios.interceptors.request.use(function (config) {
 });
 
 // 添加响应拦截器
-myAxios.interceptors.response.use(function (response) {
-     if (response?.data?.code != 200) {
+myAxios.interceptors.response.use(response => {
+    if (response?.data?.code != 200) {
         if (response.data.description) {
             Toast.fail(response.data.description)
-        }else {
+        } else {
             Toast.fail(response.data.message)
         }
     }
     // 对响应数据做点什么
     return response.data;
-}, function (error) {
+}, error => {
     // 对响应错误做点什么
+    // window.location.replace("/");
+    // Toast.fail("系统错误请重试")
     return Promise.reject(error);
 });
 

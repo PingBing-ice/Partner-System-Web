@@ -40,19 +40,12 @@
       </template>
     </van-nav-bar>
     <div id="contents">
-      <!--    <template v-if="active === 'index'">-->
-      <!--      <Index/>-->
-      <!--    </template   v-if="route.path ==='/user'|| route.path === '/search'||
-    route.path==='/user/edit'||route.path==='/userTeam/add'">-->
-      <!--    <template v-if="active === 'team'">-->
-      <!--      <Team/>-->
-      <!--    </template>-->
       <router-view/>
     </div>
     <van-tabbar route >
       <van-tabbar-item replace to="/index" icon="home-o" name="index">主页</van-tabbar-item>
       <van-tabbar-item replace to="/team" icon="search" name="team">队伍</van-tabbar-item>
-      <van-tabbar-item replace to="/find" icon="chat-o" name="chat">发现</van-tabbar-item>
+      <van-tabbar-item replace to="/find" icon="chat-o" name="chat">通讯录</van-tabbar-item>
     </van-tabbar>
   </div>
 
