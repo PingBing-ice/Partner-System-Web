@@ -50,14 +50,14 @@
 
 <script setup lang="ts">
 import {nextTick, onMounted, ref} from "vue";
-import {getCurrentUser} from "../../services/users";
-import {useRoute, useRouter} from "vue-router";
+  import {useRoute, useRouter} from "vue-router";
 import {Notify, Toast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
 import {messageType} from "../../services/MessageType";
 import {getMessages} from "../../services/MeesageUtils";
 import MyAxios from "../../plugins/myAxios";
 import {chatStateEnum} from "../../states/chat";
+import store from "../../store";
 
 
 const route = useRoute()
@@ -75,7 +75,12 @@ let socket: any = null;
 onMounted(async () => {
 
   // 获取用户人的信息,获取socket连接
-  const user = await getCurrentUser();
+  if (!store.getters.getIsLogin) {
+    Toast.fail("未登录");
+    router.back();
+    return;
+  }
+  const user =store.getters.getUser
   const res = await MyAxios.get("/partner/userTeam/get", {
     params: {
       teamId: teamID,

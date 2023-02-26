@@ -47,7 +47,7 @@ import {inject, onMounted, ref} from "vue";
 import {Toast} from "vant";
 import {useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
-import {getCurrentUser} from "../../services/users";
+  import store from "../../store";
 
 const router = useRouter();
 const show = ref(false);
@@ -59,10 +59,12 @@ const list = ref([]);
 const reload = inject('reload')
 
 onMounted(async () => {
-  user.value = getCurrentUser()
-  if (user.value == null) {
+  if (!store.getters.getIsLogin) {
+    Toast.fail("未登录");
+    router.back();
     return;
   }
+   user.value =store.getters.getUser
   const friendUser = await myAxios.get("/partner/friend/userFriend/checkFriend").then(res => {
     if (res.data !== null) {
       friendUserList.value = res.data;

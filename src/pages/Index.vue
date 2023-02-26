@@ -13,9 +13,9 @@
       <van-action-bar-button type="danger" text="立即购买" @click="onClickButton"/>
     </van-action-bar>
     <van-tab title="贴吧">
-      <van-list style="">
-        <div v-for="post in postList" style="width: auto;height: auto;">
-          <div style="padding: 16px;background-color: #f0f2f5">
+      <van-list style="background-color: #f0f2f5;padding-top: 5px">
+        <div v-for="post in postList" style="width: auto;height: auto;padding-bottom: 10px">
+          <div style="padding: 16px; background-color: #ffffff">
             <div style="display:flex;max-width: 100%;height: auto">
               <div style="margin-right: 10px">
                 <van-image
@@ -33,39 +33,45 @@
               </p>
             </div>
             <div style="margin-top: -13px">
-              <h6>你好</h6>
+              <h6></h6>
             </div>
             <p style="width: auto;height: auto;font-size:15px">
               {{ post.content }}
             </p>
             <div style="display: flex">
-              <van-icon class="icon" v-if="post.hasThumb" name="like-o" style="color: red" @click="isThumb(post.id)">
-                {{ post.thumb }}
-              </van-icon>
-              <van-icon class="icon" v-if="!post.hasThumb" name="like-o" @click="isThumb(post.id)">{{ post.thumb }}
-              </van-icon>
+              <a>
+                <van-icon class="icon" style="display: flex" :color="hasThumb(post.id)?'#d32':''" name="like-o"
+                          @click="isThumb(post.id);">
+                  <div style="font-size:12px;margin-top: 5px">
+                    {{ map.get(post.id) === 0 ? '' : map.get(post.id) }}
+                  </div>
+                </van-icon>
+              </a>
               <van-icon class="icon" name="comment-o" @click="isComment=!isComment"/>
               <van-icon class="icon" name="star-o" @click=""/>
-            </div>
-            <div>
-            </div>
 
+            </div>
             <div style="margin-top:12px" v-if="isComment">
-              <van-cell-group inset class="comment">
-                <van-field class="comment"
-                           v-model="sms"
-                           center
-                           clearable
-                >
-                  <template #button>
-                    <van-button round size="small" type="primary">回复</van-button>
-                  </template>
-                </van-field>
-              </van-cell-group>
+              <div class="comment-f">
+                <div class="comment-containers">
+                  <div class="comment-container">
+                    <div class="text-area-wrapper">
+                      <input class="ql-container" v-model="commentTxt"/>
+                    </div>
+                  </div>
+                  <div class="submit-btn" @click="sendPost(post.id)">回复</div>
+                </div>
+              </div>
+            </div>
+            <div style="background-color:  #f0f2f5;margin-top: 10px">
+              <div style="padding: 1px 1px 1px 9px">
+                <div v-for="content in commentMap.get(post.id)">
+                  <p style="font-size: 14px;">{{ content }}</p>
+                </div>
+              </div>
+
             </div>
           </div>
-
-          <br>
         </div>
 
       </van-list>
@@ -127,6 +133,8 @@ import {Notify, Toast} from "vant";
 import UserCardList from "../components/UserCardList.vue";
 import TeamCardList from "../components/TeamCardList.vue";
 
+import store from "../store";
+
 
 const userList = ref([]);
 const active = ref(0)
@@ -143,23 +151,13 @@ const isMatchModeLoading = ref(false)
 
 const postList = ref([]);
 const commentValue = ref("");
+const commentTxt = ref("");
 const isComment = ref(false);
-const isHasThumb = ref(false);
+const setPostId = ref(new Set());
+const map = ref(new Map());
+const commentMap = ref(new Map());
 onMounted(async () => {
-
-  const resp = await myAxios.post("/post/getPost", {
-    content: "",
-    pageNum: 1,
-    pageSize: 10,
-    sorted: 0,
-    tagId: "",
-    userId: ""
-  })
-  if (resp.code === 200) {
-    postList.value = resp.data.records;
-    console.log(postList.value)
-  }
-
+  await getPostList();
   const response = await myAxios.get('/api/userNotice/getNotice', {
     params: {
       region: 1,
@@ -223,7 +221,6 @@ const loadData = async () => {
     description.value = "空空如也";
   }
 
-
 }
 watchEffect(() => {
 
@@ -254,7 +251,6 @@ const onClickTag = async () => {
   }
 }
 const getTeamList = async (searchTxt) => {
-  console.log(searchTxt)
   const res = await myAxios.get("/partner/team/list", {
     params: {
       searchTxt: searchTxt,
@@ -276,7 +272,84 @@ const getTeamList = async (searchTxt) => {
 
   }
 }
-const isThumb = (id) => {
+const getPostList = async () => {
+  const resp = await myAxios.post("/post/getPost", {
+    content: "",
+    pageNum: 1,
+    pageSize: 10,
+    sorted: 0,
+    tagId: "",
+    userId: ""
+  })
+  if (resp.code === 200) {
+    postList.value = resp.data.records;
+    for (let i = 0; i < postList.value.length; i++) {
+      const post = postList.value[i];
+      if (post.hasThumb === true) {
+        setPostId.value.add(post.id)
+      }
+      map.value.set(post.id, post.thumb)
+      commentMap.value.set(post.id, post.commentList)
+    }
+  }
+}
+const isThumb = async (id) => {
+  const resp = await myAxios.post("/post/doThumb", {
+    postId: id
+  });
+  if (resp.code === 200) {
+    if (hasThumb(id)) {
+      setPostId.value.delete(id);
+      if (map.value.has(id)) {
+        let num = map.value.get(id);
+        if (num >= 1) {
+          map.value.set(id, --num)
+          return;
+        }
+        map.value.delete(id)
+      }
+    } else {
+      setPostId.value.add(id);
+      if (map.value.has(id)) {
+        let num = map.value.get(id);
+        map.value.set(id, ++num)
+      } else {
+        map.value.set(id, 1);
+
+      }
+    }
+  } else {
+    Toast.fail("点赞失败");
+  }
+
+
+}
+const sendPost = async (postId) => {
+  if (postId == null || commentTxt.value === "") {
+    return;
+  }
+  if (!store.getters.getIsLogin) {
+    Toast.fail("请先登录")
+
+  }
+  const user =store.getters.getUser
+  if (!user) {
+    return;
+  }
+
+  const resp =await myAxios.post("/postComment/doComment",{
+    "content": commentTxt.value,
+    "postId": postId,
+    "replyId": "",
+    "userId": user.id,
+  })
+  if (resp.code === 200) {
+    const commList = commentMap.value.get(postId);
+    let comment = user.userAccount + ": " + commentTxt.value
+    commList.push(comment)
+  }
+  commentTxt.value = '';
+
 }
 const onSearch = () => {
   if (searchTxt.value === '') {
@@ -295,6 +368,9 @@ const onClickButton = () => {
 const onClear = () => {
   Toast.success("关闭")
 }
+const hasThumb = (id) => {
+  return setPostId.value.has(id);
+}
 </script>
 
 <style scoped>
@@ -305,6 +381,8 @@ const onClear = () => {
 .comment {
   height: 30px;
 }
+
+*
 
 /* Standard syntax */
 @keyframes shake {
@@ -334,5 +412,55 @@ const onClear = () => {
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+
+.comment-containers {
+  margin-top: 12px;
+  padding-left: 0px;
+  padding-right: 25px;
+  display: flex;
+}
+
+.text-area-wrapper {
+  width: 100%;
+  box-sizing: border-box
+}
+
+.comment-container {
+  display: flex;
+  position: relative;
+  border: 1px solid #16b998;
+  padding-top: 1px;
+  background-color: #fff;
+  width: 100%;
+  height: 20px;
+}
+
+.ql-container {
+  border: none;
+  font-family: PingFangSC-Regular;
+  font-size: 14px !important;
+}
+
+.submit-btn {
+  margin-left: 8px;
+  line-height: 23px;
+  width: 60px;
+  background: #16B998;
+  box-shadow: 0 1px 2px #0000000d;
+  border-radius: 2px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.comment-f {
+
+}
+
+.ql-container {
+  height: 90%;
+  width: 90%;
 }
 </style>

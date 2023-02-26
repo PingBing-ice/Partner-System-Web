@@ -82,7 +82,7 @@ import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref, watchEffect} from "vue";
 import myAxios from "../../plugins/myAxios";
 import {Toast} from "vant";
-import {getCurrentUser} from "../../services/users";
+  import store from "../../store";
 
 
 const currentValue = ref();
@@ -144,13 +144,12 @@ const onSubmit = async () => {
     Toast.fail("请输入内容");
     return;
   }
-  const currentUser = await  getCurrentUser();
-  if (!currentUser) {
-    Toast.fail("用户未登录");
+  if (!store.getters.getIsLogin) {
+    Toast.fail("未登录");
+    router.back();
     return;
   }
-  console.log(editUser.value.editKey)
-  console.log(editUser.value.currentValue);
+  const currentUser =store.getters.getUser
   const res = await myAxios.post("/api/user/update", {
     "id": currentUser.id,
     [editUser.value.editKey]: editUser.value.currentValue,

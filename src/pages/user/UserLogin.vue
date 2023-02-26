@@ -56,9 +56,8 @@ import {useRoute, useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
 import {Toast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
-import {setChatUserState} from "../../states/user";
-import md5 from "md5";
 import ImageCode from "../../components/imageCode.vue";
+import store from "../../store";
 
 const router = useRouter()
 const route = useRoute()
@@ -122,9 +121,8 @@ const onSubmit = async () => {
     });
     if (res.code === 200 && res.data) {
       buttonLoading.value = false;
-      setChatUserState(res.data)
+      await store.dispatch('setUser', res.data)
       await webSocketConfig.initSocket();
-
       indexUser();
       Toast.success("登录成功");
       const redirect = route.query?.redirect ?? '/index'

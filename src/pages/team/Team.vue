@@ -27,10 +27,10 @@ import {teamStateEnum} from "../../states/team";
 
 import {inject, onMounted, ref} from "vue";
 import myAxios from "../../plugins/myAxios";
-import {getCurrentUser} from "../../services/users";
-import {Toast} from "vant";
+  import {Toast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
 import {messageType} from "../../services/MessageType";
+import store from "../../store";
 
 const router = useRouter();
 const teamList = ref([]);
@@ -39,11 +39,12 @@ const user = ref();
 
 let socket: any;
 onMounted(async ()=>{
-   user.value = await getCurrentUser();
-  if (user.value == null) {
+  if (!store.getters.getIsLogin) {
     Toast.fail("未登录");
+    router.back();
     return;
   }
+   user.value =store.getters.getUser
   await webSocketConfig.initSocket();
   if (socket == null) {
     socket = webSocketConfig.getSocket();

@@ -27,8 +27,8 @@ import {ref, onMounted} from "vue";
 import {Toast} from "vant";
 import {useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
-import {getCurrentUser} from "../../services/users";
-import UserCardList from "../../components/UserCardList.vue";
+  import UserCardList from "../../components/UserCardList.vue";
+import store from "../../store";
 
 const user = ref();
 const is = ref(false);
@@ -37,10 +37,12 @@ const searchUserList = ref([]);
 const router = useRouter();
 
 onMounted(async () => {
-  user.value = await getCurrentUser();
-  if (user.value == null) {
+  if (!store.getters.getIsLogin) {
     Toast.fail("未登录");
+    router.back();
+    return;
   }
+   user.value =store.getters.getUser
 })
 
 

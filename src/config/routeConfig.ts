@@ -17,27 +17,30 @@ import FindFriend from "../pages/friend/FindFriend.vue";
 import toChat from "../pages/chat/toChat.vue";
 import toChatTeam from "../pages/chat/toChatTeam.vue";
 import * as VueRouter from "vue-router";
-import {getCurrentUser} from "../services/users";
+
 import webSocketConfig from "./webSocketConfig";
+import store from "../store";
+import {Toast} from "vant";
+import {getCurrentUser} from "../services/users";
 
 
 // 2. 定义一些路由
 const routes = [
-    {path: '/index',title: '主页', component: Index},
-    {path: '/team',title: '队伍管理', component: Team},
+    {path: '/index', title: '主页', component: Index},
+    {path: '/team', title: '队伍管理', component: Team},
     {path: '/userTeam', component: UserTeam},
-    {path: '/userTeam/add',title: '修改队伍', component: userTeamEditPage},
-    {path: '/team/add',title: '添加队伍', component: TeamAndPage},
-    {path: '/user',title: '个人中心', component: User},
-    {path: '/search', title: '搜索',component: SearchPage},
-    {path: '/user/list',title: '搜索', component: SearchResultPage},
-    {path: '/user/edit',title: '修改信息', component: UserEditPage},
+    {path: '/userTeam/add', title: '修改队伍', component: userTeamEditPage},
+    {path: '/team/add', title: '添加队伍', component: TeamAndPage},
+    {path: '/user', title: '个人中心', component: User},
+    {path: '/search', title: '搜索', component: SearchPage},
+    {path: '/user/list', title: '搜索', component: SearchResultPage},
+    {path: '/user/edit', title: '修改信息', component: UserEditPage},
     {path: '/', component: userLogin},
     {path: '/forget', component: UserForget},
     {path: '/register', component: Register},
-    {path: '/find',title: '伙伴管理', component: Find},
-    {path: '/find/show',title: '伙伴管理', component: Show},
-    {path: '/findFriend',title: '搜索好友', component: FindFriend},
+    {path: '/find', title: '伙伴管理', component: Find},
+    {path: '/find/show', title: '伙伴管理', component: Show},
+    {path: '/findFriend', title: '搜索好友', component: FindFriend},
     {path: '/toChat', component: toChat},
     {path: '/chatTeam', component: toChatTeam},
 ]
@@ -47,24 +50,29 @@ const router = VueRouter.createRouter({
     history: VueRouter.createWebHistory(),
     routes, // `routes: routes` 的缩写
 })
-router.beforeEach(async (to, from,next) => {
-    if (to.path !== '/' && to.path !== '/register'&& to.path!=='/forget') {
+router.beforeEach(async (to, from, next) => {
+    if (!store.getters.getIsLogin) {
         const user = await getCurrentUser();
+        if (user != null) {
+            await store.dispatch('setUser', user);
+        }
+    }
+    if (to.path !== '/' && to.path !== '/register' && to.path !== '/forget') {
         // 检查用户是否已登录
         // ❗️ 避免无限重定向
-        if (user == null && to.path !== '/' && to.path !== '/register'&& to.path!=='/forget') {
+        if (!store.getters.getIsLogin && to.path !== '/' && to.path !== '/register' && to.path !== '/forget') {
             // 将用户重定向到登录页面
             next('/');
-        }else {
+        } else {
             await webSocketConfig.initSocket();
             next()
         }
-        if (user != null) {
-            if (to.path === '/' ||to.path === '/register' ) {
-                next('/index')
-            }
+
+    } else if (store.getters.getIsLogin) {
+        if (to.path === '/' || to.path === '/register'|| to.path !== '/forget') {
+            next('/index')
         }
-    }else {
+    } else {
         next();
     }
 

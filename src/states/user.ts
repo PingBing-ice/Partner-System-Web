@@ -1,5 +1,5 @@
 import {UserType} from "../models/user";
-import {getCurrentUser} from "../services/users";
+ 
 
 let chatUserState: UserType[] = [];
 

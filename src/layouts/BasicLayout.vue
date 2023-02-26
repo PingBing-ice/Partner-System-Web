@@ -56,9 +56,10 @@ import {useRoute, useRouter} from "vue-router";
 import {nextTick, onMounted, provide, ref} from "vue";
 import UserLogin from "../pages/user/UserLogin.vue";
 import UserRegister from "../pages/user/UserRegister.vue";
-import {getCurrentUser} from "../services/users";
 import routeConfig from "../config/routeConfig";
 import UserForget from "../pages/user/UserForget.vue";
+import store from "../store";
+import {Toast} from "vant";
 
 
 const router = useRouter();
@@ -70,7 +71,7 @@ const title = ref(DEFAULT_TITLE);
 router.beforeEach(async (to,from)=>{
   if (to.path === '/index' || to.path === '/team' || to.path === '/find') {
     if (!user.value || user.value.avatarUrl.length <= 0) {
-      user.value = await getCurrentUser();
+       user.value =store.getters.getUser
     }
   }
   let toPath =to.path;
@@ -86,7 +87,7 @@ router.beforeEach(async (to,from)=>{
 provide('indexUser', async () => {
   // 防止每次执行
   if (!user.value || user.value.avatarUrl.length <= 0) {
-    user.value = await getCurrentUser();
+    user.value = store.getters.getUser
   }
 
 });

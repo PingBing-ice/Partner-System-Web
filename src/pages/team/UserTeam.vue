@@ -71,9 +71,9 @@ import {useRoute, useRouter} from "vue-router";
 import MyAxios from "../../plugins/myAxios";
 import myAxios from "../../plugins/myAxios";
 import UserCardList from "../../components/UserCardList.vue";
-import {getCurrentUser} from "../../services/users";
-import {Dialog, Toast} from "vant";
+  import {Dialog, Toast} from "vant";
 import {teamStateEnum} from "../../states/team";
+import store from "../../store";
 
 
 const editState = ref(false);
@@ -95,7 +95,12 @@ const teamName = {
 }
 const team = ref();
 onMounted(async ()=>{
-  const userStatue =await getCurrentUser()
+  if (!store.getters.getIsLogin) {
+    Toast.fail("未登录");
+    router.back();
+    return;
+  }
+  const userStatue =store.getters.getUser
   userId.value = userStatue.id
   const response = await MyAxios.get("/partner/team/get",{
     params: {

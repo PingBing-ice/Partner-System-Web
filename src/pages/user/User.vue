@@ -58,10 +58,10 @@
 
 import {inject, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {getCurrentUser} from "../../services/users";
-import myAxios from "../../plugins/myAxios";
+  import myAxios from "../../plugins/myAxios";
 import {removeChatUser} from "../../states/user";
 import {Dialog, Toast} from "vant";
+import store from "../../store";
 const reload = inject('reload')
 
 const editState = ref(false);
@@ -116,7 +116,7 @@ const edit = async () => {
   // @ts-ignore
   if (res.code === 200) {
     editState.value = false;
-    removeChatUser();
+    await store.dispatch("loginOut")
     await router.push({path: '/'})
   }
 }
@@ -138,11 +138,12 @@ const toTag = () => {
           '每天只能提交五次',
     }).then(async () => {
       const tag =JSON.stringify(tagList.value)
-      const user =await getCurrentUser();
-      if (user == null) {
+      if (!store.getters.getIsLogin) {
         Toast.fail("未登录");
+        router.back();
         return;
       }
+      const user =store.getters.getUser
       const res = await myAxios.post("/api/user/update", {
         "id": user.id,
         "tags": tag,

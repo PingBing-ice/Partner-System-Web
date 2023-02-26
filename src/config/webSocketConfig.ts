@@ -1,23 +1,24 @@
 import {ref} from "vue";
-import {getCurrentUser} from "../services/users";
+ 
 import {getMessages} from "../services/MeesageUtils";
 import {Notify, Toast} from "vant";
 import {useRouter} from "vue-router";
 
 import {chatStateEnum} from "../states/chat";
 import {messageType} from "../services/MessageType";
+import store from "../store";
 const socketList:any = ref([])
 const message = ref('')
 let socket: any;
 let cloneTime: any;
 const router = useRouter();
 const initSocket = async () => {
-    const user = await getCurrentUser();
-    if (user == null) {
-        Toast.fail("未登录,请重试")
+    if (!store.getters.getIsLogin) {
+        Toast.fail("未登录");
         router.back();
         return;
     }
+    const user =store.getters.getUser
     const userId = user.id;
     socket =getSocket();
     socket.onopen = () => {

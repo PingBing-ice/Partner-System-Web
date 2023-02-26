@@ -6,10 +6,10 @@ export type UserType = {
     username?: string;
     userAccount?: string;
     avatarUrl?: string;
-    gender?: number;
+    gender?: string;
     tel?: string;
     email?: string;
     profile?: string;
-    planetCode?: string;
     tags?: string;
 };
+

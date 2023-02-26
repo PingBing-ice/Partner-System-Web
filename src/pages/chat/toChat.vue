@@ -51,12 +51,12 @@
 import {Notify, Toast} from "vant";
 import {getCurrentInstance, nextTick, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {getCurrentUser} from "../../services/users";
-import myAxios from "../../plugins/myAxios";
+  import myAxios from "../../plugins/myAxios";
 import webSocketConfig from "../../config/webSocketConfig";
 import {getMessages} from "../../services/MeesageUtils";
 import {messageType} from "../../services/MessageType";
 import {chatStateEnum} from "../../states/chat";
+import store from "../../store";
 
 const messages = ref("")
 const route = useRoute()
@@ -72,7 +72,12 @@ const recordList = ref([]);
 let socket: any = null;
 const testData: any = ref([])
 onMounted(async () => {
-  const user = await getCurrentUser()
+  if (!store.getters.getIsLogin) {
+    Toast.fail("未登录");
+    router.back();
+    return;
+  }
+  const user =store.getters.getUser
   if (user != null) {
     userId.value = user.id;
     current.value = userId.value;
