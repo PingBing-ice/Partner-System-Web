@@ -73,7 +73,7 @@ const props = withDefaults(defineProps<TeamCardListType>(), {
 
 const JoinTeam =async () => {
   if (teamPassword.value === '' || !teamPassword.value || teamID.value==='') {
-    Toast.fail("请输入密码")
+    showFailToast("请输入密码")
     return;
   }
   const res: any = await myAxios.post("/partner/team/join", {
@@ -81,9 +81,9 @@ const JoinTeam =async () => {
     password: teamPassword.value,
   });
   if (res?.code == 200) {
-    Toast.success("加入成功");
+    showSuccessToast("加入成功");
   } else {
-    Toast.fail(res.description);
+    showFailToast(res.description);
   }
   teamID.value = '';
   teamPassword.value = '';
@@ -102,9 +102,9 @@ const addTeam = async (id: string, status: number) => {
       teamId: id,
     });
     if (res?.code == 200) {
-      Toast.success("加入成功");
+      showSuccessToast("加入成功");
     } else {
-      Toast.fail(res.description);
+      showFailToast(res.description);
     }
   }
 

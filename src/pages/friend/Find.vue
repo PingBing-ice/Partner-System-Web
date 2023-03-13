@@ -1,11 +1,10 @@
 <template>
-
-  <van-cell title="添加好友" is-link to="/findFriend" style="width: 365px"/>
+  <van-cell title="添加好友" is-link to="/findFriend"/>
   <div>
-    <van-badge :content="friendUserListLength" style="width: 365px" v-if="friendUserListLength!==0">
-      <van-cell is-link @click="showPopup">好友申请</van-cell>
+    <van-badge :content="friendUserListLength" style="width: 100%" v-if="friendUserListLength!==0">
+      <van-cell is-link @click="showPopup" title="好友申请"></van-cell>
     </van-badge>
-    <van-cell is-link @click="showPopup" style="width: 365px" v-else>好友申请</van-cell>
+    <van-cell is-link @click="showPopup" title="好友申请" v-else></van-cell>
   </div>
   <van-popup v-model:show="show" position="bottom" round :style="{ height: '30%' }">
     <div v-for="friendUser in friendUserList">
@@ -23,7 +22,7 @@
 
     </div>
   </van-popup>
-  <van-collapse v-model="activeNames" style="width: 365px" @click="selectFriend">
+  <van-collapse v-model="activeNames"  @click="selectFriend">
     <van-collapse-item title="好友列表" name="1">
       <van-cell :value="userList.userAccount" v-for="userList in list" center
                 @click="toChat(userList.id,userList.username,userList.avatarUrl)">
@@ -43,11 +42,10 @@
 </template>
 <script setup>
 import {inject, onMounted, ref} from "vue";
-
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import {useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
-  import store from "../../store";
+import store from "../../store";
 
 const router = useRouter();
 const show = ref(false);
@@ -60,7 +58,7 @@ const reload = inject('reload')
 
 onMounted(async () => {
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -90,10 +88,10 @@ const rejectFriend = async (id) => {
       }
     })
     friendUserListLength.value -= 1;
-    Toast.success("拒绝成功!");
+    showFailToast("拒绝成功!");
 
   } else {
-    Toast.fail(res.message);
+    showFailToast(res.message);
   }
 
 }
@@ -111,13 +109,13 @@ const addFriend = async (id) => {
     })
     friendUserListLength.value -= 1;
     reload();
-    Toast.success("添加成功!");
+    showFailToast("添加成功!");
   }
 }
 
 const showPopup = () => {
   if (!friendUserList.value||friendUserList.value.length<=0) {
-    Toast.fail("没有好友申请")
+    showFailToast("没有好友申请")
     return;
   }
   show.value = true;

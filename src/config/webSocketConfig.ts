@@ -1,26 +1,28 @@
 import {ref} from "vue";
- 
+
 import {getMessages} from "../services/MeesageUtils";
-import {Notify, Toast} from "vant";
+import {showNotify} from 'vant';
 import {useRouter} from "vue-router";
 
 import {chatStateEnum} from "../states/chat";
 import {messageType} from "../services/MessageType";
 import store from "../store";
-const socketList:any = ref([])
+import {showSuccessToast, showFailToast} from 'vant';
+
+const socketList: any = ref([])
 const message = ref('')
 let socket: any;
 let cloneTime: any;
 const router = useRouter();
 const initSocket = async () => {
     if (!store.getters.getIsLogin) {
-        Toast.fail("未登录");
+        showFailToast("未登录");
         router.back();
         return;
     }
-    const user =store.getters.getUser
+    const user = store.getters.getUser
     const userId = user.id;
-    socket =getSocket();
+    socket = getSocket();
     socket.onopen = () => {
         // 构建发给服务器的消息体
         if (userId == null) {
@@ -32,35 +34,35 @@ const initSocket = async () => {
         sendSocket(JSON.stringify(message));
         // 定时发送心跳包
         try {
-            cloneTime =setInterval(() => {
+            cloneTime = setInterval(() => {
                 keepalive();
             }, 10000);
-        } catch (e){
+        } catch (e) {
 
             initSocket()
         }
     };
-    socket.onclose =  () => {
+    socket.onclose = () => {
         socketList.value = [];
         clearInterval(cloneTime)
         socket = null;
     };
 
-    socket.onerror =  () => {
+    socket.onerror = () => {
         socketList.value = [];
         clearInterval(cloneTime)
         socket = null;
     };
-    socket.onmessage=(msg:any) => {
+    socket.onmessage = (msg: any) => {
         const chatRecord: messageType = JSON.parse(msg.data);
-        if (chatRecord.type === 2){
+        if (chatRecord.type === 2) {
 
-        }else if (chatRecord.type === 1) {
+        } else if (chatRecord.type === 1) {
 
         }
         if (chatRecord.chatRecord.message != null) {
             message.value = chatRecord.chatRecord.message;
-            Notify({
+            showNotify({
                 message: message.value,
                 color: '#333',
                 background: '#FFFAFA',
@@ -77,7 +79,7 @@ const sendSocket = async (msg: string) => {
     } else {
         socket = getSocket();
         // 异步调用需要设置延时
-        setTimeout( () => {
+        setTimeout(() => {
             // 重新连接
             socket.send(msg);
         }, 1000);
@@ -88,7 +90,7 @@ const getOnMessage = () => {
     return null;
 }
 
-const keepalive =  async () =>{
+const keepalive = async () => {
     // 构建对象
     const heartMessage = getMessages(chatStateEnum.XT);
     await sendSocket(JSON.stringify(heartMessage));

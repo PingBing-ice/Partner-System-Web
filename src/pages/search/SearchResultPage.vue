@@ -7,7 +7,7 @@ import {useRoute} from "vue-router";
 import {onMounted, ref} from "vue";
 import myAxios from "../../plugins/myAxios";
 import qs from 'qs'
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import UserCardList from "../../components/UserCardList.vue";
 
 const route = useRoute();
@@ -29,17 +29,17 @@ onMounted(async () => {
     'tagNameList': tags,
     'searchTxt': searchTest,
   }).then((response) => {
-    Toast.success("查找成功")
+    showSuccessToast("查找成功")
     const res = response.data
     if (res.length !== 0) {
-      Toast.success("查找成功");
+      showSuccessToast("查找成功");
     } else {
-      Toast.success("查无此人")
+      showSuccessToast("查无此人")
     }
     return res;
 
   }).catch(((error) => {
-    Toast.fail("查找失败")
+    showFailToast("查找失败")
   }));
   if (userListData) {
     userListData.forEach(user => {

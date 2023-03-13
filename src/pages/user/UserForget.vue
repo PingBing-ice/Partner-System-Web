@@ -72,7 +72,7 @@
 import {ref} from "vue";
 import {useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import MyAxios from "../../plugins/myAxios";
 
 
@@ -124,12 +124,12 @@ const onSubmit =async () => {
   });
   if (res.code === 200) {
     buttonLoading.value = false;
-    Toast.success("修改成功");
+    showSuccessToast("修改成功");
     await router.push({path: '/'})
   }else {
     buttonLoading.value = false;
     if (res.description) {
-      Toast.fail(res.description)
+      showFailToast(res.description)
     }
   }
 }
@@ -166,7 +166,7 @@ const sendEmail =async () => {
   }else {
     const pattern = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/, str = email.value;
     if (!pattern.test(str)) {
-      Toast.fail("邮箱格式错误");
+      showFailToast("邮箱格式错误");
       return;
     }
   }
@@ -183,7 +183,7 @@ const sendEmail =async () => {
   if (response.code === 200) {
     subValue.value = false;
     isTime.value = true;
-    Toast.success("发送成功，请注意查收");
+    showSuccessToast("发送成功，请注意查收");
   }
   subValue.value = false;
 }

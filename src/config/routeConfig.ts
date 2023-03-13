@@ -5,6 +5,7 @@ import UserTeam from "../pages/team/UserTeam.vue";
 import userTeamEditPage from "../pages/team/userTeamEditPage.vue";
 import TeamAndPage from "../pages/team/TeamAndPage.vue";
 import User from "../pages/user/User.vue";
+import Space from "../pages/user/Space.vue";
 import SearchPage from "../pages/search/SearchPage.vue";
 import UserEditPage from "../pages/user/UserEditPage.vue";
 import SearchResultPage from "../pages/search/SearchResultPage.vue";
@@ -16,22 +17,24 @@ import Show from "../pages/friend/Show.vue";
 import FindFriend from "../pages/friend/FindFriend.vue";
 import toChat from "../pages/chat/toChat.vue";
 import toChatTeam from "../pages/chat/toChatTeam.vue";
+import post from "../pages/post/addPost.vue";
 import * as VueRouter from "vue-router";
 
 import webSocketConfig from "./webSocketConfig";
 import store from "../store";
-import {Toast} from "vant";
 import {getCurrentUser} from "../services/users";
 
 
 // 2. 定义一些路由
 const routes = [
     {path: '/index', title: '主页', component: Index},
+    {path: '/:switchTab', component: Index},
     {path: '/team', title: '队伍管理', component: Team},
     {path: '/userTeam', component: UserTeam},
     {path: '/userTeam/add', title: '修改队伍', component: userTeamEditPage},
     {path: '/team/add', title: '添加队伍', component: TeamAndPage},
-    {path: '/user', title: '个人中心', component: User},
+    {path: '/user', title: '个人信息', component: User},
+    {path: '/space', title: '个人中心', component: Space},
     {path: '/search', title: '搜索', component: SearchPage},
     {path: '/user/list', title: '搜索', component: SearchResultPage},
     {path: '/user/edit', title: '修改信息', component: UserEditPage},
@@ -43,6 +46,7 @@ const routes = [
     {path: '/findFriend', title: '搜索好友', component: FindFriend},
     {path: '/toChat', component: toChat},
     {path: '/chatTeam', component: toChatTeam},
+    {path: '/addPost', component: post},
 ]
 
 const router = VueRouter.createRouter({
@@ -51,13 +55,11 @@ const router = VueRouter.createRouter({
     routes, // `routes: routes` 的缩写
 })
 router.beforeEach(async (to, from, next) => {
-    if (!store.getters.getIsLogin) {
+    if (to.path !== '/' && to.path !== '/register' && to.path !== '/forget') {
         const user = await getCurrentUser();
         if (user != null) {
             await store.dispatch('setUser', user);
         }
-    }
-    if (to.path !== '/' && to.path !== '/register' && to.path !== '/forget') {
         // 检查用户是否已登录
         // ❗️ 避免无限重定向
         if (!store.getters.getIsLogin && to.path !== '/' && to.path !== '/register' && to.path !== '/forget') {

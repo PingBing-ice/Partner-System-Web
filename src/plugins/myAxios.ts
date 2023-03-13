@@ -1,6 +1,6 @@
 // Set config defaults when creating the instance
 import axios from "axios";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import {useRoute, useRouter} from "vue-router";
 import {getMessages} from "../services/MeesageUtils";
 
@@ -28,9 +28,9 @@ myAxios.interceptors.request.use(function (config) {
 myAxios.interceptors.response.use(response => {
     if (response?.data?.code != 200) {
         if (response.data.description) {
-            Toast.fail(response.data.description)
+            showFailToast(response.data.description)
         } else {
-            Toast.fail(response.data.message)
+            showFailToast(response.data.message)
         }
     }
     // 对响应数据做点什么
@@ -38,7 +38,9 @@ myAxios.interceptors.response.use(response => {
 }, error => {
     // 对响应错误做点什么
     // window.location.replace("/");
-    // Toast.fail("系统错误请重试")
+    if (error.code === "ERR_NETWORK") {
+        showFailToast("网络异常,请重试")
+    }
     return Promise.reject(error);
 });
 

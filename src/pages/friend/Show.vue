@@ -27,8 +27,8 @@
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import myAxios from "../../plugins/myAxios";
-import {Dialog, Toast} from "vant";
-
+import { showConfirmDialog } from 'vant';
+import { showSuccessToast, showFailToast } from 'vant';
 const route = useRoute();
 const router = useRouter();
 const editState = ref(false);
@@ -57,12 +57,12 @@ onMounted(async ()=>{
     }
     user.value = userNum;
   }else {
-    Toast.fail(res.description)
+    showFailToast(res.description)
   }
 })
 const edit =  () => {
   editState.value = true;
-  Dialog.confirm({
+  showConfirmDialog({
     title: '确认删除吗?',
   }).then(async() => {
     const res = await myAxios.get("/partner/friend/userFriend/delFriendUser",{
@@ -75,7 +75,7 @@ const edit =  () => {
       editState.value = false;
       await router.push({path: '/'})
     }else {
-      Toast.fail(res.description)
+      showFailToast(res.description)
     }
 
     // on confirm

@@ -31,27 +31,37 @@
             <van-stepper v-model="addTeamFrom.maxNum" min="2" max="20"/>
           </template>
         </van-field>
-
-
         <van-field
-            v-model="currentDate"
+            v-model="result"
             is-link
             readonly
-            name="datetimePicker"
-            label="过期时间"
+            name="datePicker"
+            label="时间选择"
             placeholder="点击选择时间"
             @click="showPicker = true"
         />
         <van-popup v-model:show="showPicker" position="bottom">
-          <van-datetime-picker
-              v-model="currentDate"
-              type="date"
-              title="选择过期时间"
-              @confirm="onConfirm"
-              @cancel="showPicker=false"
-              :min-date="minDate"
-          />
+          <van-date-picker @confirm="onConfirm" :min-date="minDate" @cancel="showPicker = false" />
         </van-popup>
+<!--        <van-field-->
+<!--            v-model="currentDate"-->
+<!--            is-link-->
+<!--            readonly-->
+<!--            label="城市"-->
+<!--            placeholder="选择城市"-->
+<!--            @click="isShow()"-->
+<!--        />-->
+
+<!--        <van-popup v-model:show="showPicker" round position="bottom">-->
+<!--          <van-date-picker v-if="showPicker"-->
+<!--                           v-model="currentDate"-->
+<!--                           title="选择日期"-->
+<!--                           :min-date="minDate"-->
+<!--                           @confirm="onConfirm"-->
+<!--                           @cancel="showPicker=false"-->
+
+<!--          />-->
+<!--        </van-popup>-->
         <van-field
             v-model="addTeamFrom.description"
             rows="3"
@@ -72,16 +82,18 @@
 </template>
 
 <script setup>
-import {onMounted, ref, watchEffect} from "vue";
+import {ref} from "vue";
 import myAxios from "../../plugins/myAxios";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import {useRouter} from "vue-router";
 import {formatDate} from "../../services/dataUtils";
 
-const currentDate = ref("");
+const currentDate = ref();
 const showPicker = ref(false);
 const minDate = new Date();
-const router=useRouter();
+const result = ref('');
+
+const router = useRouter();
 const initFromData = {
   "name": "",
   "description": "",
@@ -91,33 +103,35 @@ const initFromData = {
   "status": 0
 }
 
-watchEffect(()=>{
-  if (currentDate.value &&currentDate.value.length > 20) {
-    currentDate.value = '';
 
-
-  }
-})
 const addTeamFrom = ref({...initFromData})
-const onSubmit =async () => {
-  const postData =  {
+const onSubmit = async () => {
+  const postData = {
     ...addTeamFrom.value,
-    expireTime: currentDate.value,
+    expireTime: result.value,
     status: Number(addTeamFrom.value.status)
   }
-  const res = await myAxios.post('/partner/team/addTeam',postData);
+  const res = await myAxios.post('/partner/team/addTeam', postData);
   if (res?.code === 200) {
-    Toast.success("添加成功")
+    showSuccessToast("添加成功")
     await router.push({
       path: "/team",
     })
-  }else {
-    Toast.fail("添加失败")
+  } else {
+    showFailToast("添加失败")
   }
 }
-const onConfirm = () => {
-  currentDate.value = formatDate(currentDate.value,"YYYY-MM-DD HH-MM-SS")
+// const onConfirm = () => {
+//    const date =new Date(currentDate.value)
+//   currentDate.value = formatDate(date, "YYYY-MM-DD")
+//   showPicker.value = false;
+// }
+const onConfirm = ({ selectedValues }) => {
+  result.value = selectedValues.join('-');
   showPicker.value = false;
+};
+const isShow = () => {
+  showPicker.value = true;
 }
 </script>
 

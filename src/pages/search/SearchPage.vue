@@ -3,7 +3,7 @@
     <van-search
         v-model="searchTest"
         show-action
-        placeholder="请输入要搜索的伙伴"
+        placeholder="请输入要搜索的内容"
         input-align="center"
         @search="onSearch"
         @cancel="onCancel"

@@ -1,6 +1,6 @@
 import {UnwrapRef} from "vue";
 
-export function formatDate(time: UnwrapRef<string>, type = 'YYYY-MM-DD') { //
+export function formatDate(time: Date, type = 'YYYY-MM-DD') { //
     const y = formatNumber(time.getFullYear())
     const m = formatNumber(time.getMonth() + 1)
     const d = formatNumber(time.getDate())
@@ -11,7 +11,13 @@ export function formatDate(time: UnwrapRef<string>, type = 'YYYY-MM-DD') { //
         return `${y}-${m}-${d} ${h}:${mm}:${s}`
     } else if (type === 'YYYY-MM-DD') {
         return `${y}-${m}-${d}`
-    } else if (type === 'YYYY-MM') {
+    } else if (type==='YYYY,MM,DD'){
+        const arr = [];
+        arr.push(y);
+        arr.push(m);
+        arr.push(d);
+        return arr;
+    }else if (type === 'YYYY-MM') {
         return `${y}-${m}`
     } else if (type === 'HH-MM-SS') {
         return `${h}:${mm}:${s}`

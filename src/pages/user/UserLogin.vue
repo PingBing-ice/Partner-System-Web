@@ -1,9 +1,15 @@
 <template>
   <div class="parent" id="demo">
     <div class="title">
-      <h1 class="one">
+      <van-image
+          round
+          width="5rem"
+          height="5em"
+          src="https://hb.dogbin.vip/assets/logo.5fbb5305.png"
+      />
+      <h2 class="one">
         用户登录
-      </h1>
+      </h2>
     </div>
     <div class="div-in-center">
       <van-form @submit="onSubmit">
@@ -54,7 +60,7 @@
 import {inject, reactive, ref} from 'vue';
 import {useRoute, useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import webSocketConfig from "../../config/webSocketConfig";
 import ImageCode from "../../components/imageCode.vue";
 import store from "../../store";
@@ -124,14 +130,14 @@ const onSubmit = async () => {
       await store.dispatch('setUser', res.data)
       await webSocketConfig.initSocket();
       indexUser();
-      Toast.success("登录成功");
+      showSuccessToast("登录成功");
       const redirect = route.query?.redirect ?? '/index'
       await router.replace({path: redirect})
     } else {
       if (res.description) {
-        Toast.fail(res.description)
+        showFailToast(res.description)
       } else {
-        Toast.fail("登录失败,请重试");
+        showFailToast("登录失败,请重试");
       }
     }
     buttonLoading.value = false;
@@ -156,7 +162,11 @@ const ForgetUser = () => {
 
 <style scoped>
 div.parent {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -270px;
+  margin-left: -188px;
 }
 
 .div-in-center {
@@ -164,7 +174,7 @@ div.parent {
 }
 
 .title {
-  margin-top: 40%;
+  /*margin-top: 40%;*/
 }
 
 .one {

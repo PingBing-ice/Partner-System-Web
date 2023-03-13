@@ -1,4 +1,5 @@
 import Vuex from 'vuex'
+import {UserType} from "../models/user";
 
 
 const store = new Vuex.Store({
@@ -18,7 +19,7 @@ const store = new Vuex.Store({
         setUser(state, user) {
             state.user = user;
         },
-        loginOut:state => {
+        loginOut(state)  {
             state.user = null;
         }
     }

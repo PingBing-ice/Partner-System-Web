@@ -15,7 +15,7 @@
           src="https://pic1.zhimg.com/80/v2-88c46f9f5b2aa6d6e04469fb989b7b54_720w.jpg"
       />
       <van-tag plain style="margin-right: 8px; margin-top: 8px;color: #42b983" type="danger">
-        {{ userId === team?.userId ? '队长':'队员' }}
+        {{ team?.captain ? '队长':'队员' }}
       </van-tag>
     </template>
   </van-cell>
@@ -23,11 +23,10 @@
 
 <script setup lang="ts">
 import {useRouter} from "vue-router";
-import {teamStateEnum} from "../../states/team";
 
 import {inject, onMounted, ref} from "vue";
 import myAxios from "../../plugins/myAxios";
-  import {Toast} from "vant";
+  import { showSuccessToast, showFailToast } from 'vant';
 import webSocketConfig from "../../config/webSocketConfig";
 import {messageType} from "../../services/MessageType";
 import store from "../../store";
@@ -40,7 +39,7 @@ const user = ref();
 let socket: any;
 onMounted(async ()=>{
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -51,10 +50,12 @@ onMounted(async ()=>{
   }
   getMessage();
   userId.value = user.value.id;
-   const res =await myAxios.get("/partner/team/Check");
-  if (res.code === 200) {
-    teamList.value = res.data;
-  }
+   myAxios.get("/partner/team/check").then(res =>{
+     if (res.code === 200) {
+       teamList.value = res.data;
+     }
+   });
+
 
 })
 

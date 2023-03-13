@@ -76,7 +76,7 @@ onMounted(async () => {
 
   // 获取用户人的信息,获取socket连接
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -104,7 +104,7 @@ onMounted(async () => {
   if (response.code === 200) {
     teamChatRecord.value = response.data;
   } else if (response.code === 40000) {
-    Toast.fail("你已被踢出该队伍...")
+    showFailToast("你已被踢出该队伍...")
     await router.push({
       path: '/team'
     })

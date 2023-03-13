@@ -73,7 +73,7 @@ let socket: any = null;
 const testData: any = ref([])
 onMounted(async () => {
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -90,17 +90,14 @@ onMounted(async () => {
     //  加载聊天记录
     const response: any = await myAxios.get("/partner/record/getList", {
       params: {
-        userId: userId.value,
         friendId: friendId,
       }
     })
 
     if (response.code === 200 && response.data) {
       recordList.value = response.data;
-      console.log(recordList.value)
 
       recordList.value.forEach((record: any) => {
-
         if (record.userId == userId.value) {
           let userData = {
             id: userId.value,
@@ -125,7 +122,7 @@ onMounted(async () => {
     }
 
   } else {
-    Toast.fail("请先登录...");
+    showFailToast("请先登录...");
   }
   await nextTick(() => {
     // @ts-ignore

@@ -12,4 +12,9 @@ export type UserType = {
     profile?: string;
     tags?: string;
 };
+export type UserAvatarVo = {
+    id?: string;
+    username?: string;
+    avatarUrl?: string;
+}
 

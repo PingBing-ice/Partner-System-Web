@@ -81,7 +81,7 @@
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref, watchEffect} from "vue";
 import myAxios from "../../plugins/myAxios";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
   import store from "../../store";
 
 
@@ -115,12 +115,12 @@ onMounted(() => {
 const sendEmail =async () => {
   subValue.value = true;
   if (editUser.value.currentValue === ''||!editUser.value.currentValue) {
-    Toast.fail("请输入内容");
+    showFailToast("请输入内容");
     return;
   }
   const pattern = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/;
   if (!pattern.test(editUser.value.currentValue+'')) {
-    Toast.fail("邮箱格式错误");
+    showFailToast("邮箱格式错误");
     return;
   }
 
@@ -130,22 +130,22 @@ const sendEmail =async () => {
   if (response.code === 200) {
     isTime.value = true;
     subValue.value = false;
-    Toast.success("发送成功，请注意查收");
+    showSuccessToast("发送成功，请注意查收");
   }else {
     if (response.description) {
       subValue.value = false;
-      Toast.fail(response.description)
+      showFailToast(response.description)
     }
   }
   subValue.value = false;
 }
 const onSubmit = async () => {
   if (editUser.value.currentValue === ''||currentValue.value === editUser.value.currentValue) {
-    Toast.fail("请输入内容");
+    showFailToast("请输入内容");
     return;
   }
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -157,10 +157,10 @@ const onSubmit = async () => {
   });
 
   if (res.code === 200 && res.data > 0) {
-    Toast.success('修改成功');
+    showSuccessToast('修改成功');
     router.back();
   }else {
-    Toast.fail("修改失败");
+    showFailToast("修改失败");
   }
 }
 </script>

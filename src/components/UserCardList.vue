@@ -20,9 +20,8 @@
 <script setup lang="ts">
 import {UserType} from "../models/user";
 import myAxios from "../plugins/myAxios";
-import {Dialog, Toast} from "vant";
-
-
+import { showSuccessToast, showFailToast } from 'vant';
+import { showConfirmDialog } from 'vant';
 interface UserCardListType {
   userList: UserType[];
 }
@@ -33,7 +32,7 @@ const props = withDefaults(defineProps<UserCardListType>(), {
 })
 
 const sendFriendRequest = (id: string) => {
-  Dialog.confirm({
+  showConfirmDialog({
     title: '确认添加好友吗？',
   })
       .then(async () => {
@@ -41,11 +40,11 @@ const sendFriendRequest = (id: string) => {
           toUserId:id})
         // @ts-ignore
         if (res.code == 200) {
-          Toast.success("发送成功")
+          showSuccessToast("发送成功")
         } else {
           // @ts-ignore
           if (res.description) {
-            Toast.fail(res.description);
+            showFailToast(res.description);
           }
         }
       })

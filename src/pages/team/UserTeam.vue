@@ -71,10 +71,11 @@ import {useRoute, useRouter} from "vue-router";
 import MyAxios from "../../plugins/myAxios";
 import myAxios from "../../plugins/myAxios";
 import UserCardList from "../../components/UserCardList.vue";
-  import {Dialog, Toast} from "vant";
+  import {Dialog} from "vant";
 import {teamStateEnum} from "../../states/team";
 import store from "../../store";
-
+import { showSuccessToast, showFailToast } from 'vant';
+import { showConfirmDialog } from 'vant';
 
 const editState = ref(false);
 const show = ref(false);
@@ -96,7 +97,7 @@ const teamName = {
 const team = ref();
 onMounted(async ()=>{
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -125,17 +126,17 @@ onMounted(async ()=>{
 const clearTeam = () => {
   editState.value = true;
   console.log(teamID)
-  Dialog.confirm({
+  showConfirmDialog({
     title: '确认解散吗?',
   }).then(async() => {
     const res = await myAxios.post("/partner/team/delete",teamID);
     if (res.code === 200) {
       editState.value = false;
-      Toast.success('解散成功...');
+      showSuccessToast('解散成功...');
       await router.push({path: '/team'})
     }else {
       editState.value = false;
-      Toast.fail(res.description)
+      showFailToast(res.description)
     }
     // on confirm
   }).catch(() => {
@@ -146,7 +147,7 @@ const clearTeam = () => {
 // 退出队伍
 const edit =  () => {
   editState.value = true;
-  Dialog.confirm({
+  showConfirmDialog({
     title: '确认退出吗?',
   }).then(async() => {
         const res = await myAxios.get("/partner/team/quit",{
@@ -156,11 +157,11 @@ const edit =  () => {
         });
         if (res.code === 200) {
           editState.value = false;
-          Toast.success('退出成功...');
+          showSuccessToast('退出成功...');
           await router.push({path: '/team'})
         }else {
           editState.value = false;
-          Toast.fail(res.description)
+          showFailToast(res.description)
         }
         // on confirm
       }).catch(() => {
@@ -170,7 +171,7 @@ const edit =  () => {
 }
 const isShow = () => {
   if (!userVo || userVo.value.length <= 0) {
-    Toast.fail("人员为空，请邀请好友");
+    showFailToast("人员为空，请邀请好友");
     return;
   }
   show.value = true;
@@ -185,14 +186,14 @@ const sendFriendRequest = async (id) => {
   })
   // @ts-ignore
   if (res.code === 200) {
-    Toast.success("添加成功")
+    showSuccessToast("添加成功")
   }else {
     // @ts-ignore
-    Toast.fail(res.description)
+    showFailToast(res.description)
   }
 }
 const quitUser = (teamId,userId) => {
-  Dialog.confirm({
+  showConfirmDialog({
     title: '确定踢出吗?',
   }).then( async () => {
         const res = await myAxios.post("/partner/team/quitUserTeam",{
@@ -203,13 +204,13 @@ const quitUser = (teamId,userId) => {
           userVo.value =userVo.value.filter(user => {
             return  userId !== user.id
           })
-          Toast.success("成功!")
+          showSuccessToast("成功!")
 
         }else {
           if (res.description) {
-            Toast.success(res.description);
+            showSuccessToast(res.description);
           }else {
-            Toast.success(res.message);
+            showSuccessToast(res.message);
           }
         }
       }).catch(() => {
@@ -225,7 +226,7 @@ const onClickRightTeam = () => {
 }
 // 上传头像
 const afterRead = (file) => {
-  Dialog.confirm({
+  showConfirmDialog({
     title: '每天只能修改一次',
     message: '是否上传?',
   }).then(async () => {
@@ -235,9 +236,9 @@ const afterRead = (file) => {
     const res = await myAxios.post(`/oss/file/upload/team/${teamID}`,param);
     if (res.code === 200) {
       avatar.value = res.data;
-      Toast.success('修改成功...');
+      showSuccessToast('修改成功...');
     }else {
-      Toast.fail(res.description);
+      showFailToast(res.description);
     }
   }).catch(() => {
 

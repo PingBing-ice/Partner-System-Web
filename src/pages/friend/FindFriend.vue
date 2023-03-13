@@ -24,7 +24,7 @@
 
 <script setup>
 import {ref, onMounted} from "vue";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 import {useRouter} from "vue-router";
 import myAxios from "../../plugins/myAxios";
   import UserCardList from "../../components/UserCardList.vue";
@@ -38,7 +38,7 @@ const router = useRouter();
 
 onMounted(async () => {
   if (!store.getters.getIsLogin) {
-    Toast.fail("未登录");
+    showFailToast("未登录");
     router.back();
     return;
   }
@@ -66,7 +66,7 @@ const onSearch = async () => {
     }
     searchUserList.value = searchUserTo.data;
   }else {
-    Toast.fail(searchUserTo.description)
+    showFailToast(searchUserTo.description)
     is.value = false;
   }
   is.value = false;

@@ -33,7 +33,7 @@
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref, watchEffect} from "vue";
 import myAxios from "../../plugins/myAxios";
-import {Toast} from "vant";
+import { showSuccessToast, showFailToast } from 'vant';
 
 
 const checked = ref([])
@@ -67,11 +67,11 @@ watchEffect(()=>{
 const onSubmit = async () => {
   if (editTeam.value.teamName === '状态') {
     if (!checked.value || checked.value.length !== 1) {
-      Toast.fail("请修改值")
+      showFailToast("请修改值")
       return;
     }
     if (!password.value || password.value === '' || password.value !== confirmPassword.value) {
-      Toast.fail("密码错误");
+      showFailToast("密码错误");
       return;
     }
     const response =await myAxios.post('/partner/team/update',{
@@ -81,11 +81,11 @@ const onSubmit = async () => {
     });
     if (response.code === 200) {
       router.back();
-      Toast.success("修改成功")
+      showSuccessToast("修改成功")
     }
   }else {
     if (isFor === editTeam.value.teamValue) {
-      Toast.fail("请修改值")
+      showFailToast("请修改值")
       return;
     }
     const response =await myAxios.post('/partner/team/update',{
@@ -94,7 +94,7 @@ const onSubmit = async () => {
     });
     if (response.code === 200) {
       router.back();
-      Toast.success("修改成功")
+      showSuccessToast("修改成功")
     }
   }
 
