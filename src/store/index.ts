@@ -1,7 +1,10 @@
 import Vuex from 'vuex'
-import {UserType} from "../models/user";
 
-
+import VuexPersistence from 'vuex-persist'
+const vuexLocal = new VuexPersistence({
+    key:'myName',
+    storage: window.sessionStorage
+})
 const store = new Vuex.Store({
     state: {
         user: null,
@@ -31,7 +34,8 @@ const store = new Vuex.Store({
         LoginOut(context) {
             context.commit('loginOut')
         },
-    }
+    },
+    plugins: [vuexLocal.plugin]
 
 })
 

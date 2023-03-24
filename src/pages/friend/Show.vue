@@ -65,7 +65,7 @@ const edit =  () => {
   showConfirmDialog({
     title: '确认删除吗?',
   }).then(async() => {
-    const res = await myAxios.get("/partner/friend/userFriend/delFriendUser",{
+    const res = await myAxios.get("/partner/friend/userFriend/del",{
       params:{
         friendId:friendId
       }
@@ -73,7 +73,7 @@ const edit =  () => {
     // @ts-ignore
     if (res.code === 200) {
       editState.value = false;
-      await router.push({path: '/'})
+      await router.push({path: '/index'})
     }else {
       showFailToast(res.description)
     }

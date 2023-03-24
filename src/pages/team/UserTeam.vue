@@ -125,7 +125,6 @@ onMounted(async ()=>{
 })
 const clearTeam = () => {
   editState.value = true;
-  console.log(teamID)
   showConfirmDialog({
     title: '确认解散吗?',
   }).then(async() => {

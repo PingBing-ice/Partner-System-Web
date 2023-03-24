@@ -44,21 +44,32 @@
         </template>
       </van-field>
     </van-cell-group>
-    <van-cell-group inset v-else-if="editUser.editKey==='description'">
+    <van-cell-group inset v-else-if="editUser.editKey==='profile'">
       <!-- 通过 pattern 进行正则校验 -->
       <van-cell-group inset>
         <van-field
             v-model="editUser.currentValue"
-            rows="1"
             required
             autosize
+            maxlength="200"
+            show-word-limit
             :label="editUser.editName"
             type="textarea"
+            label-align="top"
             placeholder="请输入描述"
         />
       </van-cell-group>
     </van-cell-group>
-    <van-cell-group inset v-else>
+
+    <van-radio-group v-model="editUser.currentValue" style="display: flex;justify-content: center;margin-bottom: 12px;margin-top: 22px" direction="horizontal" v-if="editUser.editKey==='gender'">
+      <van-radio name="男" style="margin-right: 53px">男</van-radio>
+      <van-radio name="女">女</van-radio>
+    </van-radio-group>
+    <van-radio-group v-model="editUser.currentValue" style="display: flex;justify-content: center;margin-bottom: 12px;margin-top: 22px" direction="horizontal" v-if="editUser.editKey==='status'">
+      <van-radio name="公开" style="margin-right: 53px">公开</van-radio>
+      <van-radio name="私密">私密</van-radio>
+    </van-radio-group>
+    <van-cell-group inset v-if="editUser.editKey!=='gender'&&editUser.editKey!=='email'&&editUser.editKey!=='profile'&&editUser.editKey!=='status'">
       <!-- 通过 pattern 进行正则校验 -->
       <van-field
           v-model="editUser.currentValue"
@@ -140,9 +151,13 @@ const sendEmail =async () => {
   subValue.value = false;
 }
 const onSubmit = async () => {
-  if (editUser.value.currentValue === ''||currentValue.value === editUser.value.currentValue) {
+  if (editUser.value.currentValue === '') {
     showFailToast("请输入内容");
     return;
+  }
+  if (currentValue.value === editUser.value.currentValue) {
+    showFailToast("内容重复请修改");
+    return
   }
   if (!store.getters.getIsLogin) {
     showFailToast("未登录");
@@ -156,7 +171,8 @@ const onSubmit = async () => {
     "code": emailCode.value,
   });
 
-  if (res.code === 200 && res.data > 0) {
+  if (res.code === 200 && res.data ) {
+    store.commit("setUser",res.data)
     showSuccessToast('修改成功');
     router.back();
   }else {

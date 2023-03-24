@@ -36,8 +36,8 @@
           <van-icon name="search" size="18"/>
         </template>
       </van-nav-bar>
-      <van-nav-bar class="head" v-if="route.path!=='/index'&& route.path!=='/team'&& route.path!=='/find'
-    && route.path!== '/chatTeam'&& route.path!=='/toChat'&& route.path!=='/userTeam'&&route.path!=='/space'"
+      <van-nav-bar class="head" v-if="route.path!=='/'&& route.path!=='/team'&& route.path!=='/find'
+    && route.path!== '/chatTeam'&& route.path!=='/toChat'&& route.path!=='/userTeam'&&route.path!=='/space'&&route.path!=='/index'"
                    :title="title"
                    left-arrow
                    @click-left="onClickLeft"
@@ -47,12 +47,13 @@
           <van-icon name="search" size="18"/>
         </template>
       </van-nav-bar>
-      <div id="contents">
+      <div :class="
+     route.path=== '/chatTeam'|| route.path==='/toChat'?'is_contents':'contents'">
         <router-view/>
       </div>
       <div class="tail">
         <van-tabbar route>
-          <van-tabbar-item replace to="/index" icon="home-o" name="index">主页</van-tabbar-item>
+          <van-tabbar-item replace to="/" icon="home-o" name="index">主页</van-tabbar-item>
           <van-tabbar-item replace to="/team" icon="search" name="team">队伍</van-tabbar-item>
           <van-tabbar-item replace to="/find" icon="chat-o" name="chat">通讯录</van-tabbar-item>
           <van-tabbar-item replace to="/space" icon="user-o" name="chat">我的</van-tabbar-item>
@@ -71,6 +72,9 @@ import UserRegister from "../pages/user/UserRegister.vue";
 import routeConfig from "../config/routeConfig";
 import UserForget from "../pages/user/UserForget.vue";
 import store from "../store";
+import webSocketConfig from "../config/webSocketConfig";
+import {messageType} from "../services/MessageType";
+import {showNotify} from "vant";
 
 
 const router = useRouter();
@@ -103,8 +107,7 @@ provide('indexUser', async () => {
 
 });
 
-onMounted(async () => {
-
+onMounted(() => {
 })
 const findUser = () => {
   router.push({
@@ -122,13 +125,21 @@ const onClickRight = () => {
 </script>
 
 <style scoped>
-#contents {
+
+
+.contents {
   /*padding-bottom: 50px;*/
   overflow-y: auto;
-  height: auto;
+  height: 86%;
   width: auto;
+  text-align: left;
 }
-
+.is_contents{
+  overflow-y: auto;
+  height: 93%;
+  width: auto;
+  text-align: left;
+}
 .content {
   height: 100%;
   width: 100%;
@@ -138,10 +149,12 @@ const onClickRight = () => {
   height: 100%;
   width: 100%;
 }
-.head{
+
+.head {
   height: 7%;
 }
-.tail{
+
+.tail {
   height: 7%;
 }
 </style>

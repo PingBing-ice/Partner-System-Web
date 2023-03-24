@@ -23,24 +23,7 @@
     </template>
 
   </van-card>
-  <van-action-sheet
-      v-model:show="show"
-      round
-      position="bottom"
-  >
-    <van-divider>{{ '队伍最大人数: ' + max }}</van-divider>
-    <van-divider>队员</van-divider>
-    <user-card-list :userList="userListVo"/>
-  </van-action-sheet>
 
-  <van-dialog v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
-        <van-field
-            v-model="teamPassword"
-            name="password"
-            label="队伍密码"
-            placeholder="请输入密码"
-        />
-  </van-dialog>
 
 
 </template>
@@ -48,20 +31,10 @@
 <script setup lang="ts">
 import {TeamType} from "../models/team";
 import {teamStateEnum} from "../states/team";
-import {onMounted, ref, watchEffect} from "vue";
-import UserCardList from "./UserCardList.vue";
-import myAxios from "../plugins/myAxios";
-import {Dialog, Toast} from "vant";
+import {ref} from "vue";
 
-
+const emits = defineEmits(['addTeam','teamShow'])
 const show = ref(false)
-const addPasswordTeam = ref(false)
-const max = ref(0)
-const userListVo = ref([])
-const teamID = ref("")
-const teamStatus = ref(0);
-const teamPassword = ref('');
-const VanDialog  =Dialog.Component
 interface TeamCardListType {
   teamList: TeamType[];
 }
@@ -71,59 +44,20 @@ const props = withDefaults(defineProps<TeamCardListType>(), {
   teamList: [] as TeamType[],
 })
 
-const JoinTeam =async () => {
-  if (teamPassword.value === '' || !teamPassword.value || teamID.value==='') {
-    showFailToast("请输入密码")
-    return;
-  }
-  const res: any = await myAxios.post("/partner/team/join", {
-    teamId: teamID.value,
-    password: teamPassword.value,
-  });
-  if (res?.code == 200) {
-    showSuccessToast("加入成功");
-  } else {
-    showFailToast(res.description);
-  }
-  teamID.value = '';
-  teamPassword.value = '';
-}
+
 
 /**
  * 加入队伍
  */
 const addTeam = async (id: string, status: number) => {
-  if (status === 2) {
-    teamPassword.value = '';
-    addPasswordTeam.value = true;
-    teamID.value = id
-  }else {
-    const res: any = await myAxios.post("/partner/team/join", {
-      teamId: id,
-    });
-    if (res?.code == 200) {
-      showSuccessToast("加入成功");
-    } else {
-      showFailToast(res.description);
-    }
-  }
 
+  emits("addTeam", id, status);
 }
 
 const isShow = (id: string, status: number) => {
 
-  teamStatus.value = status;
-  show.value = true;
-  for (let i = 0; i < props.teamList.length; i++) {
-    const team = props.teamList[i];
-    if (team.id == id) {
+  emits("teamShow", id, status);
 
-      userListVo.value = [];
-      max.value = team.maxNum;
-      // @ts-ignore
-      userListVo.value = team.userVo
-    }
-  }
 }
 </script>
 

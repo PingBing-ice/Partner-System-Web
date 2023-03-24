@@ -16,6 +16,7 @@
     <van-cell :title="userName.userAccount" :value="user?.userAccount"/>
     <van-cell :title="userName.gender" is-link :value="user?.gender"
               @click="toEdit('gender',userName.gender,user?.gender)"/>
+
     <van-cell title="标签" @click="show = true">
       <template #right-icon>
         <van-tag plain v-for="tag in user?.tags" type="primary" size="large">{{ tag }}</van-tag>
@@ -25,6 +26,8 @@
     <van-cell :title="userName.email" is-link :value="user?.email" @click="toEdit('email',userName.email,user?.email)"/>
     <van-cell :title="userName.description" is-link :value="user?.profile"
               @click="toEdit('profile',userName.description,user?.profile)"/>
+    <van-cell :title="userName.status" is-link :value="user?.status"
+              @click="toEdit('status',userName.status,user?.status)"/>
     <van-cell :title="userName.planetCode" :value="user?.planetCode"/>
     <van-cell :title="userName.createTime" :value="user?.createTime"/>
     <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">退出登录
@@ -83,6 +86,7 @@ const userName = {
   tel: '电话号码',
   email: '邮箱',
   description: '描述',
+  status: '状态',
   planetCode: '编号',
   createTime: '创建时间'
 }
@@ -99,8 +103,9 @@ onMounted(async () => {
 
   const res = await myAxios.get("/api/user/current");
   // @ts-ignore
-  if (res.code === 200) {
+  if (res.code === 200&&res.data) {
     const users = res.data
+    store.commit("setUser", users);
     if (users.tags) {
       users.tags = JSON.parse(users.tags)
       tagList.value = users.tags
@@ -111,8 +116,9 @@ onMounted(async () => {
     user.value = users;
     avatar.value = user.value.avatarUrl
 
+  }else {
+    store.commit("loginOut")
   }
-
 })
 // 注销
 const edit = async () => {
@@ -123,7 +129,7 @@ const edit = async () => {
     editState.value = false;
     await store.dispatch("LoginOut")
     removeChatUser()
-    await router.push({path: '/'})
+    await router.push({path: '/index'})
   }
 }
 const toEdit = (editKey, editName, currentValue) => {
@@ -162,7 +168,8 @@ const toTag = () => {
         id: user.id,
         tags: tag
       }).then(resp => {
-        if (resp.code === 200) {
+        if (resp.code === 200&&resp.data) {
+          store.commit("setUser",resp.data)
           router.push({
             path: '/user'
           })
@@ -179,7 +186,7 @@ const toTag = () => {
       showFailToast(error.message)
     });
   } else {
-    Toast("请选择标签");
+    showFailToast("请选择标签");
   }
 }
 const isTagListHasID = (tag, list) => {
@@ -232,8 +239,6 @@ const afterRead = (file) => {
 </script>
 
 <style>
-#contents {
-  text-align: left;
-}
+
 
 </style>

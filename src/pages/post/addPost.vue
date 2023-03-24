@@ -1,66 +1,77 @@
 <template>
-
-  <van-form @submit="onSubmit">
-    <van-cell-group inset>
-      <van-field
-          v-model="message"
-          rows="8"
-          autosize
-          type="textarea"
-          maxlength="1000"
-          placeholder="点击此处说点什么"
-          show-word-limit
-      >
-        <template #button v-if="addTagSet.size>0">
-          <div style="display: flex;flex-direction: column">
-            <div v-for="tagId in addTagSet">
-              <van-tag plain type="primary" closeable @close="closeTag(tagId)" style="margin-bottom: 10px"
-                       size="medium">
-                {{ tagMap.get(tagId) }}
-              </van-tag>
-            </div>
+  <div v-if="route.path==='/addPost'" >
+    <vue-quill-text-editor ref="quillRef" :placeholder="'点击此处说点什么....\n注意: 违规词会被屏蔽'" :uploadFun="uploadFun" />
+  </div>
+  <van-cell-group inset>
+    <van-field  placeholder="请输入填写标签" @focus="iconButton" readonly label="标签"  @blur="iconBlur">
+      <template #button>
+        <div style="display: flex">
+          <div v-for="tagId in addTagSet">
+            <van-tag plain type="primary" closeable @close="closeTag(tagId)" style="margin-right: 2px;"
+                     size="medium">
+              {{ tagMap.get(tagId) }}
+            </van-tag>
           </div>
-        </template>
-      </van-field>
-      <div class="icon">
-        <van-uploader :after-read="afterRead">
-          <van-icon name="photo-o" class="icon-is"/>
-        </van-uploader>
-        <van-icon name="bookmark-o" @click="iconButton" class="icon-is"/>
-      </div>
-      <div class="van-hairline--top" v-if="isIcon">
-        <van-row justify="space-around">
-          <van-col span="6" v-for="tag in tagIdList">
-            <van-tag plain type="primary" @click="addTag(tag);" size="medium">{{ tagMap.get(tag) }}</van-tag>
-          </van-col>
-        </van-row>
-      </div>
-    </van-cell-group>
-    <div style="margin: 16px;">
-      <van-button round block type="primary" native-type="submit">
-        提交
-      </van-button>
+        </div>
+      </template>
+    </van-field>
+    <div class="van-hairline--top" v-if="isIcon">
+      <van-row justify="space-around">
+        <van-col span="6" v-for="tag in tagIdList">
+          <van-tag plain type="primary" @click="addTag(tag);" size="medium">{{ tagMap.get(tag) }}</van-tag>
+        </van-col>
+      </van-row>
     </div>
-  </van-form>
+  </van-cell-group>
 
+  <van-button type="default" block round @click="onSubmit">提交</van-button>
 </template>
-
 <script setup>
-import {onMounted, ref} from "vue";
+import {ref, watch} from "vue";
+import {onMounted} from "vue";
 import myAxios from "../../plugins/myAxios";
 import {showSuccessToast, showFailToast} from 'vant';
 import {useRouter} from "vue-router";
-import { showToast } from 'vant';
-
-
-
+import {useRoute} from "vue-router";
+import {showToast} from 'vant';
+const quillRef = ref();
 const message = ref('')
 const filePost = ref();
 const tagIdList = ref([]);
 const addTagSet = ref(new Set());
 const router = useRouter()
+const route = useRoute()
 const tagMap = ref();
 const isIcon = ref(false);
+watch(quillRef, async (val) => {
+  const quillInstance = val.quillInstance;
+  quillInstance.on('text-change', () => {
+    // get html content
+    message.value = quillInstance.container.firstChild.innerHTML;
+  });
+  // set html content
+})
+
+
+const doUpload = async (formData) => {
+
+}
+
+const uploadFun = (file) => {
+
+  try {
+    const oMyForm = new FormData();
+    oMyForm.append('file', file);
+    return new Promise(async (resolve, reject) => {
+      // do some validation
+      resolve(await doUpload(oMyForm));
+    });
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+
 onMounted(() => {
   // 获取标签
   myAxios.get("/api/userLabel/getLabel").then(resp => {
@@ -100,7 +111,7 @@ const onSubmit = () => {
       router.push({
         path: '/index'
       })
-      showSuccessToast("修改成功");
+      showSuccessToast("添加成功");
     } else {
       if (resp.description) {
         showFailToast(resp.description)
@@ -119,27 +130,61 @@ const addTag = (tagId) => {
 
 }
 const closeTag = (tagId) => {
-  const set = new Set();
-  addTagSet.value.forEach(tag => {
-    if (tag !== tagId) {
-      set.add(tagId);
-    }
-  })
-  addTagSet.value = set;
+  addTagSet.value.delete(tagId);
   tagIdList.value.push(tagId);
 }
 const iconButton = () => {
   isIcon.value = !isIcon.value;
 }
+const iconBlur = () =>{
+
+};
 </script>
-
 <style scoped>
-.icon {
-  margin: 13px
-}
-
-.icon-is {
-  font-size: 23px;
-  margin-right: 14px
+.van-popover__wrapper{
+  width: 100%;
 }
 </style>
+<!--<template>-->
+<!--<van-form @submit="onSubmit">-->
+<!--<van-cell-group inset>-->
+<!--  <van-field-->
+<!--      v-model="message"-->
+<!--      rows="8"-->
+<!--      autosize-->
+<!--      type="textarea"-->
+<!--      maxlength="1000"-->
+<!--      placeholder="点击此处说点什么"-->
+<!--      show-word-limit-->
+<!--  >-->
+<!--    <template #button v-if="addTagSet.size>0">-->
+
+<!--    </template>-->
+<!--  </van-field>-->
+
+
+<!--</van-cell-group>-->
+<!--<div style="margin: 16px;">-->
+<!--  <van-button round block type="primary" native-type="submit">-->
+<!--    提交-->
+<!--  </van-button>-->
+<!--</div>-->
+<!--</van-form>-->
+
+
+<!--</template>-->
+
+<!--<script setup>-->
+
+<!--</script>-->
+
+<!--<style scoped>-->
+<!--.icon {-->
+<!--  margin: 13px-->
+<!--}-->
+
+<!--.icon-is {-->
+<!--  font-size: 23px;-->
+<!--  margin-right: 14px-->
+<!--}-->
+<!--</style>-->

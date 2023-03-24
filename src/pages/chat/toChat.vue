@@ -1,5 +1,5 @@
 <template>
-  <van-nav-bar
+  <van-nav-bar style="height: 7%;width: auto"
       :title="friendName"
       left-arrow
       @click-left="onClickLeft"
@@ -9,34 +9,12 @@
       <van-icon name="friends-o" size="18"/>
     </template>
   </van-nav-bar>
-  <div id="chat">
-    <div class="chatBox">
-      <div class="chatInfo" id="chatInfo">
-        <div class="chatUser-box" v-for="(item,index) in testData" :key="index"
-             :class="userId===item.id?'chatUser-box1':'chatUser-box'">
-          <div class="chatUser-box-img">
-            <van-image round width="2.5rem" height="2.5rem"
-                       :src="item.images"/>
-          </div>
-          <div class="chatUser-info" ref="chatRoom">
-            <div class="chatUser-info-name" :class="userId===item.id?'chatUser-info-name1':'chatUser-info-name'">
-              <span>{{ item.name }}</span><span class="nowDate">{{ item.time }}</span>
-            </div>
-            <div class="chatUser-info-text" :class="userId===item.id?'chatUser-info-text1':'chatUser-info-text'">
-              <span>{{ item.message }}</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
+  <chat-card-box :chatList="testData" :userId="userId"/>
   <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"/>
   <van-cell-group inset>
     <van-field
         v-model="messages"
         center
-        clearable
         placeholder="善语结善缘"
     >
       <template #button>
@@ -48,7 +26,7 @@
 
 <script setup lang="ts">
 
-import {Notify, Toast} from "vant";
+import {Notify, showFailToast, Toast} from "vant";
 import {getCurrentInstance, nextTick, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
   import myAxios from "../../plugins/myAxios";
@@ -57,13 +35,14 @@ import {getMessages} from "../../services/MeesageUtils";
 import {messageType} from "../../services/MessageType";
 import {chatStateEnum} from "../../states/chat";
 import store from "../../store";
+import ChatCardBox from "../../components/ChatCardBox.vue";
 
 const messages = ref("")
 const route = useRoute()
 const router = useRouter()
 const friendId = route.query.friendId + ""
-const friendName = route.query.username
-const FriendNameAvatarUrl = route.query.avatarUrl
+const friendUrl = ref('')
+const friendName = ref('')
 const userId = ref("")
 const userName = ref("")
 const AvatarUrl = ref("")
@@ -88,14 +67,16 @@ onMounted(async () => {
     getOnMessage(userId.value);
 
     //  加载聊天记录
-    const response: any = await myAxios.get("/partner/record/getList", {
+    const response: any = await myAxios.get("/partner/record/chat", {
       params: {
         friendId: friendId,
       }
     })
 
     if (response.code === 200 && response.data) {
-      recordList.value = response.data;
+      recordList.value = response.data.chat;
+      friendUrl.value = response.data.avatarUrl;
+      friendName.value = response.data.name;
 
       recordList.value.forEach((record: any) => {
         if (record.userId == userId.value) {
@@ -112,13 +93,16 @@ onMounted(async () => {
         if (record.userId == friendId) {
           let FriendData = {
             id: friendId,
-            name: friendName,
-            images: FriendNameAvatarUrl,
+            name:friendName.value,
+            images: friendUrl.value,
             message: record.message,
           };
           testData.value.push(FriendData,);
         }
       })
+    }else {
+      router.back();
+      showFailToast("数据有误");
     }
 
   } else {
@@ -139,15 +123,14 @@ const getOnMessage = (id: string) => {
   socket.onmessage = (msg: any) => {
 
     const chatRecord: messageType = JSON.parse(msg.data)
-    console.log(chatRecord)
     const friend = chatRecord.chatRecord.message;
     if (chatRecord.type === chatStateEnum.HY||chatRecord.type===chatStateEnum.SYSTEM) {
       if (route.path === '/toChat') {
 
         let userData = {
           id: friendId,
-          name: friendName,
-          images: FriendNameAvatarUrl,
+          name: friendName.value,
+          images: friendUrl.value,
           message: friend,
         }
         testData.value.push(userData)
@@ -166,7 +149,7 @@ const getSend = () => {
     return
   }
   if (userId.value == null) {
-    Toast("未登录")
+    showFailToast("未登录")
     router.back();
     return;
   }

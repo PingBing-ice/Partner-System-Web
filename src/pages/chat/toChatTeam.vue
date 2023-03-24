@@ -9,34 +9,13 @@
       <van-icon name="friends-o" size="18"/>
     </template>
   </van-nav-bar>
-  <div id="chat">
-    <div class="chatBox">
-      <div class="chatInfo" id="chatInfo" ref="main">
-        <div class="chatUser-box" id="chatUser-box-id" v-for="(item,index) in testData" :key="index"
-             :class="userId===item.id?'chatUser-box1':'chatUser-box'">
-          <div class="chatUser-box-img">
-            <van-image round width="2.5rem" height="2.5rem"
-                       :src="item.images"/>
-          </div>
-          <div class="chatUser-info" ref="chatRoom">
-            <div class="chatUser-info-name" :class="userId===item.id?'chatUser-info-name1':'chatUser-info-name'">
-              <span>{{ item.name }}</span><span class="nowDate">{{ item.time }}</span>
-            </div>
-            <div class="chatUser-info-text" :class="userId===item.id?'chatUser-info-text1':'chatUser-info-text'">
-              <span>{{ item.message }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-  </div>
+ <chat-card-box  :chat-list="testData" :user-id="userId"></chat-card-box>
   <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"/>
   <van-cell-group inset>
     <van-field
         v-model="messages"
         center
-        clearable
         placeholder="善语结善缘"
     >
       <template #button>
@@ -51,13 +30,14 @@
 <script setup lang="ts">
 import {nextTick, onMounted, ref} from "vue";
   import {useRoute, useRouter} from "vue-router";
-import {Notify, Toast} from "vant";
+import {Notify, showFailToast, showSuccessToast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
 import {messageType} from "../../services/MessageType";
 import {getMessages} from "../../services/MeesageUtils";
 import MyAxios from "../../plugins/myAxios";
 import {chatStateEnum} from "../../states/chat";
 import store from "../../store";
+import ChatCardBox from "../../components/ChatCardBox.vue";
 
 
 const route = useRoute()
@@ -150,7 +130,7 @@ const getSend = () => {
   }
 
   if (userId.value == null) {
-    Toast("未登录");
+    showSuccessToast("未登录");
     router.back();
     return;
   }

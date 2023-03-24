@@ -2,22 +2,18 @@ import {ref} from "vue";
 
 import {getMessages} from "../services/MeesageUtils";
 import {showNotify} from 'vant';
-import {useRouter} from "vue-router";
 
 import {chatStateEnum} from "../states/chat";
 import {messageType} from "../services/MessageType";
 import store from "../store";
-import {showSuccessToast, showFailToast} from 'vant';
 
 const socketList: any = ref([])
 const message = ref('')
 let socket: any;
 let cloneTime: any;
-const router = useRouter();
-const initSocket = async () => {
+
+const initSocket =  () => {
     if (!store.getters.getIsLogin) {
-        showFailToast("未登录");
-        router.back();
         return;
     }
     const user = store.getters.getUser
@@ -38,7 +34,6 @@ const initSocket = async () => {
                 keepalive();
             }, 10000);
         } catch (e) {
-
             initSocket()
         }
     };
@@ -73,7 +68,7 @@ const initSocket = async () => {
 
 }
 
-const sendSocket = async (msg: string) => {
+const sendSocket =  (msg: string) => {
     if (socket != null && socket.readyState == WebSocket.OPEN) {
         socket.send(msg);
     } else {
@@ -90,10 +85,10 @@ const getOnMessage = () => {
     return null;
 }
 
-const keepalive = async () => {
+const keepalive =  () => {
     // 构建对象
     const heartMessage = getMessages(chatStateEnum.XT);
-    await sendSocket(JSON.stringify(heartMessage));
+     sendSocket(JSON.stringify(heartMessage));
 }
 const getSocket = () => {
     // 如果当前状态已经连接，无需再次初始化websocket
@@ -103,7 +98,7 @@ const getSocket = () => {
     if (socketList.value.length === 0) {
         // socket = new WebSocket("ws://localhost:9001/ws");
         const sockets = new WebSocket("ws://localhost:9001/ws");
-        // const sockets = new WebSocket("ws://47.92.124.72:9001/ws");
+        // const sockets = new WebSocket("ws://jane.fit:9001/ws");
         socketList.value.push(sockets)
     }
     socket = socketList.value[0];

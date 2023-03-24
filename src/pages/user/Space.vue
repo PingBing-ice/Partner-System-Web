@@ -1,8 +1,32 @@
 <template>
   <div class="banner">
+    <div class="background">
+
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+
+
+    </div>
 
   </div>
-  <div class="image_head">
+  <div class="image_head" v-if="user!=null">
     <van-image style="position: relative;margin-top: -1.6vmin"
                round
                width="22.4vmin"
@@ -20,17 +44,18 @@
         </span>
         <span class="van-hairline--right">
           <span class="num">
+                        {{ totalPost }}
+
+          </span>
+          <br>
+          <span class="type">文章数</span>
+        </span>
+        <span class="fans" @click="toCollect">
+          <span class="num">
             {{ totalCollect }}
           </span>
           <br>
           <span class="type">收藏数</span>
-        </span>
-        <span class="fans">
-          <span class="num">
-            {{ totalPost }}
-          </span>
-          <br>
-          <span class="type">文章数</span>
         </span>
       </div>
       <van-button plain hairline @click="toUser" type="primary" size="small"
@@ -53,341 +78,114 @@
       <p class="wenzi">{{ user.profile === '' ? '这个人很神秘，什么都没有写' : user.profile }}</p>
     </div>
   </div>
-
-
   <van-divider/>
-  <div class="cont">
-    <van-pull-refresh style="width: 100%;" v-model="postLoading" @refresh="onRefresh">
-      <div id="postList">
-        <van-list v-if="postList.length>0" style="background-color: #f0f2f5;padding-top: 5px">
-          <div v-for="post in postList" style="width: auto;height: auto;padding-bottom: 10px">
-            <div style="padding: 16px; background-color: #ffffff">
-              <div style="display:flex;max-width: 100%;height: 24px;margin-bottom: 12px;margin-top: 3px">
-                <div style="margin-right: 10px">
-                  <van-image
-                      round
-                      width="1.7rem"
-                      height="1.7rem"
-                      :src="post.userAvatarVo.avatarUrl"
-                  />
-                </div>
-                <div style="flex: 1.0;width: 0 ;color:rgb(0 0 0 / 85%)">
-                  <p style="color: #567895;font-size: 15px;line-height: 24px;">
-                    {{ post.userAvatarVo.username }}</p>
-
-                </div>
-                <van-popover :show="deleteHasPostIdSet.get(post.id)" :actions="actions" @select="onSelect(post.id)"
-                             placement="bottom-end">
-                  <template #reference>
-                    <van-icon name="ellipsis" style="width: 16px;height: 16px"/>
-                  </template>
-                </van-popover>
-              </div>
-
-              <div style="margin-top: -13px">
-                <h6></h6>
-              </div>
-              <div id="contentTxt" style="width: auto;height: auto;font-size:15px">
-                <van-text-ellipsis
-                    rows="5"
-                    :content="post.content"
-                    expand-text="展开"
-                    collapse-text="收起"
-                />
-              </div>
-              <div class="tagTxt">
-                <van-tag plain v-if="post.tag&&post.tag.length>0" v-for="tag in post.tag" type="primary"
-                         style="margin-right: 3px">{{ tag }}
-                </van-tag>
-
-              </div>
-              <van-row gutter="20" style="margin-top: 10px">
-                <van-col span="4">
-                  <div style="display: flex">
-                    <van-icon style="display: flex" class="icon" name="good-job-o"
-                              :color="hasThumb(post.id)?'#00aeec':''"
-
-                              @click="isThumb(post.id);">
-                      <div class="footer">
-                        {{ thumbMap.get(post.id) === 0 ? '' : thumbMap.get(post.id) }}
-                      </div>
-                    </van-icon>
-
-                  </div>
-
-                </van-col>
-                <van-col span="4">
-                  <van-icon class="icon" name="comment-o" @click="doIsComment(post.id)"/>
-                </van-col>
-                <van-col span="4">
-                  <div style="display: flex">
-                    <van-icon class="icon" style="display: flex" name="star-o"
-                              :color="hasCollect(post.id)?'#00aeec':''"
-                              @click="isCollect(post.id)">
-                      <div class="footer">
-                        {{ collectMap.get(post.id) === 0 ? '' : collectMap.get(post.id) }}
-                      </div>
-                    </van-icon>
-
-                  </div>
-
-                </van-col>
-              </van-row>
-              <div style="margin-top:12px" v-if="isComment.get(post.id)">
-                <div class="comment-f">
-                  <div class="comment-containers">
-                    <div class="comment-container">
-                      <div class="text-area-wrapper">
-                        <input class="ql-container" v-model="commentTxt"/>
-                      </div>
-                    </div>
-                    <div class="submit-btn" @click="sendPost(post.id)">回复</div>
-                  </div>
-                </div>
-              </div>
-              <div v-if="commentMap.get(post.id)" style="background-color:  #f0f2f5;margin-top: 10px">
-                <div style="padding: 1px 1px 1px 9px">
-                  <div v-for="content in commentMap.get(post.id)">
-                    <p style="font-size: 14px;">{{ content }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </van-list>
-        <van-empty v-if="postList.length<=0" description="无数据"/>
-      </div>
-    </van-pull-refresh>
+  <div>
+    <van-tabs v-model:active="active" shrink animated>
+      <van-tab title="最新"/>
+      <van-tab title="最热"/>
+    </van-tabs>
   </div>
-
+  <div class="cont">
+    <post-card-list :sorted="sorted" :is-own="true" v-on:showDeletePost="deletePost"></post-card-list>
+  </div>
+  <van-overlay :show="show">
+    <div class="wrapper" @click.stop>
+      <van-loading class="block" color="#0094ff" text-color="#0094ff" vertical>加载中...</van-loading>
+    </div>
+  </van-overlay>
 </template>
 
 <script setup>
 import {ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {onMounted} from "vue";
+import {onMounted, watchEffect} from "vue";
 import myAxios from "../../plugins/myAxios";
-import {showSuccessToast, showFailToast} from 'vant';
+import {showSuccessToast, showFailToast, showConfirmDialog} from 'vant';
 import store from "../../store";
-import {showToast} from 'vant';
+import postRequest from "../../plugins/request/postRequest";
+import PostCardList from "../../components/PostCardList.vue";
 
+const show = ref(false);
 const description = ref("加载中......")
-
+const active = ref(0)
 const router = useRouter();
 const route = useRoute();
-const postList = ref([]);
 const tagList = ref([]);
-const commentTxt = ref("");
-const thumbHasPostId = ref(new Set());
-const collectHasPostId = ref(new Set());
-const deleteHasPostIdSet = ref(new Map());
-const thumbMap = ref(new Map());
-const collectMap = ref(new Map());
-const isComment = ref(new Map());
-const commentMap = ref(new Map());
-const postLoading = ref(false);
 const user = ref(store.getters.getUser);
 const totalCollect = ref(0);
 const totalPost = ref(0);
 const totalThumb = ref(0);
-const actions = [
-  {text: '删除'},
-];
+const sorted = ref(0);
+
 onMounted(() => {
+  user.value = store.getters.getUser
   const tag = user.value.tags;
-  if (tag && tag !== '') {
-    tagList.value = JSON.parse(tag);
+  if (tag && tag !== '' && tag !== '[]') {
+    try {
+      tagList.value = JSON.parse(tag);
+
+    } catch (e) {
+
+    }
   }
-  getPostList();
+  getCollect()
 })
-
-const onSelect = (id) => {
-  myAxios.post("/post/delPost", {
-    id: id
-  }).then(resp => {
-    if (resp.code === 200) {
-      deleteHasPostIdSet.value.delete(id);
-      postList.value=postList.value.filter(post => post.id!==id)
-      thumbHasPostId.value.delete(id)
-      collectHasPostId.value.delete(id)
-      thumbMap.value.delete(id);
-      collectMap.value.delete(id);
-      commentMap.value.delete(id)
-      isComment.value.delete(id);
-      showSuccessToast("删除成功");
-
-    } else {
-      showFailToast(resp.description)
-    }
-  }).catch(resp => {
-    showFailToast("删除失败");
-  })
-
-}
-
-const getPostList = () => {
-  myAxios.post("/post/getPost/user", {
-    content: "",
-    pageNum: 1,
-    pageSize: 10,
-    sorted: 1,
-    tagId: "",
-    userId: ""
-  }).then(resp => {
-    if (resp.code === 200 && resp.data) {
-      const data = resp.data;
-      const list = data.postList;
-      for (let i = 0; i < list.length; i++) {
-        const postVo = list[i];
-        try {
-          postVo.tag = JSON.parse(postVo.tag);
-        } catch (e) {
-          postVo.tag = [];
-        }
-        postList.value.push(postVo)
-      }
-      totalCollect.value = data.totalCollect;
-      totalPost.value = data.totalPost;
-      totalThumb.value = data.totalThumb;
-      for (let i = 0; i < postList.value.length; i++) {
-        const post = postList.value[i];
-        deleteHasPostIdSet.value.set(post.id, false);
-        if (post.hasThumb === true) {
-          thumbHasPostId.value.add(post.id)
-        }
-        if (post.hasCollect === true) {
-          collectHasPostId.value.add(post.id)
-        }
-        thumbMap.value.set(post.id, post.thumb);
-        collectMap.value.set(post.id, post.collect);
-        commentMap.value.set(post.id, post.commentList)
-        isComment.value.set(post.id, false);
-      }
+const getCollect = () => {
+  myAxios.get("/post/col").then(rsp => {
+    if (rsp.code === 200 && rsp.data) {
+      const data = rsp.data
+      totalCollect.value = data.totalCollect
+      totalPost.value = data.totalPost
+      totalThumb.value = data.totalThumb
     }
   })
 }
-const isThumb = async (id) => {
-  const resp = await myAxios.post("/post/doThumb", {
-    postId: id
-  });
-  if (resp.code === 200) {
-    if (hasThumb(id)) {
-      thumbHasPostId.value.delete(id);
-      if (thumbMap.value.has(id)) {
-        let num = thumbMap.value.get(id);
-        if (num >= 1) {
-          thumbMap.value.set(id, --num)
-          return;
-        }
-        thumbMap.value.delete(id)
-      }
-    } else {
-      thumbHasPostId.value.add(id);
-      if (thumbMap.value.has(id)) {
-        let num = thumbMap.value.get(id);
-        thumbMap.value.set(id, ++num)
-      } else {
-        thumbMap.value.set(id, 1);
-      }
-    }
-  } else {
-    showFailToast("点赞失败");
-  }
-}
-const isCollect = (postId) => {
-  myAxios.post("/post/doCollect", {
-    postId: postId,
-  }).then(resp => {
-    if (resp.code === 200) {
-      if (hasCollect(postId)) {
-        collectHasPostId.value.delete(postId);
-        if (collectMap.value.has(postId)) {
-          let num = collectMap.value.get(postId);
-          if (num >= 1) {
-            collectMap.value.set(postId, --num)
-            return;
+// 删除post
+const deletePost =  (id) => {
+  showConfirmDialog( {
+    title: '确认删除吗？'})
+      .then(async () => {
+        const response =await postRequest.delPost(id);
+        if (response.code === 200) {
+          window.location.reload();
+
+          showSuccessToast("删除成功");
+        }else {
+          if (response.description) {
+            showFailToast(response.description);
+          }else {
+            showFailToast(response.message);
           }
-          collectMap.value.delete(postId)
         }
-      } else {
-        collectHasPostId.value.add(postId);
-        if (collectMap.value.has(postId)) {
-          let num = collectMap.value.get(postId);
-          collectMap.value.set(postId, ++num)
-        } else {
-          collectMap.value.set(postId, 1);
-        }
-      }
-    } else {
-      showFailToast("收藏失败");
-    }
-  })
-}
-// 刷新
-const onRefresh = () => {
-  setTimeout(() => {
-    showToast('刷新成功');
-    postLoading.value = false;
-    getPostList();
-  }, 1000);
-};
-const sendPost = async (postId) => {
-  if (postId == null || commentTxt.value === "") {
-    return;
-  }
-  if (!store.getters.getIsLogin) {
-    showFailToast("请先登录")
-
-  }
-  const user = store.getters.getUser
-  if (!user) {
-    return;
-  }
-
-  const resp = await myAxios.post("/post/doComment", {
-    "content": commentTxt.value,
-    "postId": postId,
-    "replyId": "",
-    "userId": user.id,
-  })
-  if (resp.code === 200) {
-    const commList = commentMap.value.get(postId);
-    let comment = user.userAccount + ": " + commentTxt.value
-    commList.push(comment)
-  }
-  commentTxt.value = '';
-
+        // on confirm
+      })
+      .catch(() => {
+        // on cancel
+      });
 }
 
 
-const hasThumb = (id) => {
-  return thumbHasPostId.value.has(id);
-}
-const hasCollect = (id) => {
-  return collectHasPostId.value.has(id);
-}
-const doIsComment = (postId) => {
-  if (isComment.value.get(postId)) {
-    isComment.value.set(postId, false);
-  } else {
-    isComment.value.set(postId, true);
-  }
-};
 const toUser = () => {
   router.push({
     path: '/user'
   })
 }
-
+const toCollect = () => {
+  router.push({
+    path: '/collect'
+  })
+}
+watchEffect(() => {
+  if (active.value === 0) {
+    sorted.value = 0;
+  } else if (active.value === 1) {
+    sorted.value = 3;
+  }
+})
 </script>
 
 <style scoped>
-.hed {
-  height: auto;
-  width: auto;
-  margin-bottom: 0px;
-  display: flex;
-}
+
 
 .head1 {
   height: 8%;
@@ -459,20 +257,500 @@ const toUser = () => {
   width: 100%;
   height: 27vmin;
   overflow: hidden;
-  background: url(/public/banner.jpg) 50%;
+  background: url(/public/svg.png) 50% 50%;
 }
 
 .image_head {
   padding: 0 3.2vmin;
 }
 
-.tagTxt {
-  margin-top: 10px;
 
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
-.icon_is {
-  background-image: url(https://wx.zsxq.com/dweb2/assets/resources/sprite@1x.fb4b9063d37e9252.png);
-  background-position: -226px -236px;
+.block {
 }
+
+@keyframes move {
+  100% {
+    transform: translate3d(0, 0, 1px) rotate(360deg);
+  }
+}
+
+.background {
+  position: relative;
+  width: 100%;
+  height: 27vmin;
+
+  overflow: hidden;
+}
+
+.background span {
+  width: 1vmin;
+  height: 1vmin;
+  border-radius: 1vmin;
+  backface-visibility: hidden;
+  position: absolute;
+  animation: move;
+  animation-duration: 46;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+
+.background span:nth-child(0) {
+  color: #b6b235;
+  top: 84%;
+  left: 48%;
+  animation-duration: 24s;
+  animation-delay: -15s;
+  transform-origin: -1vw -18vh;
+  box-shadow: -2vmin 0 0.800851570823155vmin currentColor;
+}
+.background span:nth-child(1) {
+  color: #b6b235;
+  top: 25%;
+  left: 9%;
+  animation-duration: 34s;
+  animation-delay: -5s;
+  transform-origin: -4vw -15vh;
+  box-shadow: -2vmin 0 0.46958058203518793vmin currentColor;
+}
+.background span:nth-child(2) {
+  color: #b6b235;
+  top: 85%;
+  left: 47%;
+  animation-duration: 20s;
+  animation-delay: -31s;
+  transform-origin: 19vw -11vh;
+  box-shadow: -2vmin 0 0.3730213075852733vmin currentColor;
+}
+.background span:nth-child(3) {
+  color: #b6b235;
+  top: 57%;
+  left: 53%;
+  animation-duration: 33s;
+  animation-delay: -36s;
+  transform-origin: 10vw -20vh;
+  box-shadow: -2vmin 0 0.28096671524263095vmin currentColor;
+}
+.background span:nth-child(4) {
+  color: #b6b235;
+  top: 4%;
+  left: 59%;
+  animation-duration: 37s;
+  animation-delay: -8s;
+  transform-origin: 2vw 23vh;
+  box-shadow: 2vmin 0 1.0579425934635205vmin currentColor;
+}
+.background span:nth-child(5) {
+  color: #b6b235;
+  top: 24%;
+  left: 65%;
+  animation-duration: 10s;
+  animation-delay: -34s;
+  transform-origin: 4vw 10vh;
+  box-shadow: -2vmin 0 0.5439787468442165vmin currentColor;
+}
+.background span:nth-child(6) {
+  color: #262aab;
+  top: 92%;
+  left: 13%;
+  animation-duration: 37s;
+  animation-delay: -29s;
+  transform-origin: -6vw 14vh;
+  box-shadow: 2vmin 0 0.4573568907747463vmin currentColor;
+}
+.background span:nth-child(7) {
+  color: #b6b235;
+  top: 2%;
+  left: 74%;
+  animation-duration: 42s;
+  animation-delay: -8s;
+  transform-origin: -10vw 23vh;
+  box-shadow: 2vmin 0 0.2991242048166671vmin currentColor;
+}
+.background span:nth-child(8) {
+  color: #b6b235;
+  top: 32%;
+  left: 48%;
+  animation-duration: 14s;
+  animation-delay: -10s;
+  transform-origin: 8vw 13vh;
+  box-shadow: 2vmin 0 0.6042007504912097vmin currentColor;
+}
+.background span:nth-child(9) {
+  color: #b6b235;
+  top: 40%;
+  left: 52%;
+  animation-duration: 10s;
+  animation-delay: -5s;
+  transform-origin: 15vw 8vh;
+  box-shadow: 2vmin 0 0.8110282309148902vmin currentColor;
+}
+.background span:nth-child(10) {
+  color: #262aab;
+  top: 24%;
+  left: 58%;
+  animation-duration: 28s;
+  animation-delay: -34s;
+  transform-origin: 13vw 17vh;
+  box-shadow: -2vmin 0 0.8859185828024017vmin currentColor;
+}
+.background span:nth-child(11) {
+  color: #b6b235;
+  top: 99%;
+  left: 23%;
+  animation-duration: 29s;
+  animation-delay: -1s;
+  transform-origin: 23vw -3vh;
+  box-shadow: 2vmin 0 0.5224597300185392vmin currentColor;
+}
+.background span:nth-child(12) {
+  color: #b6b235;
+  top: 75%;
+  left: 76%;
+  animation-duration: 23s;
+  animation-delay: -11s;
+  transform-origin: -17vw -13vh;
+  box-shadow: -2vmin 0 0.7189693898754965vmin currentColor;
+}
+.background span:nth-child(13) {
+  color: #262aab;
+  top: 6%;
+  left: 34%;
+  animation-duration: 42s;
+  animation-delay: -29s;
+  transform-origin: -6vw -2vh;
+  box-shadow: 2vmin 0 1.2382102982438055vmin currentColor;
+}
+.background span:nth-child(14) {
+  color: #b6b235;
+  top: 38%;
+  left: 89%;
+  animation-duration: 37s;
+  animation-delay: -15s;
+  transform-origin: -18vw 21vh;
+  box-shadow: -2vmin 0 0.7174694232734558vmin currentColor;
+}
+.background span:nth-child(15) {
+  color: #1d1c22;
+  top: 48%;
+  left: 97%;
+  animation-duration: 38s;
+  animation-delay: -35s;
+  transform-origin: -6vw 25vh;
+  box-shadow: 2vmin 0 0.6224868292622394vmin currentColor;
+}
+.background span:nth-child(16) {
+  color: #262aab;
+  top: 9%;
+  left: 51%;
+  animation-duration: 33s;
+  animation-delay: -19s;
+  transform-origin: -9vw -22vh;
+  box-shadow: -2vmin 0 0.8647579982978193vmin currentColor;
+}
+.background span:nth-child(17) {
+  color: #b6b235;
+  top: 46%;
+  left: 73%;
+  animation-duration: 45s;
+  animation-delay: -24s;
+  transform-origin: -20vw -11vh;
+  box-shadow: -2vmin 0 0.6467067254826073vmin currentColor;
+}
+.background span:nth-child(18) {
+  color: #1d1c22;
+  top: 48%;
+  left: 52%;
+  animation-duration: 23s;
+  animation-delay: -22s;
+  transform-origin: -15vw -20vh;
+  box-shadow: -2vmin 0 1.178908566033595vmin currentColor;
+}
+.background span:nth-child(19) {
+  color: #1d1c22;
+  top: 51%;
+  left: 70%;
+  animation-duration: 33s;
+  animation-delay: -24s;
+  transform-origin: -19vw 20vh;
+  box-shadow: -2vmin 0 1.086199901919919vmin currentColor;
+}
+.background span:nth-child(20) {
+  color: #b6b235;
+  top: 68%;
+  left: 19%;
+  animation-duration: 17s;
+  animation-delay: -36s;
+  transform-origin: -23vw 9vh;
+  box-shadow: 2vmin 0 1.0847563100388355vmin currentColor;
+}
+.background span:nth-child(21) {
+  color: #1d1c22;
+  top: 67%;
+  left: 71%;
+  animation-duration: 30s;
+  animation-delay: -39s;
+  transform-origin: 19vw 19vh;
+  box-shadow: -2vmin 0 0.26859834477691913vmin currentColor;
+}
+.background span:nth-child(22) {
+  color: #262aab;
+  top: 13%;
+  left: 18%;
+  animation-duration: 42s;
+  animation-delay: -17s;
+  transform-origin: -18vw -1vh;
+  box-shadow: 2vmin 0 0.543451197694202vmin currentColor;
+}
+.background span:nth-child(23) {
+  color: #1d1c22;
+  top: 60%;
+  left: 42%;
+  animation-duration: 37s;
+  animation-delay: -31s;
+  transform-origin: 12vw 5vh;
+  box-shadow: 2vmin 0 0.8501828540365135vmin currentColor;
+}
+.background span:nth-child(24) {
+  color: #b6b235;
+  top: 62%;
+  left: 72%;
+  animation-duration: 25s;
+  animation-delay: -33s;
+  transform-origin: -15vw 22vh;
+  box-shadow: 2vmin 0 0.46681475166327724vmin currentColor;
+}
+.background span:nth-child(25) {
+  color: #1d1c22;
+  top: 34%;
+  left: 39%;
+  animation-duration: 21s;
+  animation-delay: -26s;
+  transform-origin: 7vw -18vh;
+  box-shadow: -2vmin 0 0.91939463191024vmin currentColor;
+}
+.background span:nth-child(26) {
+  color: #262aab;
+  top: 28%;
+  left: 33%;
+  animation-duration: 17s;
+  animation-delay: -29s;
+  transform-origin: 9vw 24vh;
+  box-shadow: 2vmin 0 0.4621204806894439vmin currentColor;
+}
+.background span:nth-child(27) {
+  color: #1d1c22;
+  top: 31%;
+  left: 21%;
+  animation-duration: 34s;
+  animation-delay: -31s;
+  transform-origin: 21vw 11vh;
+  box-shadow: -2vmin 0 0.8119948939319954vmin currentColor;
+}
+.background span:nth-child(28) {
+  color: #262aab;
+  top: 11%;
+  left: 59%;
+  animation-duration: 21s;
+  animation-delay: -18s;
+  transform-origin: 12vw 12vh;
+  box-shadow: 2vmin 0 0.45117785871740623vmin currentColor;
+}
+.background span:nth-child(29) {
+  color: #1d1c22;
+  top: 100%;
+  left: 60%;
+  animation-duration: 37s;
+  animation-delay: -5s;
+  transform-origin: 5vw 11vh;
+  box-shadow: -2vmin 0 1.1768649571875636vmin currentColor;
+}
+.background span:nth-child(30) {
+  color: #b6b235;
+  top: 25%;
+  left: 81%;
+  animation-duration: 28s;
+  animation-delay: -39s;
+  transform-origin: 11vw -21vh;
+  box-shadow: -2vmin 0 0.8129351372411007vmin currentColor;
+}
+.background span:nth-child(31) {
+  color: #1d1c22;
+  top: 57%;
+  left: 33%;
+  animation-duration: 15s;
+  animation-delay: -19s;
+  transform-origin: 5vw 21vh;
+  box-shadow: -2vmin 0 1.1386656299973013vmin currentColor;
+}
+.background span:nth-child(32) {
+  color: #1d1c22;
+  top: 47%;
+  left: 43%;
+  animation-duration: 11s;
+  animation-delay: -2s;
+  transform-origin: -16vw 3vh;
+  box-shadow: -2vmin 0 0.7601214814485324vmin currentColor;
+}
+.background span:nth-child(33) {
+  color: #b6b235;
+  top: 6%;
+  left: 14%;
+  animation-duration: 44s;
+  animation-delay: -19s;
+  transform-origin: -18vw -19vh;
+  box-shadow: -2vmin 0 0.6938327096315169vmin currentColor;
+}
+.background span:nth-child(34) {
+  color: #b6b235;
+  top: 22%;
+  left: 34%;
+  animation-duration: 13s;
+  animation-delay: -28s;
+  transform-origin: 22vw 2vh;
+  box-shadow: -2vmin 0 1.154268802507705vmin currentColor;
+}
+.background span:nth-child(35) {
+  color: #b6b235;
+  top: 59%;
+  left: 14%;
+  animation-duration: 12s;
+  animation-delay: -20s;
+  transform-origin: -2vw 1vh;
+  box-shadow: 2vmin 0 1.166721119808012vmin currentColor;
+}
+.background span:nth-child(36) {
+  color: #b6b235;
+  top: 6%;
+  left: 38%;
+  animation-duration: 6s;
+  animation-delay: -11s;
+  transform-origin: -5vw 22vh;
+  box-shadow: 2vmin 0 1.0063795207852728vmin currentColor;
+}
+.background span:nth-child(37) {
+  color: #262aab;
+  top: 24%;
+  left: 62%;
+  animation-duration: 34s;
+  animation-delay: -1s;
+  transform-origin: -23vw -3vh;
+  box-shadow: 2vmin 0 1.0861260539320619vmin currentColor;
+}
+.background span:nth-child(38) {
+  color: #262aab;
+  top: 48%;
+  left: 17%;
+  animation-duration: 45s;
+  animation-delay: -38s;
+  transform-origin: 13vw -5vh;
+  box-shadow: 2vmin 0 0.7785712656051238vmin currentColor;
+}
+.background span:nth-child(39) {
+  color: #1d1c22;
+  top: 73%;
+  left: 70%;
+  animation-duration: 32s;
+  animation-delay: -27s;
+  transform-origin: -12vw -11vh;
+  box-shadow: 2vmin 0 0.4553404226575346vmin currentColor;
+}
+.background span:nth-child(40) {
+  color: #b6b235;
+  top: 28%;
+  left: 64%;
+  animation-duration: 32s;
+  animation-delay: -3s;
+  transform-origin: 2vw 14vh;
+  box-shadow: -2vmin 0 0.5015508008950393vmin currentColor;
+}
+.background span:nth-child(41) {
+  color: #262aab;
+  top: 14%;
+  left: 50%;
+  animation-duration: 21s;
+  animation-delay: -9s;
+  transform-origin: -15vw -17vh;
+  box-shadow: 2vmin 0 0.6388602785030533vmin currentColor;
+}
+.background span:nth-child(42) {
+  color: #262aab;
+  top: 38%;
+  left: 67%;
+  animation-duration: 14s;
+  animation-delay: -36s;
+  transform-origin: -1vw -3vh;
+  box-shadow: 2vmin 0 0.4099667300020169vmin currentColor;
+}
+.background span:nth-child(43) {
+  color: #262aab;
+  top: 72%;
+  left: 33%;
+  animation-duration: 10s;
+  animation-delay: -12s;
+  transform-origin: -8vw -6vh;
+  box-shadow: 2vmin 0 0.6933076952471395vmin currentColor;
+}
+.background span:nth-child(44) {
+  color: #1d1c22;
+  top: 69%;
+  left: 24%;
+  animation-duration: 7s;
+  animation-delay: -31s;
+  transform-origin: -24vw 10vh;
+  box-shadow: -2vmin 0 0.5125754994234237vmin currentColor;
+}
+.background span:nth-child(45) {
+  color: #1d1c22;
+  top: 81%;
+  left: 15%;
+  animation-duration: 42s;
+  animation-delay: -28s;
+  transform-origin: -10vw 15vh;
+  box-shadow: 2vmin 0 0.5798780731589239vmin currentColor;
+}
+.background span:nth-child(46) {
+  color: #1d1c22;
+  top: 70%;
+  left: 30%;
+  animation-duration: 21s;
+  animation-delay: -39s;
+  transform-origin: 10vw -14vh;
+  box-shadow: 2vmin 0 0.5872810869045775vmin currentColor;
+}
+.background span:nth-child(47) {
+  color: #262aab;
+  top: 87%;
+  left: 6%;
+  animation-duration: 33s;
+  animation-delay: -40s;
+  transform-origin: -1vw -22vh;
+  box-shadow: 2vmin 0 0.5213321671704825vmin currentColor;
+}
+.background span:nth-child(48) {
+  color: #b6b235;
+  top: 1%;
+  left: 22%;
+  animation-duration: 22s;
+  animation-delay: -17s;
+  transform-origin: -8vw 24vh;
+  box-shadow: -2vmin 0 0.51671837541754vmin currentColor;
+}
+.background span:nth-child(49) {
+  color: #1d1c22;
+  top: 33%;
+  left: 49%;
+  animation-duration: 40s;
+  animation-delay: -10s;
+  transform-origin: -23vw -3vh;
+  box-shadow: 2vmin 0 0.6969744070504578vmin currentColor;
+}
+
 </style>
