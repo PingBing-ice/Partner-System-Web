@@ -5,6 +5,9 @@ import route from "./config/routeConfig";
 import 'vant/lib/index.css';
 import { List } from 'vant';
 
+// ============================================
+
+// =============================================
 import { ActionBar, ActionBarIcon, ActionBarButton,Toast } from 'vant';
 // @ts-ignore
 import VueQuillTextEditor from 'vue-quill-text-editor';
@@ -26,4 +29,5 @@ app.use(moment);
 //整个应用支持路由。
 app.use(VueQuillTextEditor)
 app.use(route.router)
+
 app.mount('#app')

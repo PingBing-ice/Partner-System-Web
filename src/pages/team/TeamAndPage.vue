@@ -43,25 +43,6 @@
         <van-popup v-model:show="showPicker" position="bottom">
           <van-date-picker @confirm="onConfirm" :min-date="minDate" @cancel="showPicker = false" />
         </van-popup>
-<!--        <van-field-->
-<!--            v-model="currentDate"-->
-<!--            is-link-->
-<!--            readonly-->
-<!--            label="城市"-->
-<!--            placeholder="选择城市"-->
-<!--            @click="isShow()"-->
-<!--        />-->
-
-<!--        <van-popup v-model:show="showPicker" round position="bottom">-->
-<!--          <van-date-picker v-if="showPicker"-->
-<!--                           v-model="currentDate"-->
-<!--                           title="选择日期"-->
-<!--                           :min-date="minDate"-->
-<!--                           @confirm="onConfirm"-->
-<!--                           @cancel="showPicker=false"-->
-
-<!--          />-->
-<!--        </van-popup>-->
         <van-field
             v-model="addTeamFrom.description"
             rows="3"
@@ -121,11 +102,7 @@ const onSubmit = async () => {
     showFailToast("添加失败")
   }
 }
-// const onConfirm = () => {
-//    const date =new Date(currentDate.value)
-//   currentDate.value = formatDate(date, "YYYY-MM-DD")
-//   showPicker.value = false;
-// }
+
 const onConfirm = ({ selectedValues }) => {
   result.value = selectedValues.join('-');
   showPicker.value = false;

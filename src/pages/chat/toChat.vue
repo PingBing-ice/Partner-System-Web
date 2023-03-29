@@ -1,6 +1,6 @@
 <template>
   <van-nav-bar style="height: 7%;width: auto"
-      :title="friendName"
+      :title="titleName"
       left-arrow
       @click-left="onClickLeft"
       @click-right="onClickRightTeam"
@@ -43,6 +43,8 @@ const router = useRouter()
 const friendId = route.query.friendId + ""
 const friendUrl = ref('')
 const friendName = ref('')
+const titleName = ref('')
+
 const userId = ref("")
 const userName = ref("")
 const AvatarUrl = ref("")
@@ -77,7 +79,7 @@ onMounted(async () => {
       recordList.value = response.data.chat;
       friendUrl.value = response.data.avatarUrl;
       friendName.value = response.data.name;
-
+      titleName.value = friendName.value;
       recordList.value.forEach((record: any) => {
         if (record.userId == userId.value) {
           let userData = {
@@ -121,12 +123,10 @@ const getOnMessage = (id: string) => {
   }
 
   socket.onmessage = (msg: any) => {
-
     const chatRecord: messageType = JSON.parse(msg.data)
     const friend = chatRecord.chatRecord.message;
     if (chatRecord.type === chatStateEnum.HY||chatRecord.type===chatStateEnum.SYSTEM) {
       if (route.path === '/toChat') {
-
         let userData = {
           id: friendId,
           name: friendName.value,
@@ -134,6 +134,7 @@ const getOnMessage = (id: string) => {
           message: friend,
         }
         testData.value.push(userData)
+        titleName.value = friendName.value;
         nextTick(() => {
           // @ts-ignore
           document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
@@ -165,6 +166,7 @@ const getSend = () => {
   let message;
   if (friendId == "1") {
     message = getMessages(chatStateEnum.SYSTEM, userId.value, friendId, mss);
+    titleName.value="AI正在思考中..."
   } else {
     message = getMessages(chatStateEnum.HY, userId.value, friendId, mss);
   }

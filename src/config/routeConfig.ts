@@ -11,6 +11,7 @@ import UserEditPage from "../pages/user/UserEditPage.vue";
 import SearchResultPage from "../pages/search/SearchResultPage.vue";
 import userLogin from "../pages/user/UserLogin.vue";
 import UserForget from "../pages/user/UserForget.vue";
+import UserLabel from "../pages/user/UserLabel.vue";
 import Register from "../pages/user/UserRegister.vue";
 import Find from "../pages/friend/Find.vue";
 import Show from "../pages/friend/Show.vue";
@@ -36,6 +37,7 @@ const routes = [
     {path: '/userTeam/add', title: '修改队伍', component: userTeamEditPage},
     {path: '/team/add', title: '添加队伍', component: TeamAndPage},
     {path: '/user', title: '个人信息', component: User},
+    {path: '/label', title: '个人标签', component: UserLabel},
     {path: '/space', title: '个人中心', component: Space},
     {path: '/collect', title: '我的收藏', component: Collect},
     {path: '/space/details', title: '详情', component: Details},

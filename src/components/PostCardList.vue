@@ -122,6 +122,7 @@ const userId = ref('');
 const postList = ref([]);
 const thumbHasPostId = ref(new Set());
 const collectHasPostId = ref(new Set());
+const commTxt = ref(new Map());
 const thumbMap = ref(new Map());
 const collectMap = ref(new Map());
 const commentMap = ref(new Map());
@@ -183,6 +184,7 @@ watchEffect(async () => {
       collectMap.value.set(post.id, post.collect);
       commentMap.value.set(post.id, post.commentList)
       isComment.value.set(post.id, false);
+      commTxt.value.set(post.id, "");
     }
 
   }
@@ -329,8 +331,12 @@ const sendPost = async (postId) => {
     },
     postId: postId
   }
-  const commList = commentMap.value.get(postId);
-  commList.push(rep)
+  let commList = commentMap.value.get(postId);
+  if (!commList) {
+    commentMap.value.set(postId,[]);
+  }
+  commList = commentMap.value.get(postId);
+  commList.push(rep);
 
   if (resp.code !== 200) {
     if (commList.length === 1) {
@@ -352,6 +358,10 @@ const hasCollect = (id) => {
   return collectHasPostId.value.has(id);
 }
 const doIsComment = (postId) => {
+  for (const key of isComment.value.keys()) {
+    isComment.value.set(key, false);
+  }
+  commentTxt.value = '';
   if (isComment.value.get(postId)) {
     isComment.value.set(postId, false);
   } else {

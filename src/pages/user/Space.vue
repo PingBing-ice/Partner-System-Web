@@ -21,6 +21,9 @@
       <span></span>
       <span></span>
       <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
 
 
     </div>
@@ -71,7 +74,7 @@
             {{ user.userAccount }}
           </span>
     </div>
-    <div style="padding: 1px">
+    <div style="padding: 1px" @click="toTag">
       <van-tag plain v-for="tag in tagList" type="primary" style="margin-right: 3px">{{ tag }}</van-tag>
     </div>
     <div>
@@ -123,9 +126,13 @@ onMounted(() => {
   if (tag && tag !== '' && tag !== '[]') {
     try {
       tagList.value = JSON.parse(tag);
-
     } catch (e) {
-
+      if (tag) {
+        try {
+          tagList.value = JSON.parse(JSON.stringify(tag));
+        } catch (e) {
+        }
+      }
     }
   }
   getCollect()
@@ -141,19 +148,20 @@ const getCollect = () => {
   })
 }
 // 删除post
-const deletePost =  (id) => {
-  showConfirmDialog( {
-    title: '确认删除吗？'})
+const deletePost = (id) => {
+  showConfirmDialog({
+    title: '确认删除吗？'
+  })
       .then(async () => {
-        const response =await postRequest.delPost(id);
+        const response = await postRequest.delPost(id);
         if (response.code === 200) {
           window.location.reload();
 
           showSuccessToast("删除成功");
-        }else {
+        } else {
           if (response.description) {
             showFailToast(response.description);
-          }else {
+          } else {
             showFailToast(response.message);
           }
         }
@@ -168,6 +176,11 @@ const deletePost =  (id) => {
 const toUser = () => {
   router.push({
     path: '/user'
+  })
+}
+const toTag = () => {
+  router.push({
+    path: '/label'
   })
 }
 const toCollect = () => {
@@ -255,7 +268,7 @@ watchEffect(() => {
 
 .banner {
   width: 100%;
-  height: 27vmin;
+  height: 20%;
   overflow: hidden;
   background: url(/public/svg.png) 50% 50%;
 }
@@ -284,7 +297,7 @@ watchEffect(() => {
 .background {
   position: relative;
   width: 100%;
-  height: 27vmin;
+  height: 100%;
 
   overflow: hidden;
 }
@@ -311,6 +324,7 @@ watchEffect(() => {
   transform-origin: -1vw -18vh;
   box-shadow: -2vmin 0 0.800851570823155vmin currentColor;
 }
+
 .background span:nth-child(1) {
   color: #b6b235;
   top: 25%;
@@ -320,6 +334,7 @@ watchEffect(() => {
   transform-origin: -4vw -15vh;
   box-shadow: -2vmin 0 0.46958058203518793vmin currentColor;
 }
+
 .background span:nth-child(2) {
   color: #b6b235;
   top: 85%;
@@ -329,6 +344,7 @@ watchEffect(() => {
   transform-origin: 19vw -11vh;
   box-shadow: -2vmin 0 0.3730213075852733vmin currentColor;
 }
+
 .background span:nth-child(3) {
   color: #b6b235;
   top: 57%;
@@ -338,6 +354,7 @@ watchEffect(() => {
   transform-origin: 10vw -20vh;
   box-shadow: -2vmin 0 0.28096671524263095vmin currentColor;
 }
+
 .background span:nth-child(4) {
   color: #b6b235;
   top: 4%;
@@ -347,6 +364,7 @@ watchEffect(() => {
   transform-origin: 2vw 23vh;
   box-shadow: 2vmin 0 1.0579425934635205vmin currentColor;
 }
+
 .background span:nth-child(5) {
   color: #b6b235;
   top: 24%;
@@ -356,6 +374,7 @@ watchEffect(() => {
   transform-origin: 4vw 10vh;
   box-shadow: -2vmin 0 0.5439787468442165vmin currentColor;
 }
+
 .background span:nth-child(6) {
   color: #262aab;
   top: 92%;
@@ -365,6 +384,7 @@ watchEffect(() => {
   transform-origin: -6vw 14vh;
   box-shadow: 2vmin 0 0.4573568907747463vmin currentColor;
 }
+
 .background span:nth-child(7) {
   color: #b6b235;
   top: 2%;
@@ -374,6 +394,7 @@ watchEffect(() => {
   transform-origin: -10vw 23vh;
   box-shadow: 2vmin 0 0.2991242048166671vmin currentColor;
 }
+
 .background span:nth-child(8) {
   color: #b6b235;
   top: 32%;
@@ -383,6 +404,7 @@ watchEffect(() => {
   transform-origin: 8vw 13vh;
   box-shadow: 2vmin 0 0.6042007504912097vmin currentColor;
 }
+
 .background span:nth-child(9) {
   color: #b6b235;
   top: 40%;
@@ -392,6 +414,7 @@ watchEffect(() => {
   transform-origin: 15vw 8vh;
   box-shadow: 2vmin 0 0.8110282309148902vmin currentColor;
 }
+
 .background span:nth-child(10) {
   color: #262aab;
   top: 24%;
@@ -401,6 +424,7 @@ watchEffect(() => {
   transform-origin: 13vw 17vh;
   box-shadow: -2vmin 0 0.8859185828024017vmin currentColor;
 }
+
 .background span:nth-child(11) {
   color: #b6b235;
   top: 99%;
@@ -410,6 +434,7 @@ watchEffect(() => {
   transform-origin: 23vw -3vh;
   box-shadow: 2vmin 0 0.5224597300185392vmin currentColor;
 }
+
 .background span:nth-child(12) {
   color: #b6b235;
   top: 75%;
@@ -419,6 +444,7 @@ watchEffect(() => {
   transform-origin: -17vw -13vh;
   box-shadow: -2vmin 0 0.7189693898754965vmin currentColor;
 }
+
 .background span:nth-child(13) {
   color: #262aab;
   top: 6%;
@@ -428,6 +454,7 @@ watchEffect(() => {
   transform-origin: -6vw -2vh;
   box-shadow: 2vmin 0 1.2382102982438055vmin currentColor;
 }
+
 .background span:nth-child(14) {
   color: #b6b235;
   top: 38%;
@@ -437,6 +464,7 @@ watchEffect(() => {
   transform-origin: -18vw 21vh;
   box-shadow: -2vmin 0 0.7174694232734558vmin currentColor;
 }
+
 .background span:nth-child(15) {
   color: #1d1c22;
   top: 48%;
@@ -446,6 +474,7 @@ watchEffect(() => {
   transform-origin: -6vw 25vh;
   box-shadow: 2vmin 0 0.6224868292622394vmin currentColor;
 }
+
 .background span:nth-child(16) {
   color: #262aab;
   top: 9%;
@@ -455,6 +484,7 @@ watchEffect(() => {
   transform-origin: -9vw -22vh;
   box-shadow: -2vmin 0 0.8647579982978193vmin currentColor;
 }
+
 .background span:nth-child(17) {
   color: #b6b235;
   top: 46%;
@@ -464,6 +494,7 @@ watchEffect(() => {
   transform-origin: -20vw -11vh;
   box-shadow: -2vmin 0 0.6467067254826073vmin currentColor;
 }
+
 .background span:nth-child(18) {
   color: #1d1c22;
   top: 48%;
@@ -473,6 +504,7 @@ watchEffect(() => {
   transform-origin: -15vw -20vh;
   box-shadow: -2vmin 0 1.178908566033595vmin currentColor;
 }
+
 .background span:nth-child(19) {
   color: #1d1c22;
   top: 51%;
@@ -482,6 +514,7 @@ watchEffect(() => {
   transform-origin: -19vw 20vh;
   box-shadow: -2vmin 0 1.086199901919919vmin currentColor;
 }
+
 .background span:nth-child(20) {
   color: #b6b235;
   top: 68%;
@@ -491,6 +524,7 @@ watchEffect(() => {
   transform-origin: -23vw 9vh;
   box-shadow: 2vmin 0 1.0847563100388355vmin currentColor;
 }
+
 .background span:nth-child(21) {
   color: #1d1c22;
   top: 67%;
@@ -500,6 +534,7 @@ watchEffect(() => {
   transform-origin: 19vw 19vh;
   box-shadow: -2vmin 0 0.26859834477691913vmin currentColor;
 }
+
 .background span:nth-child(22) {
   color: #262aab;
   top: 13%;
@@ -509,6 +544,7 @@ watchEffect(() => {
   transform-origin: -18vw -1vh;
   box-shadow: 2vmin 0 0.543451197694202vmin currentColor;
 }
+
 .background span:nth-child(23) {
   color: #1d1c22;
   top: 60%;
@@ -518,6 +554,7 @@ watchEffect(() => {
   transform-origin: 12vw 5vh;
   box-shadow: 2vmin 0 0.8501828540365135vmin currentColor;
 }
+
 .background span:nth-child(24) {
   color: #b6b235;
   top: 62%;
@@ -527,6 +564,7 @@ watchEffect(() => {
   transform-origin: -15vw 22vh;
   box-shadow: 2vmin 0 0.46681475166327724vmin currentColor;
 }
+
 .background span:nth-child(25) {
   color: #1d1c22;
   top: 34%;
@@ -536,6 +574,7 @@ watchEffect(() => {
   transform-origin: 7vw -18vh;
   box-shadow: -2vmin 0 0.91939463191024vmin currentColor;
 }
+
 .background span:nth-child(26) {
   color: #262aab;
   top: 28%;
@@ -545,6 +584,7 @@ watchEffect(() => {
   transform-origin: 9vw 24vh;
   box-shadow: 2vmin 0 0.4621204806894439vmin currentColor;
 }
+
 .background span:nth-child(27) {
   color: #1d1c22;
   top: 31%;
@@ -554,6 +594,7 @@ watchEffect(() => {
   transform-origin: 21vw 11vh;
   box-shadow: -2vmin 0 0.8119948939319954vmin currentColor;
 }
+
 .background span:nth-child(28) {
   color: #262aab;
   top: 11%;
@@ -563,6 +604,7 @@ watchEffect(() => {
   transform-origin: 12vw 12vh;
   box-shadow: 2vmin 0 0.45117785871740623vmin currentColor;
 }
+
 .background span:nth-child(29) {
   color: #1d1c22;
   top: 100%;
@@ -572,6 +614,7 @@ watchEffect(() => {
   transform-origin: 5vw 11vh;
   box-shadow: -2vmin 0 1.1768649571875636vmin currentColor;
 }
+
 .background span:nth-child(30) {
   color: #b6b235;
   top: 25%;
@@ -581,6 +624,7 @@ watchEffect(() => {
   transform-origin: 11vw -21vh;
   box-shadow: -2vmin 0 0.8129351372411007vmin currentColor;
 }
+
 .background span:nth-child(31) {
   color: #1d1c22;
   top: 57%;
@@ -590,6 +634,7 @@ watchEffect(() => {
   transform-origin: 5vw 21vh;
   box-shadow: -2vmin 0 1.1386656299973013vmin currentColor;
 }
+
 .background span:nth-child(32) {
   color: #1d1c22;
   top: 47%;
@@ -599,6 +644,7 @@ watchEffect(() => {
   transform-origin: -16vw 3vh;
   box-shadow: -2vmin 0 0.7601214814485324vmin currentColor;
 }
+
 .background span:nth-child(33) {
   color: #b6b235;
   top: 6%;
@@ -608,6 +654,7 @@ watchEffect(() => {
   transform-origin: -18vw -19vh;
   box-shadow: -2vmin 0 0.6938327096315169vmin currentColor;
 }
+
 .background span:nth-child(34) {
   color: #b6b235;
   top: 22%;
@@ -617,6 +664,7 @@ watchEffect(() => {
   transform-origin: 22vw 2vh;
   box-shadow: -2vmin 0 1.154268802507705vmin currentColor;
 }
+
 .background span:nth-child(35) {
   color: #b6b235;
   top: 59%;
@@ -626,6 +674,7 @@ watchEffect(() => {
   transform-origin: -2vw 1vh;
   box-shadow: 2vmin 0 1.166721119808012vmin currentColor;
 }
+
 .background span:nth-child(36) {
   color: #b6b235;
   top: 6%;
@@ -635,6 +684,7 @@ watchEffect(() => {
   transform-origin: -5vw 22vh;
   box-shadow: 2vmin 0 1.0063795207852728vmin currentColor;
 }
+
 .background span:nth-child(37) {
   color: #262aab;
   top: 24%;
@@ -644,6 +694,7 @@ watchEffect(() => {
   transform-origin: -23vw -3vh;
   box-shadow: 2vmin 0 1.0861260539320619vmin currentColor;
 }
+
 .background span:nth-child(38) {
   color: #262aab;
   top: 48%;
@@ -653,6 +704,7 @@ watchEffect(() => {
   transform-origin: 13vw -5vh;
   box-shadow: 2vmin 0 0.7785712656051238vmin currentColor;
 }
+
 .background span:nth-child(39) {
   color: #1d1c22;
   top: 73%;
@@ -662,6 +714,7 @@ watchEffect(() => {
   transform-origin: -12vw -11vh;
   box-shadow: 2vmin 0 0.4553404226575346vmin currentColor;
 }
+
 .background span:nth-child(40) {
   color: #b6b235;
   top: 28%;
@@ -671,6 +724,7 @@ watchEffect(() => {
   transform-origin: 2vw 14vh;
   box-shadow: -2vmin 0 0.5015508008950393vmin currentColor;
 }
+
 .background span:nth-child(41) {
   color: #262aab;
   top: 14%;
@@ -680,6 +734,7 @@ watchEffect(() => {
   transform-origin: -15vw -17vh;
   box-shadow: 2vmin 0 0.6388602785030533vmin currentColor;
 }
+
 .background span:nth-child(42) {
   color: #262aab;
   top: 38%;
@@ -689,6 +744,7 @@ watchEffect(() => {
   transform-origin: -1vw -3vh;
   box-shadow: 2vmin 0 0.4099667300020169vmin currentColor;
 }
+
 .background span:nth-child(43) {
   color: #262aab;
   top: 72%;
@@ -698,6 +754,7 @@ watchEffect(() => {
   transform-origin: -8vw -6vh;
   box-shadow: 2vmin 0 0.6933076952471395vmin currentColor;
 }
+
 .background span:nth-child(44) {
   color: #1d1c22;
   top: 69%;
@@ -707,6 +764,7 @@ watchEffect(() => {
   transform-origin: -24vw 10vh;
   box-shadow: -2vmin 0 0.5125754994234237vmin currentColor;
 }
+
 .background span:nth-child(45) {
   color: #1d1c22;
   top: 81%;
@@ -716,6 +774,7 @@ watchEffect(() => {
   transform-origin: -10vw 15vh;
   box-shadow: 2vmin 0 0.5798780731589239vmin currentColor;
 }
+
 .background span:nth-child(46) {
   color: #1d1c22;
   top: 70%;
@@ -725,6 +784,7 @@ watchEffect(() => {
   transform-origin: 10vw -14vh;
   box-shadow: 2vmin 0 0.5872810869045775vmin currentColor;
 }
+
 .background span:nth-child(47) {
   color: #262aab;
   top: 87%;
@@ -734,6 +794,7 @@ watchEffect(() => {
   transform-origin: -1vw -22vh;
   box-shadow: 2vmin 0 0.5213321671704825vmin currentColor;
 }
+
 .background span:nth-child(48) {
   color: #b6b235;
   top: 1%;
@@ -743,6 +804,7 @@ watchEffect(() => {
   transform-origin: -8vw 24vh;
   box-shadow: -2vmin 0 0.51671837541754vmin currentColor;
 }
+
 .background span:nth-child(49) {
   color: #1d1c22;
   top: 33%;

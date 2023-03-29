@@ -56,40 +56,49 @@
       <div @click="onSearch">搜索</div>
     </template>
   </van-search>
-  <div v-if="postList && postList.length>0">
-    <van-divider
-        :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
-    >
-      文章
-    </van-divider>
-    <span v-for="post in postList">
+
+  <van-tabs v-model:active="active" v-if="userList.length>0||postList.length>0||teamList.length>0">
+    <van-tab title="文章" v-if="postList && postList.length>0">
+      <div v-if="postList && postList.length>0">
+        <!--        <van-divider-->
+        <!--            :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"-->
+        <!--        >-->
+        <!--          文章-->
+        <!--        </van-divider>-->
+        <span v-for="post in postList">
       <div class="fo">
               <div class="txt"
                    v-html="post.content" @click="toDetails(post.id)"/>
       </div>
-      <div class="van-hairline--bottom"></div>
+          <!--      <div class="van-hairline&#45;&#45;bottom"></div>-->
     </span>
-  </div>
-  <div v-if="userList && userList.length>0">
-    <van-divider
-        :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
-    >
-      用户
-    </van-divider>
-    <user-card-list :user-list="userList" v-on:userId="showAddUserOn"/>
-  </div>
+      </div>
+    </van-tab>
+    <van-tab title="用户" v-if="userList && userList.length>0">
+      <div v-if="userList && userList.length>0">
+        <van-divider
+            :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
+        >
+          用户
+        </van-divider>
+        <user-card-list :user-list="userList" v-on:userId="showAddUserOn"/>
+      </div>
+    </van-tab>
+    <van-tab title="队伍" v-if="teamList && teamList.length>0">
+      <div v-if="teamList && teamList.length>0">
+        <van-divider
+            :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
+        >
+          队伍
+        </van-divider>
+        <team-card-list :teamList="teamList" v-on:addTeam="addTeam"
+                        v-on:teamShow="isShow"/>
+      </div>
+    </van-tab>
+  </van-tabs>
 
-  <div v-if="teamList && teamList.length>0">
-    <van-divider
-        :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
-    >
-      队伍
-    </van-divider>
-    <team-card-list :teamList="teamList" v-on:addTeam="addTeam"
-                    v-on:teamShow="isShow"/>
-  </div>
   <div v-if="userList.length<=0&&postList.length<=0&&teamList.length<=0">
-    <van-empty description="查无数据" />
+    <van-empty description="查无数据"/>
   </div>
 </template>
 
@@ -103,7 +112,8 @@ import myAxios from "../../plugins/myAxios";
 import {showFailToast, showSuccessToast} from "vant";
 import TeamCardList from "../../components/TeamCardList.vue";
 import {useRouter} from "vue-router";
-const router =useRouter()
+
+const router = useRouter()
 const postList = ref([])
 const userList = ref([])
 const teamList = ref([])
@@ -117,12 +127,14 @@ const addPasswordTeam = ref(false);
 const teamPassword = ref('');
 const teamStatus = ref(0);
 const max = ref(0);
+const active = ref(0);
 const isFor = ref(false);
-let txt='';
+let txt = '';
 const searchTxt = ref('');
+
 const onSearch = async () => {
 
-  if (searchTxt.value === '' || txt===searchTxt.value) {
+  if (searchTxt.value === '' || txt === searchTxt.value) {
     return;
   }
   isFor.value = true;
@@ -158,7 +170,18 @@ const getTeam = async () => {
 const getUser = async () => {
   const resp = await userRequest.search(1, 10, searchTxt.value);
   if (resp.code === 200 && resp.data) {
-    userList.value = resp.data.records;
+    const list = resp.data.records;
+    for (let i = 0; i < list.length; i++) {
+      const user= list[i]
+      if (user.tags) {
+        try {
+          user.tags = JSON.parse(user.tags);
+        } catch (e){
+
+        }
+      }
+      userList.value.push(user);
+    }
   }
 
 }

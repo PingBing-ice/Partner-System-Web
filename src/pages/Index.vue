@@ -179,9 +179,9 @@
 </template>
 
 <script setup>
-import {onMounted, ref, watchEffect} from "vue";
+import {onMounted, ref} from "vue";
 import myAxios from "../plugins/myAxios";
-import {showSuccessToast, showFailToast, showToast} from 'vant';
+import {showSuccessToast, showFailToast} from 'vant';
 import UserCardList from "../components/UserCardList.vue";
 import TeamCardList from "../components/TeamCardList.vue";
 
@@ -272,6 +272,8 @@ const loadData = async () => {
       finished.value = true;
     }
   }
+  isMatchModeLoading.value = false;
+  loadingUser.value = false;
 }
 
 
@@ -318,6 +320,7 @@ const onUserLoad = async () => {
         if (userList.value.length >= total.value) {
           finished.value = true;
         }
+        page++;
       }
 
     }

@@ -96,9 +96,7 @@ const getSocket = () => {
         return socket;
     }
     if (socketList.value.length === 0) {
-        // socket = new WebSocket("ws://localhost:9001/ws");
-        const sockets = new WebSocket("ws://localhost:9001/ws");
-        // const sockets = new WebSocket("ws://jane.fit:9001/ws");
+        const sockets = new WebSocket(import.meta.env.VITE_SOCKET_URL);
         socketList.value.push(sockets)
     }
     socket = socketList.value[0];

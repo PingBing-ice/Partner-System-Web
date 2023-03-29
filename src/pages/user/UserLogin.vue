@@ -47,20 +47,24 @@
             </template>
           </van-field>
         </van-cell-group>
+        <div class="wj" >
+          <van-checkbox icon-size="12px" v-model="remember" shape="square">记住我</van-checkbox>
+          <span style="margin-left: 62%;" @click="ForgetUser">忘记密码？</span>
+        </div>
         <div style="margin: 16px;">
           <van-button round :loading="buttonLoading" :disabled="buttonLoading" loading-text="登录中..." block
                       type="primary" native-type="submit">
             登录
           </van-button>
         </div>
-        <span style="color: #1989fa; font-size: 5px; " @click="ForgetUser">忘记密码</span>
-        <span style="color: #1989fa; font-size: 5px;margin-left: 69%;" @click="RegisterUser">注册账号</span>
+        <span style="color: #1989fa; font-size: 12px;" @click="RegisterUser">注册账号</span>
       </van-form>
     </div>
   </div>
   <span class="s">
     <span>
-      <svg style="margin-bottom: -1px"   t="1679372811744" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+      <svg style="margin-bottom: -1px" t="1679372811744" class="icon" viewBox="0 0 1024 1024" version="1.1"
+           xmlns="http://www.w3.org/2000/svg"
            p-id="8372" width="12" height="12"><path
           d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"
           p-id="8373"></path><path
@@ -69,7 +73,6 @@
       2023 |
     </span>
       <a href="http://beian.miit.gov.cn/" style="color: #1890ff"> 湘ICP备2022021863号</a>
-
   </span>
 </template>
 
@@ -81,8 +84,8 @@ import {showSuccessToast} from 'vant';
 import webSocketConfig from "../../config/webSocketConfig";
 import store from "../../store";
 import imageRequest from "../../plugins/request/imageRequest";
-import image from "../../../public/lb.png"
-
+import image from "../../../public/LG.png"
+import {Base64}  from 'js-base64'
 const router = useRouter()
 const route = useRoute()
 const userNameClass = ref(false);
@@ -96,9 +99,22 @@ const indexUser = inject('indexUser')
 const codeUrl = ref('');
 
 const uuid = ref('');
+const remember = ref(true);
 // 验证码
 const code = ref('')
 onMounted(() => {
+  const name=localStorage.getItem("username");
+  const pass=localStorage.getItem("password");
+
+  if (name && pass) {
+    try {
+      userAccount.value =Base64.decode(name);
+      password.value = Base64.decode(pass);
+    }catch (e) {
+
+    }
+
+  }
   getCode();
 })
 
@@ -155,11 +171,19 @@ const onSubmit = async () => {
       await store.dispatch('setUser', res.data)
       await webSocketConfig.initSocket();
       indexUser();
-      const redirect = route.query?.redirect ?? '/index'
+      if (remember.value) {
+        const name=Base64.encode(userAccount.value);
+        const pass=Base64.encode(password.value);
+        localStorage.setItem("username", name);
+        localStorage.setItem("password", pass);
+      }else {
+        localStorage.removeItem("username");
+        localStorage.removeItem("password");
+      }
+      const redirect = route.query?.redirect ?? '/index';
       await router.replace({path: redirect})
     } else if (res.description) {
       if (res.description === '验证码错误') {
-
         await getCode()
         code.value = '';
         codeClass.value = true;
@@ -259,6 +283,13 @@ div.parent {
   bottom: 0;
   float: left;
   left: 29%;
-  font-size: 1px
+  font-size: 10px
+}
+
+.wj {
+  margin: 5px 33px;
+  font-size: 12px;
+  display: flex;
+  color: #1989fa;
 }
 </style>

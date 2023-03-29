@@ -25,7 +25,6 @@
       <van-button round plain hairline icon="star-o"  :color="post.hasCollect ?'#00aeec':''" size="small" @click="doCollect">收藏</van-button>
     </div>
     <span class="com">评论{{ `(` + le + `)` }}</span>
-
     <van-list v-if="post.commentList.length>0"  v-for="post in post.commentList">
       <div style="display:flex;">
         <van-divider/>
@@ -44,7 +43,8 @@
             </div>
           </div>
         </div>
-        <div v-if="post._com" style="margin-left: 70%;margin-top: 12px">
+        <div v-if="post._com" class="pl" >
+
           <van-popover  placement="bottom-end" :actions="actions" @select="delCom(post.commentId)" >
             <template #reference>
               <van-icon style="margin-right: 10px" name="ellipsis"/>
@@ -58,10 +58,12 @@
           {{ post.content }}
         </span>
     </van-list>
+    <van-empty description="暂无评论" image-size="7rem" v-if="post.commentList.length<=0"/>
 
 
   </div>
-  <div class="send">
+  <van-divider />
+  <div class="send" v-if="post!=null">
     <van-search
         left-icon="edit"
         v-model="commTxt"
@@ -279,6 +281,12 @@ const sendCommTxt =async () => {
   font-size: 14px;
 }
 .send{
-  margin-top: 10px;
+  position: initial;
+  width: 100%;
+}
+.pl{
+  position: relative;
+  left: 46%;
+  margin: 12px
 }
 </style>

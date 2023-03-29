@@ -1,13 +1,13 @@
 <template>
 
-    <span v-for="post in postList">
+    <span v-if="postList.length>0"  v-for="post in postList">
       <div class="fo">
               <div class="txt"
                    v-html="post.content" @click="toDetails(post.id)"/>
       </div>
       <div class="van-hairline--bottom"></div>
     </span>
-
+  <van-empty v-if="postList.length<=0" description="数据为空请先收藏" />
 </template>
 
 <script setup>

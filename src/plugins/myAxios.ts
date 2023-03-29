@@ -1,15 +1,13 @@
 // Set config defaults when creating the instance
 import axios from "axios";
-import { showFailToast } from 'vant';
+import {showFailToast} from 'vant';
 import store from "../store";
-import {useRouter} from "vue-router";
+import {useRoute} from "vue-router";
 import routeConfig from "../config/routeConfig";
 
 
-
 const myAxios = axios.create({
-    // baseURL: 'http://jane.fit/py',
-    baseURL: 'http://localhost/py',
+    baseURL: import.meta.env.VITE_AX_BASE_URL,
     withCredentials: true,
 });
 // myAxios.defaults.withCredentials = true;
@@ -33,11 +31,16 @@ myAxios.interceptors.response.use(async response => {
             store.commit("loginOut");
             window.location.href = '/';
         }
-        if (response.data.description) {
-            showFailToast(response.data.description);
+        if (response.data.code === 40100 && useRoute().path!=='/') {
+            showFailToast("未登录");
         } else {
-            showFailToast(response.data.message);
+            if (response.data.description) {
+                showFailToast(response.data.description);
+            } else {
+                showFailToast(response.data.message);
+            }
         }
+
     }
     // 对响应数据做点什么
     return response.data;
