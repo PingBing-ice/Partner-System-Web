@@ -1,5 +1,6 @@
 <template>
   <template v-if="user">
+
     <van-cell :title="userName.avatarUrl">
       <van-uploader :after-read="afterRead">
         <van-image
@@ -17,8 +18,8 @@
     <van-cell :title="userName.gender" is-link :value="user?.gender"
               @click="toEdit('gender',userName.gender,user?.gender)"/>
 
-    <van-cell title="标签" @click="toTag">
-      <template #right-icon>
+    <van-cell title="标签" @click="toTag" is-link :value="!user.tags?'请设置标签':''">
+      <template #right-icon v-if="user.tags">
         <van-tag plain v-for="tag in user?.tags" type="primary" size="large">{{ tag }}</van-tag>
       </template>
     </van-cell>
@@ -33,27 +34,6 @@
     <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">退出登录
     </van-button>
   </template>
-<!--  <van-popup-->
-<!--      v-model:show="show"-->
-<!--      round-->
-<!--      position="bottom"-->
-<!--      :style="{ height: '60%' }"-->
-<!--  >-->
-<!--    <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }">已选标签</van-divider>-->
-<!--    <van-row gutter="5" justify="center" v-if="tagList.length>0">-->
-<!--      <van-col span="6" v-for="tag in tagList">-->
-<!--        <van-tag plain :show="tagShow" closeable type="primary" @close="close(tag)" size="medium">{{ tag }}</van-tag>-->
-<!--      </van-col>-->
-<!--    </van-row>-->
-<!--    <div v-if="tagList.length ===0 " style="color: #42b983; text-align: center">请选择标签</div>-->
-<!--    <van-divider :style="{ color: '#1989fa', borderColor: '#fa0723', padding: '0 16px' }">选择标签</van-divider>-->
-<!--    <van-row gutter="4" justify="center" v-if="tagIdList.length>0">-->
-<!--      <van-col span="5" v-for="tagId in tagIdList">-->
-<!--        <van-tag plain type="danger" @click="addTag(tagMap.get(tagId))" size="medium">{{ tagMap.get(tagId) }}</van-tag>-->
-<!--      </van-col>-->
-<!--    </van-row>-->
-<!--    <van-button round block type="primary" @click="toTag" native-type="submit" style="margin-top: 50px">提交</van-button>-->
-<!--  </van-popup>-->
 
 
 </template>
@@ -61,11 +41,13 @@
 <script setup>
 import {inject, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import {removeChatUser} from "../../states/user";
 import { showConfirmDialog } from 'vant';
 import { showSuccessToast, showFailToast } from 'vant';
 import store from "../../store";
+import webSocketConfig from "../../config/webSocketConfig";
+import {removeToken} from "../../util/cookie";
 
 const reload = inject('reload')
 
@@ -116,8 +98,11 @@ onMounted(async () => {
     user.value = users;
     avatar.value = user.value.avatarUrl
 
+  }else if (res.code === 201) {
+     await router.back();
   }else {
-    store.commit("loginOut")
+    store.commit("loginOut");
+
   }
 })
 // 注销
@@ -129,7 +114,9 @@ const edit = async () => {
     editState.value = false;
     await store.dispatch("LoginOut")
     removeChatUser()
-    await router.push({path: '/index'})
+    removeToken()
+    webSocketConfig.clearSocket();
+    await router.push({path: '/'})
   }
 }
 const toEdit = (editKey, editName, currentValue) => {
@@ -146,51 +133,7 @@ const toTag = () => {
   router.push({
     path:'/label'
   })
-  // if (tagList.value.length > 0) {
-  //   showConfirmDialog({
-  //     title: '确认提交吗?',
-  //     message:
-  //         '每天只能提交五次',
-  //   }).then(() => {
-  //     const list = [];
-  //     for (let i = 0; i < tagIdList.value.length; i++) {
-  //       const id = tagIdList.value[i];
-  //       const tag = tagMap.value.get(id)
-  //       if (isTagListHasID(tag, tagList.value)) {
-  //         list.push(id);
-  //       }
-  //     }
-  //     const tag = JSON.stringify(list)
-  //     if (!store.getters.getIsLogin) {
-  //       showFailToast("未登录");
-  //       router.back();
-  //       return;
-  //     }
-  //     const user = store.getters.getUser
-  //     myAxios.post("/api/user/update", {
-  //       id: user.id,
-  //       tags: tag
-  //     }).then(resp => {
-  //       if (resp.code === 200&&resp.data) {
-  //         store.commit("setUser",resp.data)
-  //         router.push({
-  //           path: '/user'
-  //         })
-  //         showSuccessToast("修改成功");
-  //       }else {
-  //         showFailToast(resp.description);
-  //       }
-  //     }).catch(() => {
-  //       showFailToast("修改失败")
-  //     });
-  //
-  //   }).catch(error => {
-  //     // on cancel
-  //     showFailToast(error.message)
-  //   });
-  // } else {
-  //   showToast("请选择标签");
-  // }
+
 }
 const isTagListHasID = (tag, list) => {
   for (let i = 0; i < list.length; i++) {

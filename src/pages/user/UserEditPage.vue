@@ -91,7 +91,7 @@
 <script setup>
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref, watchEffect} from "vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import { showSuccessToast, showFailToast } from 'vant';
   import store from "../../store";
 

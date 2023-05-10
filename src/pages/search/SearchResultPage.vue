@@ -5,8 +5,7 @@
 <script setup>
 import {useRoute} from "vue-router";
 import {onMounted, ref} from "vue";
-import myAxios from "../../plugins/myAxios";
-import qs from 'qs'
+import myAxios from "../../config/myAxios";
 import { showSuccessToast, showFailToast } from 'vant';
 import UserCardList from "../../components/UserCardList.vue";
 

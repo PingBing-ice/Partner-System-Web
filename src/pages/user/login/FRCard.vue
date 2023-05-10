@@ -1,86 +1,38 @@
 <template>
-  <div class="parent">
-
-
-    <div class="title">
-      <h1 class="one">
-        忘记密码
-      </h1>
+  <div id="Login">
+    <div class="loginIcon">
+      <van-icon name="arrow-left" @click="toPath"/>
     </div>
-    <div class="content">
-
-      <van-form @submit="onSubmit">
-        <van-cell-group inset>
-          <van-field
-              v-model="userAccount"
-              name="userAccount"
-              label="账户"
-              placeholder="请输入要修改的账户"
-              :class="{'apply-shake':userAccountClass}"
-          />
-          <van-field
-              v-model="password"
-              type="password"
-              name="password"
-              label="密码"
-              placeholder="密码"
-              :class="{'apply-shake':passwordClass}"
-          />
-          <van-field
-              v-model="checkPassword"
-              type="password"
-              name="checkPassword"
-              label="确认密码"
-              placeholder="确认密码"
-              :class="{'apply-shake':checkPasswordClass}"
-          />
-          <van-field
-              v-model="email"
-              name="email"
-              label="邮箱"
-              placeholder="输入账户绑定的邮箱"
-              :class="{'apply-shake':emailClass}"
-          />
-          <van-field
-              v-model="code"
-              center
-              clearable
-              label="邮箱验证码"
-              placeholder="请输入邮箱验证码"
-              :class="{'apply-shake':codeClass}"
-          >
-            <template #button>
-              <van-button size="small" v-if="isTime===false" @click="sendEmail" :loading="subValue"
-                          loading-text="发送中..." type="primary">发送验证码
-              </van-button>
-              <van-count-down v-if="isTime===true" :time="time" format="ss" @finish="isTime = false"/>
-            </template>
-          </van-field>
-
-        </van-cell-group>
-        <div class="submit">
-          <van-button round :loading="buttonLoading" :disabled="buttonLoading" loading-text="修改中..." block
-                      type="primary" native-type="submit">
-            修改
+    <div class="lg" style="top: 6%">
+      <div class="loginContent">
+        <h2>{{ route.path==='/forget'?'忘记密码': '注册账号' }}</h2>
+        <InputCard v-model="userAccount" @value="getAccount" :class="{'apply-shake':userAccountClass}"/>
+        <InputCard v-model="password" @value="getPassword" :type="'password'" :class="{'apply-shake':passwordClass}"/>
+        <InputCard v-model="checkPassword" @value="getCheck" :placeholder="'确认密码'" :type="'password'" :class="{'apply-shake':checkPasswordClass}"/>
+        <InputCard v-model="email" @value="getEmail" :placeholder="'请输入邮箱'" :class="{'apply-shake':emailClass}"/>
+        <div class="code" style="margin-top: 20px" :class="{'apply-shake':codeClass}">
+          <input class="loginCode" v-model="code" placeholder="请输入验证码" type="text" >
+          <van-button size="small" v-if="isTime===false" @click="sendEmail" :loading="subValue"
+                      loading-text="发送中..." color="rgb(123 201 249 / 77%)">发送验证码
           </van-button>
+          <div style="width: 76px;display: flex;justify-content: center;align-items: center" v-if="isTime===true">
+            <van-count-down v-if="isTime===true" :time="time" format="ss" @finish="isTime = false"/>
+          </div>
         </div>
-        <div class="submit">
-          <van-button plain round block type="primary" @click="toLogin">
-            登录
-          </van-button>
+        <div class="login_but">
+          <button class="login_but_an" @click="onSubmit">{{  route.path==='/forget'?'修改': '注册' }}</button>
         </div>
-
-      </van-form>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {ref} from "vue";
-import {useRouter} from "vue-router";
-import myAxios from "../../plugins/myAxios";
-import {showSuccessToast, showFailToast} from 'vant';
-import MyAxios from "../../plugins/myAxios";
+import {useRoute, useRouter} from "vue-router";
+import myAxios from "../../../config/myAxios";
+import {showSuccessToast, showFailToast, showToast} from 'vant';
+import InputCard from "../../../components/InputCard.vue";
 
 
 const userAccountClass = ref(false);
@@ -96,13 +48,15 @@ const isTime = ref(false);
 
 
 const router = useRouter();
+const route = useRoute();
 const userAccount = ref('');
 const code = ref('');
 const password = ref('');
 const email = ref('');
 const checkPassword = ref('');
-const onSubmit = async () => {
 
+
+const onSubmit = async () => {
   tx();
   if (!email.value || email.value === '') {
     emailClass.value = true;
@@ -122,6 +76,14 @@ const onSubmit = async () => {
     return;
   }
   buttonLoading.value = true;
+  if (route.path === '/forget') {
+    await forget()
+  }else {
+    await register();
+  }
+
+}
+const forget = async () => {
   const res = await myAxios.post('/api/user/forget', {
     userAccount: userAccount.value,
     password: password.value,
@@ -131,8 +93,33 @@ const onSubmit = async () => {
   });
   if (res.code === 200) {
     buttonLoading.value = false;
-    showSuccessToast("修改成功");
-    await router.push({path: '/index'})
+    showToast({
+      message: '修改成功',
+      position: 'top',
+    });
+    await router.push({path: '/login'})
+  } else {
+    buttonLoading.value = false;
+    if (res.description) {
+      showFailToast(res.description)
+    }
+  }
+}
+const register =async () => {
+  const res = await myAxios.post('/api/user/Register', {
+    userAccount: userAccount.value,
+    password: password.value,
+    checkPassword: checkPassword.value,
+    email: email.value,
+    code: code.value
+  });
+  if (res.code === 200) {
+    buttonLoading.value = false;
+    showToast({
+      message: '注册成功',
+      position: 'top',
+    });
+    await router.push({path: '/'})
   } else {
     buttonLoading.value = false;
     if (res.description) {
@@ -173,7 +160,10 @@ const sendEmail = async () => {
   } else {
     const pattern = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/, str = email.value;
     if (!pattern.test(str)) {
-      showFailToast("邮箱格式错误");
+      showToast({
+        message: '邮箱格式错误',
+        position: 'top',
+      });
       return;
     }
   }
@@ -183,9 +173,8 @@ const sendEmail = async () => {
     return;
   }
   subValue.value = true;
-  const response = await myAxios.post('/oss/sendForget', {
-    email: email.value,
-    userAccount: userAccount.value
+  const response = await myAxios.post('/oss/send', {
+    email: email.value
   });
   if (response.code === 200) {
     subValue.value = false;
@@ -194,8 +183,22 @@ const sendEmail = async () => {
   }
   subValue.value = false;
 }
-const toLogin = () => {
-  router.push({path: '/'})
+const getAccount = (e) => {
+  userAccount.value = e;
+}
+const getPassword = (e) => {
+  password.value = e;
+}
+const getCheck = (e) => {
+  checkPassword.value = e
+}
+const getEmail = (e) => {
+  email.value = e;
+}
+const toPath = () => {
+  router.push({
+    path: '/login'
+  })
 }
 </script>
 
@@ -238,12 +241,13 @@ const toLogin = () => {
 .apply-shake {
   animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
 }
-.parent{
+
+.parent {
   position: absolute;
   top: 50%;
   left: 50%;
   margin-top: -270px;
   margin-left: -188px;
-
 }
+
 </style>

@@ -64,7 +64,7 @@
 
 <script setup>
 import {ref} from "vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import { showSuccessToast, showFailToast } from 'vant';
 import {useRouter} from "vue-router";
 import {formatDate} from "../../services/dataUtils";
@@ -112,6 +112,8 @@ const isShow = () => {
 }
 </script>
 
-<style scoped>
-
+<style >
+.van-field__control:read-only {
+  width: 100%;
+}
 </style>

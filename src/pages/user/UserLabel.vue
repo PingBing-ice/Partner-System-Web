@@ -10,9 +10,7 @@
     />
   </form>
   <van-divider>已选标签</van-divider>
-  <div v-if=" activeIds&&activeIds.length<=0">
-    <van-empty :image-size="[35, 20]" description="未选择标签"/>
-  </div>
+
   <div v-if="activeIds&&activeIds.length ===0 " style="color: #42b983; text-align: center">请选择标签</div>
   <van-row gutter="20" justify="center">
     <van-col v-for="tag in activeIds">
@@ -28,6 +26,7 @@
       v-model:main-active-index="activeIndex"
       :items="tagList"
       style="height: 250px"
+      @click-item="add"
   />
   <div style="padding: 12px">
     <van-button block type="primary" plain @click="updateResult">修改</van-button>
@@ -37,7 +36,7 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
 import {useRouter} from "vue-router";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import store from "../../store";
 import {showFailToast, showSuccessToast, showToast,showConfirmDialog} from "vant";
 
@@ -47,7 +46,7 @@ const router = useRouter();
 // 标签列表
 const InitTagList = ref([])
 const InitTag = ref([])
-const tagList = ref(InitTagList)
+const tagList = ref([])
 // 已选择的标签
 const activeIds = ref([]);
 const activeIndex = ref(0);
@@ -71,32 +70,39 @@ onMounted(() => {
         router.back();
       }
     }
-    activeIds.value = tag;
+    if (tag) {
+
+      activeIds.value = tag;
+    }
   } else {
     showFailToast("未登录");
     router.back();
   }
+
   getLabel();
+  tagList.value = InitTagList.value;
 })
 const getLabel = () => {
+
   myAxios.get('/api/userLabel/getUserLabel').then(res => {
     if (res.code === 200) {
       const b = res.data
-      b.forEach(c => {
+      for (let i = 0; i < b.length; i++) {
+
+        const tagData = b[i]
         const labelList = []
-        c.label.forEach(m => {
-          let k = {text: m, id: m}
+        for (let label of tagData.label) {
+          let k = {text: label, id: label.toString()}
           labelList.push(k)
-        })
+        }
         let a = {
-          text: c.labelType,
+          text: tagData.labelType,
           children: labelList
         }
         InitTagList.value.push(a)
         InitTag.value.push(a)
-      })
 
-
+      }
     }
   });
 
@@ -112,10 +118,11 @@ const onSearch = () => {
 }
 const onCancel = () => {
   searchTest.value = '';
-  console.log(InitTagList.value)
   tagList.value = InitTag.value;
 }
-
+const add = () => {
+  console.log(activeIds.value)
+}
 const show = ref(true);
 // 移出标签
 const doClose = (tag) => {
@@ -125,7 +132,7 @@ const doClose = (tag) => {
 };
 const updateResult = () => {
   if (activeIds.value.length <= 0) {
-    showToast("请选择标签")
+    showToast({message:"请选择标签",position: 'top',})
     return;
   }
   showConfirmDialog({
@@ -138,7 +145,8 @@ const updateResult = () => {
     try {
       tag = JSON.stringify(activeIds.value);
     } catch (e) {
-      showToast("请求错误请重试");
+      showToast({message:'请求错误请重试',position: 'top'});
+
       return;
     }
     myAxios.post("/api/user/update", {

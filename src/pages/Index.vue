@@ -1,12 +1,13 @@
 <template>
-  <van-notice-bar v-if="notice"
-                  left-icon="volume-o"
-                  scrollable
-                  :text="notice"
-                  color="#1989fa" background="#ecf9ff"
-  />
-  <van-button icon="plus" class="addBut" @click="toAddPost" type="primary" round/>
-  <van-back-top right="7%" bottom="17%" target=".contents"/>
+  <div class="addPostTop">
+    <div>
+      <van-button v-if="isTop&&active!=='队伍'" class="backTop" icon="arrow-up" @click="backTop" type="primary"
+                  size="small"
+                  round></van-button>
+    </div>
+    <van-button icon="plus" class="addBut" @click="toAddPost" type="primary" round/>
+  </div>
+
 
 
   <van-dialog z-index="100" v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
@@ -52,8 +53,6 @@
       />
     </van-cell-group>
   </van-dialog>
-
-
   <van-popup
       v-model:show="showPostUserVo"
       round
@@ -81,6 +80,7 @@
           <br>
           <span class="type">加入天数</span>
         </span>
+
       <span class="van-hairline--right">
           <span class="num">
             {{ postUserVo.postTotal }}
@@ -97,61 +97,124 @@
         </span>
     </div>
     <div class="adduserF">
-      <van-button plain hairline block class="addUser" @click="show=!show">添加好友</van-button>
+      <button class="addUser" @click="showAddUserOn(postUserVo.id)">添加好友</button>
     </div>
   </van-popup>
-  <van-tabs v-model:active="active" @click-tab="onClickTab" @change="onTabChange" animated>
-    <van-tab title="贴吧" name="贴吧">
-      <post-card-list v-on:showPostUser="showUser" :is-own="false" :sorted="0"/>
-    </van-tab>
 
-    <van-tab title="用户" name="用户">
-      <div id="userList">
-        <van-cell center :title="isMatchMode? '推荐模式':'普通模式'">
-          <template #right-icon>
+  <div class="indexTabs">
+    <van-tabs v-model:active="active" @change="onTabChange" animated swipeable>
+      <template #nav-bottom>
+      </template>
+      <template #nav-left>
+        <div style="display: flex;align-items: center;padding: 0 50px 0 16px">
+          <img @click="toUser" :src="user?.avatarUrl" alt="" class="avatar" v-if="store.getters.getIsLogin">
+        </div>
+      </template>
 
-            <van-switch v-model="isMatchMode" size="24" @update:model-value="onMatch"/>
-          </template>
-        </van-cell>
-        <van-tabs v-if="userList||userList.length>0 && tagUserList|| tagUserList.length>0" v-model:active="activeName"
-                  @click-tab="onClickTag">
-          <van-tab title="全部" name="a">
-            <van-list
-                v-model:loading="loadingUser"
-                :finished="finished"
-                finished-text="没有更多了"
-                @load="onUserLoad"
-            >
-              <user-card-list :user-list="userList" v-on:userId="showAddUserOn"/>
-            </van-list>
+      <van-tab title="用户" name="用户">
+        <div id="userList">
+          <van-cell style="background-image: linear-gradient(to left,#fbf7f8, #f5f9fc);" center
+                    :title="isMatchMode? '推荐模式':'普通模式'">
+            <template #right-icon>
+              <van-switch v-model="isMatchMode" size="24" @update:model-value="onMatch"/>
+            </template>
+          </van-cell>
+          <van-tabs v-if="userList||userList.length>0 && tagUserList|| tagUserList.length>0" v-model:active="activeName"
+                    @click-tab="onClickTag">
+            <van-tab title="全部" name="a">
 
-          </van-tab>
-          <van-tab v-for="tag in tagList" :title="tag" :name="tag">
-            <user-card-list v-if=" tagUserList || tagUserList.length>0" :user-list="tagUserList"/>
-          </van-tab>
+              <div class="indexUserListCard card">
+                <user-card-list :user-list="userList" v-on:userId="showAddUserOn"/>
+              </div>
+
+            </van-tab>
+            <van-tab class="userTabs" v-for="tag in tagList" :title="tag" :name="tag">
+              <div class="indexUserListCard card">
+                <user-card-list v-if=" tagUserList || tagUserList.length>0" :user-list="tagUserList"/>
+              </div>
+            </van-tab>
+          </van-tabs>
+        </div>
+
+      </van-tab>
+      <van-tab title="首页" name="首页">
+        <van-tabs v-model:active="IndexActive" shrink type="card">
+          <div id="indexTags">
+            <van-tab title="推荐" :title-class="'indexTitle'">
+              <van-swipe :autoplay="3000" lazy-render style="margin: 10px 5px 7px 5px;border-radius: 10px;">
+                <van-swipe-item>
+                  <div class="banner1 ac">
+                  </div>
+                </van-swipe-item>
+                <van-swipe-item>
+                  <div class="banner2 ac">
+                  </div>
+                </van-swipe-item>
+              </van-swipe>
+
+              <van-notice-bar v-if="notice"
+                              left-icon="volume-o"
+                              scrollable
+                              :text="notice"
+                              color="rgb(56 121 186)" background="#f0f9fe"
+              >
+              </van-notice-bar>
+              <div class="ls">
+                <div class="lll one" @click="toPoints">
+                  <div class="llTitle">每日签到</div>
+                  <em>
+                    <img style="width: 58px;height: 58px" src="https://www.xcng.cn/wp-content/uploads/2023/02/登录成功.png">
+                  </em>
+                </div>
+                <div class="lll two">
+                  <div class="llTitle">每日活动</div>
+                  <em>
+                    <img style="width: 58px;height: 58px" src="https://www.xcng.cn/wp-content/uploads/2023/02/眨眼.png">
+                  </em>
+                </div>
+                <div class="lll three">
+                  <div class="llTitle">优质专栏</div>
+                  <em>
+                    <img style="width: 58px;height: 58px" src="https://www.xcng.cn/wp-content/uploads/2023/02/红包.png">
+                  </em>
+                </div>
+              </div>
+              <post-card-list v-on:showPostUser="showUser" :is-own="false" :sorted="0"/>
+            </van-tab>
+            <van-tab :title="'图片'" :title-class="'indexTitle'">
+              <ImgRreviewCard :images="imageList"/>
+            </van-tab>
+          </div>
+
         </van-tabs>
-      </div>
 
-    </van-tab>
-    <van-tab title="队伍" name="队伍">
-      <div :class="{'apply-shake':searchTeamName.value}">
-        <van-search
-            v-model="searchTxt"
-            show-action
-            placeholder="请输入队伍关键词"
-            @search="onSearch"
-            @clear="onClear()"
-        >
-          <template #action>
-            <div @click="onClickButton">搜索</div>
-          </template>
-        </van-search>
-      </div>
-      <team-card-list v-if="teamList && teamList.length>0" :teamList="teamList" v-on:addTeam="addTeam"
-                      v-on:teamShow="isShow"/>
-      <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
-    </van-tab>
-  </van-tabs>
+      </van-tab>
+      <van-tab title="队伍" name="队伍">
+        <div :class="{'apply-shake':searchTeamName.value}">
+          <van-search
+              v-model="searchTxt"
+              show-action
+              placeholder="请输入队伍关键词"
+              @search="onSearch"
+              @clear="onClear()"
+          >
+            <template #action>
+              <div @click="onClickButton">搜索</div>
+            </template>
+          </van-search>
+        </div>
+        <team-card-list v-if="teamList && teamList.length>0" :teamList="teamList" v-on:addTeam="addTeam"
+                        v-on:teamShow="isShow"/>
+        <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
+      </van-tab>
+      <template #nav-right>
+        <div style="display: flex;align-items: center; padding: 0 16px 0 50px">
+          
+          <van-icon name="search" size="18" @click="toSearch" style="color:#4a94af;"/>
+        </div>
+      </template>
+    </van-tabs>
+  </div>
   <van-overlay :show="isMatchModeLoading">
     <div class="wrapper" @click.stop>
       <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
@@ -176,12 +239,13 @@
       <!--      <van-loading color="#0094ff" text-color="#0094ff" vertical>加载中...</van-loading>-->
     </div>
   </van-overlay>
+
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
-import myAxios from "../plugins/myAxios";
-import {showSuccessToast, showFailToast} from 'vant';
+import {onActivated, onMounted, ref, watch} from "vue";
+import myAxios from "../config/myAxios";
+import {showSuccessToast, showFailToast, showToast} from 'vant';
 import UserCardList from "../components/UserCardList.vue";
 import TeamCardList from "../components/TeamCardList.vue";
 
@@ -189,6 +253,9 @@ import TeamCardList from "../components/TeamCardList.vue";
 import {useRoute, useRouter} from "vue-router";
 import PostCardList from "../components/PostCardList.vue";
 import userRequest from "../plugins/request/userRequest";
+import store from "../store";
+import ImgRreviewCard from "../components/ImgRreviewCard.vue";
+import postRequest from "../plugins/request/postRequest";
 
 const show = ref(false)
 const addPasswordTeam = ref(false)
@@ -200,7 +267,6 @@ const teamPassword = ref('');
 const showTeam = ref(false);
 const userList = ref([]);
 const finished = ref(false);
-const loadingUser = ref(false);
 const description = ref("加载中......")
 const teamList = ref([]);
 const tagList = ref([]);
@@ -213,26 +279,119 @@ const isMatchMode = ref(false)
 const isMatchModeLoading = ref(false)
 const router = useRouter();
 const route = useRoute();
-const active = ref(route.query.tab)
+const active = ref(route.query.tab ?? '首页')
 const loading = ref(false);
 const showPostUserVo = ref(false);
 const showAddUser = ref(false);
 const postUserVo = ref();
 const message = ref('');
 const userId = ref('');
-let page = 1;
+let page = 0;
 const total = ref(100);
-
+const top = ref(0);
+const isTop = ref(false);
+const IndexActive = ref(0);
+const user = ref(store.getters.getUser)
+let isUserLod = true;
+let imagePage = 0;
+let imageLock = true;
+let isImageLod = true;
 onMounted(async () => {
-  await getNotice();
+  await notices();
   await getLabel();
   if (active.value === '队伍') {
     await getTeamList();
   }
+  await onUserLoad()
+  const card = document.querySelector(".card");
+  const indexTags = document.getElementById("indexTags");
+  if (card) {
+    // 添加滚动监听
+    card.addEventListener("scroll", isTops);
+  }
+  if (indexTags) {
+    indexTags.addEventListener("scroll", isIndex)
+  }
 })
+const isIndex = async () => {
+  const indexTags = document.getElementById("indexTags");
+  if (indexTags.scrollTop >= 200 && isTop.value === false) {
+    isTop.value = true
+  }
+  if (indexTags.scrollTop < 200 && isTop.value === true) {
+    isTop.value = false
+  }
+  // 滚动加载图片
+  if (IndexActive.value === 1 && isImageLod) {
+    const to = indexTags.scrollHeight - indexTags.scrollTop;
+    if (to <= 900) {
+      if (imageLock) {
+        imageLock = false;
+        await loadImage(++imagePage, 10);
+        imageLock = true;
+      }
+    }
+  }
 
+}
+const isTops = async () => {
+  const card = document.querySelector(".card");
+  if (card) {
+    // 防止isTop 刷新频繁
+    if (card.scrollTop >= 200 && isTop.value === false) {
+      isTop.value = true
+    }
+    if (card.scrollTop < 200 && isTop.value === true) {
+      isTop.value = false
+    }
+    if (active.value === '用户') {
+      if (!finished.value) {
+        const to = card.scrollHeight - card.scrollTop;
+        if (to <= 900) {
+          if (isUserLod) {
+            isUserLod = false;
+            await onUserLoad();
+            isUserLod = true;
+          }
+          // 滚动加载
+        }
+      }
+    }
+  }
+}
+onActivated(() => {
+  const indexTags = document.getElementById("indexTags");
+  if (indexTags) {
+    indexTags.scrollTop = store.getters.getTop;
+  }
+})
+watch(IndexActive, async () => {
+  if (IndexActive.value === 1 && imageList.value.size <= 0) {
+    await loadImage(++imagePage, 10)
+  }
+})
+// 加载image】
+const loadImage = async (num, size) => {
+  const resp = await postRequest.getImageList(num, size);
+  if (resp.code === 200 && resp.data) {
+    const data = resp.data;
+    if (data.records) {
+      for (let record of data.records) {
+        if (record.imageUrl) {
+          imageList.value.add(record.imageUrl);
+        }
+      }
+    }
+    console.log(imageList.value)
 
-const getNotice = async () => {
+    if (imageList.value.size >= data.total) {
+      isImageLod = false;
+    }
+  }
+}
+const imageList = ref(new Set())
+
+const notices = async () => {
   const response = await myAxios.get('/api/userNotice/getNotice', {
     params: {
       region: 1,
@@ -258,11 +417,11 @@ const loadData = async () => {
       return;
     }
     for (let i = 0; i < list.length; i++) {
-      const user= list[i]
+      const user = list[i]
       if (user.tags) {
         try {
           user.tags = JSON.parse(user.tags);
-        } catch (e){
+        } catch (e) {
 
         }
       }
@@ -273,24 +432,20 @@ const loadData = async () => {
     }
   }
   isMatchModeLoading.value = false;
-  loadingUser.value = false;
 }
 
-
-// 切换 tab
-const onClickTab = () => {
+watch(active, async (value) => {
   if (active.value === '贴吧') {
   } else if (active.value === '队伍') {
     if (teamList.value <= 0) {
       getTeamList()
     }
   } else if (active.value === '用户') {
-    if (page === 1 && userList.value.length <= 0) {
-      loadData();
-    }
+    await onUserLoad();
   }
+})
 
-}
+
 const onUserLoad = async () => {
   if (active.value !== '用户') {
     return;
@@ -299,6 +454,7 @@ const onUserLoad = async () => {
     if (userList.value.length >= total.value) {
       finished.value = true;
     } else {
+      page++;
       const resp = await userRequest.getUserList(page, 10);
       if (resp.code === 200 && resp.data.items) {
         const list = resp.data.items;
@@ -307,11 +463,11 @@ const onUserLoad = async () => {
           return;
         }
         for (let i = 0; i < list.length; i++) {
-          const user= list[i]
+          const user = list[i]
           if (user.tags) {
             try {
               user.tags = JSON.parse(user.tags);
-            } catch (e){
+            } catch (e) {
 
             }
           }
@@ -320,13 +476,11 @@ const onUserLoad = async () => {
         if (userList.value.length >= total.value) {
           finished.value = true;
         }
-        page++;
       }
 
     }
   }
   isMatchModeLoading.value = false;
-  loadingUser.value = false;
 
 }
 // 发送添加好友
@@ -340,14 +494,16 @@ const sendFriendRequest = () => {
   }).then(resp => {
     // @ts-ignore
     if (resp.code === 200) {
-      showSuccessToast("发送成功")
+      showToast({message: '发送成功!', position: 'top'});
+
     } else {
       if (resp.description) {
         showFailToast(resp.description);
       }
     }
   }).catch(resp => {
-    showFailToast("发送失败");
+    showToast({message: '发送失败!', position: 'top'});
+
   });
 }
 const close = () => {
@@ -502,6 +658,7 @@ const onMatch = async (value) => {
         num: 3
       }
     })
+
     if (response.code === 200 && response.data) {
       isMatchModeLoading.value = false;
       userList.value = response.data;
@@ -515,6 +672,7 @@ const onMatch = async (value) => {
       });
     } else {
       isMatchModeLoading.value = false;
+      isMatchMode.value = false;
     }
   } else {
     page = 1;
@@ -522,8 +680,37 @@ const onMatch = async (value) => {
     await loadData()
   }
 }
+const backTop = () => {
+  if (active.value === '首页') {
+    const indexTags = document.getElementById('indexTags');
+    topDH(indexTags)
+  } else {
+    const card = document.querySelector(".card");
+    if (card) {
+      topDH(card);
+    }
+  }
+}
+const topDH = (html) => {
+  let x = 30;
+  let top = html.scrollTop//获取点击时页面的滚动条纵坐标位置
+  const timeTop = setInterval(() => {
+    html.scrollTop = (top -= (x += 1.5))//一次减30往上滑动
+    if (top <= 0) {
+      clearInterval(timeTop)
+    }
+  }, 5)
 
-
+}
+const toPoints = () => {
+  router.push({path: '/points'})
+}
+const toUser = () => {
+  router.push({path: '/user'})
+}
+const toSearch = () => {
+  router.push({path: '/search'})
+}
 </script>
 
 <style scoped>
@@ -558,12 +745,24 @@ const onMatch = async (value) => {
   height: 100%;
 }
 
-
-.addBut {
+.addPostTop {
+  display: flex;
   position: fixed;
   z-index: 200;
   right: 6%;
-  top: 84%;
+  top: 77%;
+  flex-direction: column;
+  height: 80px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backTop {
+
+}
+
+.addBut {
+
 }
 
 
@@ -622,16 +821,6 @@ const onMatch = async (value) => {
   margin-bottom: 24px
 }
 
-.addUser {
-  color: #16b998;
-  background: rgba(65, 183, 140, .05);
-  width: 85%
-}
-
-.adduserF {
-  display: flex;
-  justify-content: center;
-}
 
 /*加载动画*/
 .wheel-and-hamster {
@@ -905,5 +1094,86 @@ const onMatch = async (value) => {
   to {
     transform: rotate(-1turn);
   }
+}
+
+.ac {
+  border-radius: 1px;
+  height: 37vw;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+
+}
+
+.banner1 {
+  background-image: url('src/assets/ac.jpeg');
+}
+
+.banner2 {
+  background-image: url(https://bing-edu.oss-cn-hangzhou.aliyuncs.com/banner1.jpg);
+}
+
+.ls {
+  position: relative;
+  overflow: hidden;
+  margin: 6px 0 3px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: rgba(99, 99, 99, 0.1) 0 2px 8px 0;
+}
+
+.lll {
+
+  margin-right: 6px;
+  flex: 1;
+  position: relative;
+  padding: 0 2vw;
+  background: #fff;
+  height: 17vw;
+  border-radius: 10px;
+  box-shadow: 0 0.5vw 1vw rgb(96 125 139 / 0.2);
+}
+
+.llTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 8vw;
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding: 10px;
+  font-size: 10px;
+  text-shadow: 0 0 5px rgb(0 0 0 / 0.5);
+}
+
+.one {
+  background-color: #8EC5FC;
+  background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
+}
+
+.two {
+  background-color: #FBAB7E;
+  background-image: linear-gradient(62deg, #FBAB7E 0%, #F7CE68 100%);
+}
+
+.three {
+  background-color: #FF9A8B;
+  background-image: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+  margin-right: 0;
+}
+
+em {
+  position: absolute;
+  right: 1vw;
+  bottom: -3vw;
+  width: 15vw;
+  height: 13vw;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: .7;
 }
 </style>

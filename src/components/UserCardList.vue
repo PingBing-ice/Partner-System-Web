@@ -1,4 +1,5 @@
 <template>
+
   <van-card v-if="props.userList&& props.userList.length>0" v-for="user in props.userList"
             :desc="user.profile"
             :title="user.userAccount"
@@ -30,8 +31,8 @@
 
 <script setup lang="ts">
 import {UserType} from "../models/user";
-import myAxios from "../plugins/myAxios";
-import {showSuccessToast, showFailToast} from 'vant';
+import myAxios from "../config/myAxios";
+import {showSuccessToast, showFailToast, showToast} from 'vant';
 import {ref} from "vue";
 
 const show = ref(false);
@@ -59,20 +60,19 @@ const sendFriendRequest = () => {
     // @ts-ignore
     if (resp.code == 200) {
       if (resp.data&&resp.data === 1) {
-        showSuccessToast("发送成功");
+        showToast({message:'发送成功!',position: 'top'});
         return
       }
-        showSuccessToast("同意好友申请");
+      showToast({message:'同意好友申请!',position: 'top'});
     } else {
       // @ts-ignore
       if (resp.description) {
         // @ts-ignore
-        showFailToast(resp.description);
+        showToast({message:resp.description,position: 'top'});
       }
     }
   }).catch(resp=>{
-
-      showFailToast("发送失败")
+    showToast({message:'发送失败!',position: 'top'});
 
   });
 }

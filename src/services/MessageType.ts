@@ -9,6 +9,8 @@ type ChatRecordVo = {
     userId?: string;
     // 发送的id
     sendId?: string;
+    sendUrl?: string;
+    sendName?: string;
     // 消息
     message?: string;
 }

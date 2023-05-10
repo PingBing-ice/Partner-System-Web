@@ -10,31 +10,27 @@
     </template>
   </van-nav-bar>
 
- <chat-card-box  :chat-list="testData" :user-id="userId"></chat-card-box>
-  <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"/>
-  <van-cell-group inset>
-    <van-field
-        v-model="messages"
-        center
-        placeholder="善语结善缘"
-    >
-      <template #button>
-        <van-button size="small" type="primary" @click="getSend">发送</van-button>
-      </template>
-    </van-field>
-  </van-cell-group>
+  <chat-card-box :chat-list="testData" :user-id="userId"></chat-card-box>
+  <div style="width: 100%;display: flex;justify-content: center;">
+    <div class="chatBut">
+      <div class="sendBut">
+        <input type="text" placeholder="善语结善缘" v-model="messages" class="chatIput" >
+        <van-button size="small"  type="primary" @click="getSend">发送</van-button>
+      </div>
+
+    </div>
+  </div>
 
 </template>
 
 
-<script setup lang="ts">
+<script setup>
 import {nextTick, onMounted, ref} from "vue";
-  import {useRoute, useRouter} from "vue-router";
-import {Notify, showFailToast, showSuccessToast} from "vant";
+import {useRoute, useRouter} from "vue-router";
+import {showFailToast, showSuccessToast, showToast} from "vant";
 import webSocketConfig from "../../config/webSocketConfig";
-import {messageType} from "../../services/MessageType";
 import {getMessages} from "../../services/MeesageUtils";
-import MyAxios from "../../plugins/myAxios";
+import MyAxios from "../../config/myAxios";
 import {chatStateEnum} from "../../states/chat";
 import store from "../../store";
 import ChatCardBox from "../../components/ChatCardBox.vue";
@@ -42,82 +38,78 @@ import ChatCardBox from "../../components/ChatCardBox.vue";
 
 const route = useRoute()
 const router = useRouter()
-const testData: any = ref([]);
+const testData = ref([]);
 const userList = ref([]);
 const teamChatRecord = ref([]);
 const messages = ref("");
 const userId = ref("");
 const userName = ref("")
 const avatarUrl = ref("")
-const teamID = route.query.teamID + ""
-const teamNane = route.query.teamNane
-let socket: any = null;
+const teamUrl = ref("")
+const teamID = route.query.id + ""
+const teamNane = ref("")
+let socket = null;
 onMounted(async () => {
 
   // 获取用户人的信息,获取socket连接
   if (!store.getters.getIsLogin) {
-    showFailToast("未登录");
+    showToast({message:'未登录!',position: 'top'});
+
     router.back();
     return;
   }
-  const user =store.getters.getUser
-  const res = await MyAxios.get("/partner/userTeam/get", {
-    params: {
-      teamId: teamID,
-    }
+  const user = store.getters.getUser
+  const resp = await MyAxios.post("/partner/team/chat/team", {
+    id: teamID,
   })
-  // @ts-ignore
-  if (res.code === 200) {
-    userList.value = res.data;
+  if (resp.code === 200 && resp.data) {
+    const data = resp.data
+    teamNane.value = data.teamName;
+    userList.value = data.userList;
+    teamChatRecord.value = data.teamChat;
+    teamUrl.value = data.teamUrl;
+  } else {
+    router.back();
+    return;
   }
+
   await webSocketConfig.initSocket();
   socket = webSocketConfig.getSocket();
 
-  // 获取队伍的队员信息
-
-  // 查看队伍的聊天信息
-  const response: any = await MyAxios.get("/partner/teamChatRecord/getTeam", {
-    params: {
-      teamId: teamID,
-    }
-  })
-  if (response.code === 200) {
-    teamChatRecord.value = response.data;
-  } else if (response.code === 40000) {
-    showFailToast("你已被踢出该队伍...")
-    await router.push({
-      path: '/team'
-    })
-  }
   getOnMessage();
   userId.value = user.id;
   userName.value = user.userAccount
   avatarUrl.value = user.avatarUrl;
 
   if (teamChatRecord.value.length > 0) {
-    teamChatRecord.value.forEach(teamChat => {
-      userList.value.forEach(user => {
-        // @ts-ignore
-        if (user.id == teamChat.userId) {
-          let userData = {
-            // @ts-ignore
-            id: user.id,
-            // @ts-ignore
-            name: user.userAccount,
-            // @ts-ignore
-            images: user.avatarUrl,
-            // @ts-ignore
-            message: teamChat.message,
-          };
-          // @ts-ignore
-          testData.value.push(userData);
-           nextTick(() => {
-            // @ts-ignore
-            document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
-          })
-        }
+    const userMap = userList.value.map(user => [user.id, user]);
+    const map = new Map(userMap);
+    for (let chat of teamChatRecord.value) {
+      const uId = chat.userId;
+      const u = map.get(uId);
+      let userData={
+        id: "",
+        name: "",
+        images: "",
+        message: "",
+      }
+      if (u !== null && u) {
+        userData.id = u.id;
+        userData.name = u.username;
+        userData.images = u.avatarUrl;
+        userData.message = chat.message;
+      }else {
+        userData.id = user.id;
+        userData.name = user.userAccount;
+        userData.images = user.avatarUrl;
+        userData.message = chat.message;
+      }
+      testData.value.push(userData);
+      await nextTick(() => {
+        document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
       })
-    })
+    }
+
   }
 
 
@@ -142,13 +134,11 @@ const getSend = () => {
     images: avatarUrl.value,
     message: mes
   }
-  // @ts-ignore
   testData.value.push(userData);
-  const sendMessage = getMessages(chatStateEnum.DW, userId.value, teamID, mes);
+  const sendMessage = getMessages(chatStateEnum.DW, userId.value, teamID, mes,teamUrl.value,teamNane.value);
   webSocketConfig.sendSocket(JSON.stringify(sendMessage));
 
   nextTick(() => {
-    // @ts-ignore
     document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
   })
 
@@ -158,13 +148,12 @@ const getOnMessage = () => {
     webSocketConfig.initSocket()
     socket = webSocketConfig.getSocket()
   }
-  socket.onmessage = (msg: any) => {
-
-    const messages: messageType = JSON.parse(msg.data);
-    if (messages.type === 2) {
-      userList.value.forEach((user: { id: string | undefined; userAccount: any; avatarUrl: any; }) => {
+  socket.onmessage = (msg) => {
+    const messages = JSON.parse(msg.data);
+    if (messages.type === chatStateEnum.DW) {
+      userList.value.forEach((user) => {
         const chat = messages.chatRecord;
-        if (chat.userId == user.id) {
+        if (chat.userId === user.id) {
           let userData = {
             id: user.id,
             name: user.userAccount,
@@ -174,8 +163,7 @@ const getOnMessage = () => {
 
           testData.value.push(userData);
           nextTick(() => {
-            // @ts-ignore
-            document.getElementById('chatInfo').scrollTop =document.getElementById('chatInfo').scrollHeight
+            document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
           })
         }
       })
@@ -192,7 +180,7 @@ const onClickRightTeam = () => {
     path: '/userTeam',
     query: {
       teamID: teamID,
-      teamName: teamNane,
+      teamName: teamNane.value,
     }
   })
 }
@@ -204,117 +192,5 @@ body {
   background-color: #E8E8E8;
 }
 
-#chat {
-  height: calc(100vh - 200px);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column-reverse;
-}
 
-#chat .chatBox {
-  /*width: 100%;*/
-  /*height: 100%;*/
-  background-color: #fff;
-  overflow: hidden;
-  border-radius: 0.625rem;
-}
-
-
-#chat .chatBox-middle {
-  width: 100%;
-  height: 80%;
-  background-color: #fff;
-  /*border-bottom: 0.0625rem solid #2B3D63;*/
-}
-
-
-#chat .chatBox-infoDesk {
-  width: 100%;
-  height: 10rem;
-}
-
-#chat .chatBox-textarea {
-  width: 100%;
-  height: 6.25rem;
-}
-
-#chat .chatBox-sendOut {
-  margin-top: 0.625rem;
-  width: 100%;
-  height: 3.125rem;
-  text-align: right;
-}
-
-#chat .sendOut {
-  padding: 0 1.25rem;
-  height: 2.1875rem;
-  margin: 0.3125rem 1.25rem 0 0;
-}
-
-#chat .chatInfo {
-  width: 94%;
-  height: 100%;
-  margin: auto;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-#chat .chatUser-box {
-  width: 100%;
-  margin-bottom: 6px;
-  display: flex;
-  flex-direction: row;
-}
-
-
-#chat .chatUser-box-img {
-  display: flex;
-}
-
-#chat .chatUser-info {
-  margin: 0 0.6rem;
-  /*距离底部0*/
-  bottom: 0;
-}
-
-#chat .chatUser-info-name {
-  font-size: 0.875rem;
-  color: #888;
-  display: flex;
-  flex-direction: row;
-}
-
-#chat .nowDate {
-  margin: 0 0.625rem;
-}
-
-#chat .chatUser-info-text {
-  margin-top: 0.3125rem;
-  max-width: 20rem;
-  padding: 0.5rem;
-  background-color: #E8E8E8;
-  border-radius: 0.5rem;
-  float: left;
-  table-layout: fixed;
-  word-break: break-all;
-  overflow: hidden;
-}
-
-#chat .chatUser-info-text span {
-  font-size: 0.9375rem;
-  line-height: 1.5625rem;
-}
-
-#chat .chatUser-box1 {
-  flex-direction: row-reverse;
-}
-
-#chat .chatUser-info-name1 {
-  flex-direction: row-reverse;
-}
-
-#chat .chatUser-info-text1 {
-  float: right;
-}
 </style>

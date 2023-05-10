@@ -1,11 +1,21 @@
 <template>
-  <van-cell title="添加好友" is-link to="/findFriend"/>
-  <div>
-    <van-badge :content="friendUserListLength" style="width: 98%" v-if="friendUserListLength!==0">
-      <van-cell is-link @click="showPopup" title="好友申请"></van-cell>
-    </van-badge>
-    <van-cell is-link @click="showPopup" title="好友申请" v-else></van-cell>
-  </div>
+  <van-nav-bar :title="route.name">
+    <template #right>
+      <van-icon name="search" size="18" @click="toSearch"/>
+    </template>
+    <template #left v-if="store.getters.getIsLogin">
+      <img @click="toUser" :src="user?.avatarUrl" alt="" class="avatar">
+    </template>
+  </van-nav-bar>
+  <van-cell title="添加好友" is-link to="/search/friend"/>
+  <van-cell is-link @click="showPopup" title="好友申请">
+    <template #title v-if="friendUserListLength!==0">
+      <van-badge :content="friendUserListLength" style="width: 98%" >
+        好友申请
+      </van-badge>
+    </template>
+  </van-cell>
+
   <van-popup v-model:show="show" position="bottom" round :style="{ height: '30%' }">
     <div v-for="friendUser in friendUserList">
       <van-card
@@ -30,7 +40,7 @@
   </van-popup>
   <van-collapse v-model="activeNames" @click="selectFriend">
     <van-collapse-item title="好友列表" name="1">
-      <van-cell :value="userList.userAccount" v-for="userList in list" center
+      <van-cell v-for="userList in list" center
                 @click="toChat(userList.id,userList.username,userList.avatarUrl)">
         <!-- 使用 title 插槽来自定义标题 -->
         <template #title>
@@ -40,27 +50,51 @@
               height="1.8rem"
               :src="userList.avatarUrl"
           />
+
+
+          <span class="find-name">
+            {{ userList.userAccount }}
+          </span>
+        </template>
+        <template #right-icon>
+          <div class="find-status">
+            {{ listStatus.has(userList.id) ? '在线' : '离线' }}
+          </div>
+
         </template>
       </van-cell>
     </van-collapse-item>
   </van-collapse>
-
 </template>
 <script setup>
-import {inject, onMounted, ref} from "vue";
-import {showSuccessToast, showFailToast} from 'vant';
-import {useRouter} from "vue-router";
-import myAxios from "../../plugins/myAxios";
+import {inject, onMounted, provide, ref, watch, watchEffect} from "vue";
+import {showSuccessToast, showFailToast, showNotify} from 'vant';
+import {useRoute, useRouter} from "vue-router";
+import myAxios from "../../config/myAxios";
 import store from "../../store";
 
 const router = useRouter();
+const route= useRoute();
 const show = ref(false);
 const friendUserList = ref([]);
-const friendUserListLength = ref();
+const friendUserListLength = ref(0);
 const user = ref();
 const activeNames = ref(['1']);
 const list = ref([]);
 const reload = inject('reload')
+const ADV = inject('ADV')
+
+const listStatus = ref(new Set("1"));
+watchEffect(() => {
+  const userId = ADV.value.userId
+  const statuts = ADV.value.statuts
+  if (userId && statuts) {
+    listStatus.value.add(userId);
+  } else if (userId && !statuts) {
+    listStatus.value.delete(userId)
+  }
+})
+
 
 onMounted(() => {
   if (!store.getters.getIsLogin) {
@@ -72,21 +106,25 @@ onMounted(() => {
   myAxios.get("/partner/friend/userFriend/check").then(res => {
     if (res.code === 200 && res.data) {
       const userList = res.data;
-      for (let i = 0; i < userList.length; i++) {
-        if (userList[i].tags) {
-          userList[i].tags = JSON.parse(userList[i].tags)
+      for (let userListElement of userList) {
+        if (userListElement.tags) {
+          userListElement.tags = JSON.parse(userListElement.tags)
         }
-        friendUserList.value.push(userList[i])
+        friendUserList.value.push(userListElement)
       }
+
       friendUserListLength.value = friendUserList.value.length;
     }
   })
+  selectFriends();
+})
+const selectFriends = () => {
   myAxios.get("/partner/friend/userFriend/select").then(resp => {
     if (resp.code === 200 && resp.data) {
       list.value = resp.data;
     }
   })
-})
+}
 const rejectFriend = async (id) => {
   await reject(null, id)
 }
@@ -112,7 +150,7 @@ const reject = async (acceptId, refuseId) => {
       }
       return true;
     })
-    --friendUserListLength.value ;
+    --friendUserListLength.value;
     showSuccessToast("成功");
   } else {
     showFailToast(resp.message);
@@ -121,6 +159,7 @@ const reject = async (acceptId, refuseId) => {
 }
 const addFriend = async (id) => {
   await reject(id, null);
+  selectFriends();
 }
 
 const showPopup = () => {
@@ -136,17 +175,36 @@ const selectFriend = async () => {
 }
 const toChat = (friendId, name, avatarUrl) => {
   router.push({
-    path: "/toChat",
+    path: "/chat",
     query: {
-      friendId: friendId,
-      username: name,
-      avatarUrl: avatarUrl,
+      id: friendId,
     }
   })
 }
 
+
+const showNotifyAV = () => {
+  let userAv = {
+    username: user.value.userAccount,
+    av: user.value.avatarUrl,
+  }
+};
+const toUser = () => {
+  router.push({path: '/user'})
+}
+const toSearch = () => {
+  router.push({path: '/search'})
+}
 </script>
 
 <style scoped>
+.find-name {
+  margin-left: 15px;
+  position: absolute;
+}
 
+.find-status {
+  color: #777;
+  font-size: 13px;
+}
 </style>

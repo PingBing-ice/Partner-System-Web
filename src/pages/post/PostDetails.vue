@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <div style="width: auto;height: auto;font-size:15px">
+    <div style="width: 100%;height: auto;font-size:15px;overflow:auto;">
       <div v-html="post.content" id="content" ></div>
     </div>
 
@@ -25,7 +25,7 @@
       <van-button round plain hairline icon="star-o"  :color="post.hasCollect ?'#00aeec':''" size="small" @click="doCollect">收藏</van-button>
     </div>
     <span class="com">评论{{ `(` + le + `)` }}</span>
-    <van-list v-if="post.commentList.length>0"  v-for="post in post.commentList">
+    <van-list v-if="post.commentList&& post.commentList.length>0"  v-for="post in post.commentList">
       <div style="display:flex;">
         <van-divider/>
         <div class="auth_info">
@@ -58,35 +58,38 @@
           {{ post.content }}
         </span>
     </van-list>
-    <van-empty description="暂无评论" image-size="7rem" v-if="post.commentList.length<=0"/>
+      <van-empty description="暂无评论"
+                 image-size="2rem" v-if="post.commentList&&post.commentList.length<=0" style="height: 100px;width: 100%"/>
+
+    <div class="send">
+      <van-search
+          left-icon="edit"
+          v-model="commTxt"
+          show-action
+          placeholder="围观不如发送..."
+          @search="sendCommTxt"
+      >
+        <template #action>
+          <div @click="sendCommTxt">发送</div>
+        </template>
+      </van-search>
+    </div>
+  </div>
 
 
-  </div>
-  <van-divider />
-  <div class="send" v-if="post!=null">
-    <van-search
-        left-icon="edit"
-        v-model="commTxt"
-        show-action
-        placeholder="围观不如发送..."
-        @search="sendCommTxt"
-    >
-      <template #action>
-        <div @click="sendCommTxt">发送</div>
-      </template>
-    </van-search>
-  </div>
 </template>
 
 
 <script setup>
-import {useRoute,useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import store from "../../store";
 import {showConfirmDialog, showFailToast, showToast,showSuccessToast} from "vant";
 import postRequest from "../../plugins/request/postRequest";
 import moment from 'moment'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 
 const route = useRoute()
 const router = useRouter()
@@ -97,9 +100,10 @@ const le = ref(0);
 const actions = [
   {text: '删 除', color: 'red'},
 ];
+
 onMounted(async () => {
   if (!store.getters.getIsLogin) {
-    showToast('未登录');
+    showToast({message:'未登录',position: 'top'});
     await router.back();
   }
   await getPost();
@@ -259,6 +263,9 @@ const sendCommTxt =async () => {
 }
 
 .psi {
+  overflow-y: auto;
+  overflow-x: auto;
+  height: 100%;
   padding: 14px;
 }
 
@@ -283,6 +290,7 @@ const sendCommTxt =async () => {
 .send{
   position: initial;
   width: 100%;
+  height: 20%;
 }
 .pl{
   position: relative;

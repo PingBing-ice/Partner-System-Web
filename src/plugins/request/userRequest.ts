@@ -1,4 +1,5 @@
-import myAxios from "../myAxios";
+import myAxios from "../../config/myAxios";
+
 
 const getUserList =async (page: number,size:number) => {
   return  await myAxios.get('/api/user/recommend', {
@@ -16,7 +17,11 @@ const search =async (pageNum:number,size:number,name:string) => {
     userName: name
   });
 }
+const getCurrentUser= async ()=>{
+  return await myAxios.get('/api/user/current');
+}
 export default {
   getUserList,
-  search
+  search,
+  getCurrentUser
 }

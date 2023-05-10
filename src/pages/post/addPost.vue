@@ -1,48 +1,45 @@
 <template>
-  <div v-if="route.path==='/addPost'" >
-    <vue-quill-text-editor ref="quillRef" :placeholder="'点击此处说点什么....\n注意: 违规词会被屏蔽'" :uploadFun="uploadFun" />
-  </div>
-  <van-cell-group inset>
-    <van-field  placeholder="请输入填写标签" @focus="iconButton" readonly label="标签"  @blur="iconBlur">
-      <template #button>
-        <div style="display: flex">
-          <div v-for="tagId in addTagSet">
-            <van-tag plain type="primary" closeable @close="closeTag(tagId)" style="margin-right: 2px;"
-                     size="medium">
-              {{ tagMap.get(tagId) }}
-            </van-tag>
-          </div>
-        </div>
-      </template>
-    </van-field>
-    <div class="van-hairline--top" v-if="isIcon">
-      <van-row justify="space-around">
-        <van-col span="6" v-for="tag in tagIdList">
-          <van-tag plain type="primary" @click="addTag(tag);" size="medium">{{ tagMap.get(tag) }}</van-tag>
-        </van-col>
-      </van-row>
+  <div id="addPost">
+    <div v-if="route.path==='/addPost'">
+      <div id="aaa">
+        <ckeditor :editor="editor" v-model="message" :config="editorConfig"></ckeditor>
+      </div>
     </div>
-  </van-cell-group>
 
-  <van-button type="default" block round @click="onSubmit">提交</van-button>
+    <div class="addTag">
+      标签 :
+      <van-popover v-model:show="showPopover" placement="top" style="top: 103px;height: 28vh" :actions="actions" @select="addTag">
+        <template #reference>
+          <van-button type="primary">浅色风格</van-button>
+        </template>
+      </van-popover>
+    </div>
+    <div class="adduserF">
+      <button class="addUser" @click="onSubmit">提交</button>
+
+    </div>
+  </div>
+
 </template>
 <script setup>
 import {ref, watch} from "vue";
 import {onMounted} from "vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import {showSuccessToast, showFailToast} from 'vant';
 import {useRouter} from "vue-router";
 import {useRoute} from "vue-router";
 import {showToast} from 'vant';
+
 const quillRef = ref();
 const message = ref('')
 const filePost = ref();
-const tagIdList = ref([]);
+const actions = ref([]);
 const addTagSet = ref(new Set());
 const router = useRouter()
 const route = useRoute()
-const tagMap = ref();
+const tagMap = ref(new Map());
 const isIcon = ref(false);
+const showPopover = ref(false);
 watch(quillRef, async (val) => {
   const quillInstance = val.quillInstance;
   quillInstance.on('text-change', () => {
@@ -52,13 +49,11 @@ watch(quillRef, async (val) => {
   // set html content
 })
 
-
 const doUpload = async (formData) => {
 
 }
 
 const uploadFun = (file) => {
-
   try {
     const oMyForm = new FormData();
     oMyForm.append('file', file);
@@ -72,40 +67,50 @@ const uploadFun = (file) => {
 };
 
 
-onMounted(() => {
+onMounted(async () => {
   // 获取标签
-  myAxios.get("/api/userLabel/getLabel").then(resp => {
-    if (resp.code === 200 && resp.data) {
-      tagMap.value = new Map(Object.entries(resp.data))
-      for (let valueKey of tagMap.value.keys()) {
-        tagIdList.value.push(valueKey)
+  const resp =await myAxios.get("/api/userLabel/getLabel")
+  console.log(resp)
+  if (resp.code === 200 && resp.data) {
+
+    tagMap.value = new Map(Object.entries(resp.data))
+    for (let key of tagMap.value.keys()) {
+      let a={
+        text: tagMap.value.get(key)
       }
+      actions.value.push(a)
     }
-  })
+  }
+
+
 })
 
-const afterRead = (file) => {
-  filePost.value = file.file;
-};
+
 // 提交
 const onSubmit = () => {
+
+  // return;
   if (message.value.length <= 0) {
-    showToast("请输入内容");
+    showToast({message: '请输入内容', position: 'top'});
     return;
   }
-  const tagIdList = [];
+  let tagIdList = [];
   addTagSet.value.forEach(id => {
     tagIdList.push(id);
   });
-  const tag = JSON.stringify(tagIdList);
+  if (tagIdList.length <= 0) {
+    tagIdList = "";
+  }else {
+    tagIdList= JSON.stringify(tagIdList)
+  }
+
   // 此时可以自行将文件上传至服务器
   let param = new FormData();
   param.append("file", filePost.value);
-
   myAxios.post("/post/addPost", {
-    file: filePost.value,
+    file: param,
     content: message.value,
-    tagId: tag,
+    tagId: tagIdList,
   }).then(resp => {
     if (resp.code === 200) {
       router.push({
@@ -122,69 +127,34 @@ const onSubmit = () => {
 
   })
 }
-const addTag = (tagId) => {
-  if (tagIdList.value.length > 0) {
-    tagIdList.value = tagIdList.value.filter(tag => tag !== tagId)
-    addTagSet.value.add(tagId);
-  }
 
-}
-const closeTag = (tagId) => {
-  addTagSet.value.delete(tagId);
-  tagIdList.value.push(tagId);
-}
-const iconButton = () => {
-  isIcon.value = !isIcon.value;
-}
-const iconBlur = () =>{
 
-};
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+const editor = ClassicEditor
+
+const editorConfig = {}
+
 </script>
 <style scoped>
-.van-popover__wrapper{
+.van-popover__wrapper {
   width: 100%;
 }
+
+.van-field__control {
+  width: 0;
+}
+
+.van-field__control:read-only {
+  width: 0;
+}
+
+.addTag {
+  font-size: 13px;
+  height: 30px;
+  padding: 10px;
+}
+:root .van-popover[data-popper-placement=top]{
+  top: 103px;
+}
 </style>
-<!--<template>-->
-<!--<van-form @submit="onSubmit">-->
-<!--<van-cell-group inset>-->
-<!--  <van-field-->
-<!--      v-model="message"-->
-<!--      rows="8"-->
-<!--      autosize-->
-<!--      type="textarea"-->
-<!--      maxlength="1000"-->
-<!--      placeholder="点击此处说点什么"-->
-<!--      show-word-limit-->
-<!--  >-->
-<!--    <template #button v-if="addTagSet.size>0">-->
-
-<!--    </template>-->
-<!--  </van-field>-->
-
-
-<!--</van-cell-group>-->
-<!--<div style="margin: 16px;">-->
-<!--  <van-button round block type="primary" native-type="submit">-->
-<!--    提交-->
-<!--  </van-button>-->
-<!--</div>-->
-<!--</van-form>-->
-
-
-<!--</template>-->
-
-<!--<script setup>-->
-
-<!--</script>-->
-
-<!--<style scoped>-->
-<!--.icon {-->
-<!--  margin: 13px-->
-<!--}-->
-
-<!--.icon-is {-->
-<!--  font-size: 23px;-->
-<!--  margin-right: 14px-->
-<!--}-->
-<!--</style>-->

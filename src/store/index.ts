@@ -1,21 +1,27 @@
-import Vuex from 'vuex'
+import Vuex, {createStore} from 'vuex'
 
 import VuexPersistence from 'vuex-persist'
+
 const vuexLocal = new VuexPersistence({
     key:'myName',
     storage: window.sessionStorage
 })
-const store = new Vuex.Store({
+const store = createStore({
     state: {
         user: null,
+        top: 0,
     },
     getters: {
         getUser(state) {
             return state.user;
         },
+        getTop(state) {
+            return state.top
+        },
         getIsLogin(state) {
             return state.user != null;
         },
+
     }
     ,
     mutations: {
@@ -24,7 +30,11 @@ const store = new Vuex.Store({
         },
         loginOut(state)  {
             state.user = null;
-        }
+        },
+        setTop(state, num) {
+            state.top = num;
+        },
+
     }
     ,
     actions: {

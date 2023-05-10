@@ -26,7 +26,7 @@
 <script setup>
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import { showConfirmDialog } from 'vant';
 import { showSuccessToast, showFailToast } from 'vant';
 const route = useRoute();

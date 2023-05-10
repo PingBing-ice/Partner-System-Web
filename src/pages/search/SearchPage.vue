@@ -1,5 +1,4 @@
 <template>
-
   <van-overlay :show="isFor">
     <div class="wrapper" @click.stop>
       <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
@@ -60,17 +59,11 @@
   <van-tabs v-model:active="active" v-if="userList.length>0||postList.length>0||teamList.length>0">
     <van-tab title="文章" v-if="postList && postList.length>0">
       <div v-if="postList && postList.length>0">
-        <!--        <van-divider-->
-        <!--            :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"-->
-        <!--        >-->
-        <!--          文章-->
-        <!--        </van-divider>-->
         <span v-for="post in postList">
       <div class="fo">
               <div class="txt"
                    v-html="post.content" @click="toDetails(post.id)"/>
       </div>
-          <!--      <div class="van-hairline&#45;&#45;bottom"></div>-->
     </span>
       </div>
     </van-tab>
@@ -108,7 +101,7 @@ import postRequest from "../../plugins/request/postRequest";
 import teamRequest from "../../plugins/request/teamRequest";
 import userRequest from "../../plugins/request/userRequest";
 import UserCardList from "../../components/UserCardList.vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import {showFailToast, showSuccessToast} from "vant";
 import TeamCardList from "../../components/TeamCardList.vue";
 import {useRouter} from "vue-router";

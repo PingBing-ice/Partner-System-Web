@@ -1,43 +1,44 @@
 <template>
-  <div class="banner">
-    <div class="background">
+  <div id="space">
+    <div class="banner">
+      <div class="background">
 
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
 
+
+      </div>
 
     </div>
-
-  </div>
-  <div class="image_head" v-if="user!=null">
-    <van-image style="position: relative;margin-top: -1.6vmin"
-               round
-               width="22.4vmin"
-               height="22.4vmin"
-               :src="user.avatarUrl"
-    />
-    <div class="head1">
-      <div class="head2">
+    <div class="image_head" v-if="user!=null">
+      <van-image style="position: relative;margin-top: -1.6vmin"
+                 round
+                 width="22.4vmin"
+                 height="22.4vmin"
+                 :src="user.avatarUrl"
+      />
+      <div class="head1">
+        <div class="head2">
         <span class="van-hairline--right">
           <span class="num">
             {{ totalThumb }}
@@ -45,7 +46,7 @@
           <br>
           <span class="type">获赞数</span>
         </span>
-        <span class="van-hairline--right">
+          <span class="van-hairline--right">
           <span class="num">
                         {{ totalPost }}
 
@@ -53,56 +54,71 @@
           <br>
           <span class="type">文章数</span>
         </span>
-        <span class="fans" @click="toCollect">
+          <span class="fans" @click="toCollect">
           <span class="num">
             {{ totalCollect }}
           </span>
           <br>
           <span class="type">收藏数</span>
         </span>
+        </div>
+        <van-button plain hairline @click="toUser" type="primary" size="small"
+                    style="margin-top: 3.2vmin;font-size: 3.73333vmin" block>
+          编辑资料
+        </van-button>
       </div>
-      <van-button plain hairline @click="toUser" type="primary" size="small"
-                  style="margin-top: 3.2vmin;font-size: 3.73333vmin" block>
-        编辑资料
-      </van-button>
     </div>
-  </div>
 
-  <div style="padding: 3.2vmin;clear: both;height: auto">
-    <div>
+    <div style="padding: 3.2vmin;clear: both;height: auto">
+      <div>
           <span class="userName">
             {{ user.userAccount }}
           </span>
+      </div>
+      <div style="padding: 1px"  >
+        <van-tag @click="toTag" v-if="tagList.length>0" plain v-for="tag in tagList" type="primary" style="margin-right: 3px">{{ tag }}</van-tag>
+      </div>
+      <div style="height: 20px">
+        <p class="wenzi">{{ !user.profile||user.profile === '' ? '这个人很神秘，什么都没有写' : user.profile }}</p>
+      </div>
     </div>
-    <div style="padding: 1px" @click="toTag">
-      <van-tag plain v-for="tag in tagList" type="primary" style="margin-right: 3px">{{ tag }}</van-tag>
+    <div class="space-box">
+      <div class="spaceBox">
+        <div class="box1">
+          <img class="box1-image" src="../../assets/jf.png" alt="">
+          <div class="box-txt">积分管理</div>
+        </div>
+        <div class="box1" @click="toRecord">
+          <img class="box1-image" src="../../assets/jl.png" alt="">
+          <div class="box-txt">浏览记录</div>
+        </div>
+      </div>
     </div>
-    <div>
-      <p class="wenzi">{{ user.profile === '' ? '这个人很神秘，什么都没有写' : user.profile }}</p>
+
+    <div class="spaceTab">
+      <van-tabs v-model:active="active" shrink animated>
+        <van-tab title="最新"/>
+        <van-tab title="最热"/>
+      </van-tabs>
     </div>
+
+    <div class="cont">
+      <post-card-list :sorted="sorted" :is-own="true" v-on:showDeletePost="deletePost"></post-card-list>
+    </div>
+    <van-overlay :show="show">
+      <div class="wrapper" @click.stop>
+        <van-loading class="block" color="#0094ff" text-color="#0094ff" vertical>加载中...</van-loading>
+      </div>
+    </van-overlay>
   </div>
-  <van-divider/>
-  <div>
-    <van-tabs v-model:active="active" shrink animated>
-      <van-tab title="最新"/>
-      <van-tab title="最热"/>
-    </van-tabs>
-  </div>
-  <div class="cont">
-    <post-card-list :sorted="sorted" :is-own="true" v-on:showDeletePost="deletePost"></post-card-list>
-  </div>
-  <van-overlay :show="show">
-    <div class="wrapper" @click.stop>
-      <van-loading class="block" color="#0094ff" text-color="#0094ff" vertical>加载中...</van-loading>
-    </div>
-  </van-overlay>
+
 </template>
 
 <script setup>
 import {ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, watchEffect} from "vue";
-import myAxios from "../../plugins/myAxios";
+import myAxios from "../../config/myAxios";
 import {showSuccessToast, showFailToast, showConfirmDialog} from 'vant';
 import store from "../../store";
 import postRequest from "../../plugins/request/postRequest";
@@ -188,6 +204,11 @@ const toCollect = () => {
     path: '/collect'
   })
 }
+const toRecord = () => {
+  router.push({
+    path: '/record'
+  })
+}
 watchEffect(() => {
   if (active.value === 0) {
     sorted.value = 0;
@@ -268,7 +289,7 @@ watchEffect(() => {
 
 .banner {
   width: 100%;
-  height: 20%;
+  height: 14vh;
   overflow: hidden;
   background: url(/public/svg.png) 50% 50%;
 }
@@ -814,5 +835,30 @@ watchEffect(() => {
   transform-origin: -23vw -3vh;
   box-shadow: 2vmin 0 0.6969744070504578vmin currentColor;
 }
-
+.space-box{
+  padding: 6px 0 6px 0;
+  background-color: rgb(240, 242, 245);
+}
+.spaceBox{
+  justify-content: space-around;
+  align-items: center;
+  display: flex;
+  width: 100%;
+  height: 62px;
+  background-color: #ffffff;
+  border-radius: 6px
+}
+.box1{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.box1-image{
+  width: 26px;
+  height: 26px;
+}
+.box-txt{
+  margin-top: 3px;
+  font-size: 10px;
+}
 </style>

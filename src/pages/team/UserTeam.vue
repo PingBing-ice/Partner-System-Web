@@ -68,8 +68,8 @@
 <script setup>
 import {nextTick, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import MyAxios from "../../plugins/myAxios";
-import myAxios from "../../plugins/myAxios";
+import MyAxios from "../../config/myAxios";
+import myAxios from "../../config/myAxios";
 import UserCardList from "../../components/UserCardList.vue";
   import {Dialog} from "vant";
 import {teamStateEnum} from "../../states/team";
@@ -81,7 +81,7 @@ const editState = ref(false);
 const show = ref(false);
 const route=useRoute()
 const router=useRouter()
-const teamID =route.query.teamID
+const teamID =route.query.id
 const teamNameTitle =route.query.teamName
 const userVo = ref([])
 const userId = ref()

@@ -21,6 +21,14 @@ export const chatStateEnum = {
     /**
      * 系统
      */
-    SYSTEM: 4,
+    SYSTEM: 999,
+    /**
+     * 上线通知
+     */
+    ADV: 4,
+    /**
+     * 大厅
+     */
+    HAL: 6,
 
 }

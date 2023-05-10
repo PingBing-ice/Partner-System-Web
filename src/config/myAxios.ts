@@ -1,16 +1,16 @@
 // Set config defaults when creating the instance
 import axios from "axios";
-import {showFailToast} from 'vant';
+import {showFailToast, showToast} from 'vant';
 import store from "../store";
-import {useRoute} from "vue-router";
-import routeConfig from "../config/routeConfig";
-
+import {useRoute, useRouter} from "vue-router";
+import webSocketConfig from "./webSocketConfig";
+import * as path from "path";
+import router from './routeConfig'
 
 const myAxios = axios.create({
     baseURL: import.meta.env.VITE_AX_BASE_URL,
     withCredentials: true,
 });
-// myAxios.defaults.withCredentials = true;
 
 /**
  * 全局响应拦截器
@@ -28,16 +28,22 @@ myAxios.interceptors.request.use(function (config) {
 myAxios.interceptors.response.use(async response => {
     if (response?.data?.code !== 200) {
         if (response?.data?.code === 40100) {
+            showToast({message: '未登录', position: 'top'});
             store.commit("loginOut");
-            window.location.href = '/';
-        }
-        if (response.data.code === 40100 && useRoute().path!=='/') {
-            showFailToast("未登录");
+            webSocketConfig.clearSocket();
+            const path= router.router.currentRoute.value.fullPath;
+            if (path !== '/') {
+                await router.router.push({
+                    path: '/login',
+                    query: {redirect: path}
+                });
+            }
+
         } else {
             if (response.data.description) {
-                showFailToast(response.data.description);
+                showToast({message: response.data.description, position: 'top'});
             } else {
-                showFailToast(response.data.message);
+                showToast({message: response.data.message, position: 'top'});
             }
         }
 
