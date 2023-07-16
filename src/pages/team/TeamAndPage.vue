@@ -41,7 +41,7 @@
             @click="showPicker = true"
         />
         <van-popup v-model:show="showPicker" position="bottom">
-          <van-date-picker @confirm="onConfirm" :min-date="minDate" @cancel="showPicker = false" />
+          <van-date-picker @confirm="onConfirm" :min-date="minDate" @cancel="showPicker.value = false" />
         </van-popup>
         <van-field
             v-model="addTeamFrom.description"
@@ -62,26 +62,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref} from "vue";
-import myAxios from "../../config/myAxios";
-import { showSuccessToast, showFailToast } from 'vant';
+import {showSuccessToast, showFailToast, showToast} from 'vant';
 import {useRouter} from "vue-router";
-import {formatDate} from "../../services/dataUtils";
+import teamRequest from "@/plugins/request/teamRequest";
 
-const currentDate = ref();
-const showPicker = ref(false);
+let showPicker = ref<boolean>(false);
 const minDate = new Date();
 const result = ref('');
+const resultTime = ref<number>(0);
 
 const router = useRouter();
 const initFromData = {
-  "name": "",
-  "description": "",
-  "expireTime": "",
-  "maxNum": 0,
-  "password": "",
-  "status": 0
+  name: "",
+  description: "",
+  expireTime: "",
+  maxNum: 0,
+  password: "",
+  status: 0
 }
 
 
@@ -89,21 +88,23 @@ const addTeamFrom = ref({...initFromData})
 const onSubmit = async () => {
   const postData = {
     ...addTeamFrom.value,
-    expireTime: result.value,
+    expireTime: resultTime.value,
     status: Number(addTeamFrom.value.status)
-  }
-  const res = await myAxios.post('/partner/team/addTeam', postData);
+  };
+  const res=await teamRequest.add(postData)
   if (res?.code === 200) {
-    showSuccessToast("添加成功")
+    showToast({message: '添加成功', position: 'top'});
     await router.push({
       path: "/team",
     })
   } else {
-    showFailToast("添加失败")
+    showToast({message: '添加失败', position: 'top'});
   }
 }
 
-const onConfirm = ({ selectedValues }) => {
+const onConfirm = ({ selectedValues }:any) => {
+  const date = new Date(selectedValues);
+  resultTime.value = date.getTime();
   result.value = selectedValues.join('-');
   showPicker.value = false;
 };

@@ -5,34 +5,38 @@
     </div>
     <div class="lg" style="top: 6%">
       <div class="loginContent">
-        <h2>{{ route.path==='/forget'?'忘记密码': '注册账号' }}</h2>
+        <h2>{{ route.path === '/forget' ? '忘记密码' : '注册账号' }}</h2>
         <InputCard v-model="userAccount" @value="getAccount" :class="{'apply-shake':userAccountClass}"/>
         <InputCard v-model="password" @value="getPassword" :type="'password'" :class="{'apply-shake':passwordClass}"/>
-        <InputCard v-model="checkPassword" @value="getCheck" :placeholder="'确认密码'" :type="'password'" :class="{'apply-shake':checkPasswordClass}"/>
+        <InputCard v-model="checkPassword" @value="getCheck" :placeholder="'确认密码'" :type="'password'"
+                   :class="{'apply-shake':checkPasswordClass}"/>
         <InputCard v-model="email" @value="getEmail" :placeholder="'请输入邮箱'" :class="{'apply-shake':emailClass}"/>
         <div class="code" style="margin-top: 20px" :class="{'apply-shake':codeClass}">
-          <input class="loginCode" v-model="code" placeholder="请输入验证码" type="text" >
+          <input class="loginCode" v-model="code" placeholder="请输入验证码" type="text">
           <van-button size="small" v-if="isTime===false" @click="sendEmail" :loading="subValue"
                       loading-text="发送中..." color="rgb(123 201 249 / 77%)">发送验证码
           </van-button>
-          <div style="width: 76px;display: flex;justify-content: center;align-items: center" v-if="isTime===true">
+          <div class="jishi" v-if="isTime===true">
             <van-count-down v-if="isTime===true" :time="time" format="ss" @finish="isTime = false"/>
           </div>
         </div>
         <div class="login_but">
-          <button class="login_but_an" @click="onSubmit">{{  route.path==='/forget'?'修改': '注册' }}</button>
+          <button class="login_but_an" @click="onSubmit">{{ route.path === '/forget' ? '修改' : '注册' }}</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import myAxios from "../../../config/myAxios";
-import {showSuccessToast, showFailToast, showToast} from 'vant';
+import {showFailToast, showToast} from 'vant';
 import InputCard from "../../../components/InputCard.vue";
+import {setToken} from "@/util/cookie";
+import wsIns from "@/util/socket/websocket";
+import userRequest from "@/plugins/request/userRequest";
+import store from "@/store";
 
 
 const userAccountClass = ref(false);
@@ -45,8 +49,6 @@ const subValue = ref(false);
 // 倒计时
 const time = ref(60 * 1000);
 const isTime = ref(false);
-
-
 const router = useRouter();
 const route = useRoute();
 const userAccount = ref('');
@@ -78,19 +80,13 @@ const onSubmit = async () => {
   buttonLoading.value = true;
   if (route.path === '/forget') {
     await forget()
-  }else {
+  } else {
     await register();
   }
 
 }
 const forget = async () => {
-  const res = await myAxios.post('/api/user/forget', {
-    userAccount: userAccount.value,
-    password: password.value,
-    checkPassword: checkPassword.value,
-    email: email.value,
-    code: code.value
-  });
+  const res = await userRequest.forget(userAccount.value, password.value, checkPassword.value, email.value, code.value);
   if (res.code === 200) {
     buttonLoading.value = false;
     showToast({
@@ -105,15 +101,15 @@ const forget = async () => {
     }
   }
 }
-const register =async () => {
-  const res = await myAxios.post('/api/user/Register', {
-    userAccount: userAccount.value,
-    password: password.value,
-    checkPassword: checkPassword.value,
-    email: email.value,
-    code: code.value
-  });
-  if (res.code === 200) {
+const register = async () => {
+  const res = await userRequest.register(userAccount.value, password.value, checkPassword.value, email.value, code.value);
+  if (res.code === 200 && res.data) {
+    setToken(res.data)
+    wsIns.auth(res.data);
+    const resp = await userRequest.getCurrentUser();
+    if (resp.code === 200 && resp.data) {
+      await store.dispatch('setUser', resp.data);
+    }
     buttonLoading.value = false;
     showToast({
       message: '注册成功',
@@ -173,26 +169,25 @@ const sendEmail = async () => {
     return;
   }
   subValue.value = true;
-  const response = await myAxios.post('/oss/send', {
-    email: email.value
-  });
+  const response =await userRequest.sendEmail(email.value);
   if (response.code === 200) {
     subValue.value = false;
     isTime.value = true;
-    showSuccessToast("发送成功，请注意查收");
+    showToast({message: '发送成功，请注意查收', position: 'top'});
+
   }
   subValue.value = false;
 }
-const getAccount = (e) => {
+const getAccount = (e:string) => {
   userAccount.value = e;
 }
-const getPassword = (e) => {
+const getPassword = (e:string) => {
   password.value = e;
 }
-const getCheck = (e) => {
+const getCheck = (e:string) => {
   checkPassword.value = e
 }
-const getEmail = (e) => {
+const getEmail = (e:string) => {
   email.value = e;
 }
 const toPath = () => {
@@ -250,4 +245,10 @@ const toPath = () => {
   margin-left: -188px;
 }
 
+.jishi {
+  width: 76px;
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
 </style>

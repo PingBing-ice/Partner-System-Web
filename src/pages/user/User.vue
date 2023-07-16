@@ -1,6 +1,5 @@
 <template>
-  <template v-if="user">
-
+  <div id="user" v-if="user">
     <van-cell :title="userName.avatarUrl">
       <van-uploader :after-read="afterRead">
         <van-image
@@ -11,52 +10,73 @@
         />
       </van-uploader>
     </van-cell>
+    <div class="cell">
+      <van-cell :title="userName.username" is-link :value="user?.username"
+                @click="toEdit('username',userName.username,user?.username)"/>
+    </div>
+    <div class="cell" style="padding: 0">
+      <van-cell :title="userName.userAccount" :value="user?.userAccount"/>
+    </div>
+    <div class="cell">
+      <van-cell :title="userName.gender" is-link :value="user?.gender"
+                @click="toEdit('gender',userName.gender,user?.gender)"/>
+    </div>
+    <div class="cell" style="padding: 0">
+      <van-cell title="标签" @click="toTag" is-link :value="!user.tags?'请设置标签':''">
+        <template #right-icon v-if="user.tags">
+          <van-tag plain v-for="tag in user?.tags" type="primary" size="large">{{ tag }}</van-tag>
+        </template>
+      </van-cell>
+    </div>
 
-    <van-cell :title="userName.username" is-link :value="user?.username"
-              @click="toEdit('username',userName.username,user?.username)"/>
-    <van-cell :title="userName.userAccount" :value="user?.userAccount"/>
-    <van-cell :title="userName.gender" is-link :value="user?.gender"
-              @click="toEdit('gender',userName.gender,user?.gender)"/>
 
-    <van-cell title="标签" @click="toTag" is-link :value="!user.tags?'请设置标签':''">
-      <template #right-icon v-if="user.tags">
-        <van-tag plain v-for="tag in user?.tags" type="primary" size="large">{{ tag }}</van-tag>
-      </template>
-    </van-cell>
-    <van-cell :title="userName.tel" is-link :value="user?.tel" @click="toEdit('tel',userName.tel,user?.tel)"/>
-    <van-cell :title="userName.email" is-link :value="user?.email" @click="toEdit('email',userName.email,user?.email)"/>
-    <van-cell :title="userName.description" is-link :value="user?.profile"
-              @click="toEdit('profile',userName.description,user?.profile)"/>
-    <van-cell :title="userName.status" is-link :value="user?.status"
-              @click="toEdit('status',userName.status,user?.status)"/>
-    <van-cell :title="userName.planetCode" :value="user?.planetCode"/>
-    <van-cell :title="userName.createTime" :value="user?.createTime"/>
-    <van-button type="primary" round @click="edit" :loading="editState" loading-text="注销中..." size="large">退出登录
-    </van-button>
-  </template>
+    <div class="cell">
+      <van-cell :title="userName.tel" is-link :value="user?.tel" @click="toEdit('tel',userName.tel,user?.tel)"
+      />
+    </div>
+    <div class="cell" style="padding: 0">
+      <van-cell :title="userName.email" is-link :value="user?.email" @click="toEdit('email',userName.email,user?.email)"
+      />
+    </div>
+    <div class="cell" style="padding: 0">
+      <van-cell :title="userName.description" is-link :value="user?.profile"
+                @click="toEdit('profile',userName.description,user?.profile)"/>
+    </div>
+    <div class="cell">
+      <van-cell :title="userName.status" is-link :value="user?.status"
+                @click="toEdit('status',userName.status,user?.status)"/>
+    </div>
+    <div class="cell">
+      <van-cell :title="userName.planetCode" :value="user?.planetCode"/>
+    </div>
+    <div class="cell" style="padding: 0">
+      <van-cell :title="userName.createTime" :value="user?.createTime"/>
+    </div>
+    <div class="cell" style="padding-bottom: 20px;box-shadow: none;">
+      <van-button type="primary" style="background: #fff;color: #ee0a24;border: 1px solid #ee0a24" round @click="edit"
+                  :loading="editState" loading-text="注销中..." size="large">退出登录
+      </van-button>
+    </div>
 
+  </div>
 
 </template>
 
-<script setup>
-import {inject, onMounted, ref} from "vue";
+<script setup lang="ts">
+import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import myAxios from "../../config/myAxios";
-import {removeChatUser} from "../../states/user";
-import { showConfirmDialog } from 'vant';
-import { showSuccessToast, showFailToast } from 'vant';
+import {showConfirmDialog, showToast} from 'vant';
 import store from "../../store";
-import webSocketConfig from "../../config/webSocketConfig";
-import {removeToken} from "../../util/cookie";
+import userRequest from "@/plugins/request/userRequest";
+import {upload} from "@/plugins/request/ossRequest";
 
-const reload = inject('reload')
 
 const editState = ref(false);
 const show = ref(false);
 const tagShow = ref(true);
 // '王者荣耀','吃鸡','火影','英雄联盟','大一','大二'
-const tagIdList = ref([])
-const tagList = ref([])
+const tagIdList = ref<any[]>([])
+const tagList = ref<any[]>([])
 const tagMap = ref(new Map())
 const avatar = ref("");
 const router = useRouter()
@@ -75,19 +95,18 @@ const userName = {
 
 const user = ref()
 onMounted(async () => {
-  const response = await myAxios.get("/api/userLabel/getLabel");
-  if (response.code === 200 && response.data) {
-    tagMap.value = new Map(Object.entries(response.data))
-    for (let valueKey of tagMap.value.keys()) {
-      tagIdList.value.push(valueKey)
-    }
-  }
-
-  const res = await myAxios.get("/api/user/current");
-  // @ts-ignore
-  if (res.code === 200&&res.data) {
+  // const response = await tagRequest.getUserTag();
+  // if (response.code === 200 && response.data) {
+  //   tagMap.value = new Map(Object.entries(response.data))
+  //   for (let valueKey of tagMap.value.keys()) {
+  //     tagIdList.value.push(valueKey)
+  //   }
+  // }
+  const res = await userRequest.getCurrentUser()
+  if (res.code === 200 && res.data) {
     const users = res.data
-    store.commit("setUser", users);
+    await store.dispatch("setUser", users);
+
     if (users.tags) {
       users.tags = JSON.parse(users.tags)
       tagList.value = users.tags
@@ -97,31 +116,25 @@ onMounted(async () => {
     }
     user.value = users;
     avatar.value = user.value.avatarUrl
-
-  }else if (res.code === 201) {
-     await router.back();
-  }else {
+  } else if (res.code === 201) {
+    await router.back();
+  } else {
     store.commit("loginOut");
-
   }
 })
 // 注销
 const edit = async () => {
   editState.value = true;
-  const res = await myAxios.post("/api/user/Logout");
-  // @ts-ignore
-  if (res.code === 200) {
+  const logout = await userRequest.Logout();
+  if (logout) {
     editState.value = false;
-    await store.dispatch("LoginOut")
-    removeChatUser()
-    removeToken()
-    webSocketConfig.clearSocket();
-    await router.push({path: '/'})
+    await router.push({path: '/'});
   }
+
 }
-const toEdit = (editKey, editName, currentValue) => {
+const toEdit = (editKey: string, editName: string, currentValue: string) => {
   router.push({
-    path: '/user/edit',
+    path: '/edit',
     query: {
       editKey,
       currentValue,
@@ -131,11 +144,11 @@ const toEdit = (editKey, editName, currentValue) => {
 }
 const toTag = () => {
   router.push({
-    path:'/label'
+    path: '/label'
   })
 
 }
-const isTagListHasID = (tag, list) => {
+const isTagListHasID = (tag:any, list:any[]) => {
   for (let i = 0; i < list.length; i++) {
     if (tag === list[i]) {
       return true;
@@ -144,7 +157,7 @@ const isTagListHasID = (tag, list) => {
   return false;
 
 }
-const close = (tag) => {
+const close = (tag:any) => {
   if (tagList.value && tagList.value.length > 0) {
     tagList.value = tagList.value.filter(item => {
       return tag !== item;
@@ -152,7 +165,7 @@ const close = (tag) => {
   }
 
 }
-const addTag = (tag) => {
+const addTag = (tag:any) => {
   for (let i = 0; i < tagList.value.length; i++) {
     if (tagList.value[i] === tag) {
       return;
@@ -160,21 +173,18 @@ const addTag = (tag) => {
   }
   tagList.value.push(tag)
 }
-const afterRead = (file) => {
+const afterRead = (file:Blob) => {
   showConfirmDialog({
     title: '每天只能修改一次',
     message: '是否上传?',
   }).then(async () => {
-    const File = file.file
     let param = new FormData();
-    param.append("file", File)
-    const res = await myAxios.post("/oss/file/upload", param);
+    param.append("file", file)
+   const res=await upload(param)
     if (res.code === 200) {
       avatar.value = res.data;
-      reload()
-      showSuccessToast('修改成功...');
-    } else {
-      showFailToast(res.description);
+      window.location.reload();
+      showToast({message: '修改成功', position: 'top'});
     }
   }).catch(() => {
 
@@ -185,6 +195,16 @@ const afterRead = (file) => {
 </script>
 
 <style>
+#user {
+  height: 90%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  background-color: #eff2f5;
+}
 
-
+.cell {
+  padding-top: 10px;
+  box-shadow: rgba(99, 99, 99, 0.1) 0 2px 8px 0;
+}
 </style>

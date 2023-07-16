@@ -1,21 +1,22 @@
 <template>
   <form action="/">
     <van-search
-        v-model="searchTest"
+        v-model="searchTxt"
         show-action
         placeholder="请输入标签"
         input-align="center"
         @search="onSearch"
         @cancel="onCancel"
+        @clear="onCancel"
     />
   </form>
   <van-divider>已选标签</van-divider>
 
   <div v-if="activeIds&&activeIds.length ===0 " style="color: #42b983; text-align: center">请选择标签</div>
   <van-row gutter="20" justify="center">
-    <van-col v-for="tag in activeIds">
-      <van-tag :show="show" closeable size="medium" type="primary" @close="doClose(tag)" plain>
-        {{ tag }}
+    <van-col v-for="id in activeIds">
+      <van-tag :show="show" closeable size="medium" type="primary" @close="doClose(id)" plain>
+        {{ tagMap.get(id) }}
       </van-tag>
     </van-col>
   </van-row>
@@ -33,138 +34,131 @@
   </div>
 </template>
 
-<script setup>
-import {onMounted, ref, watch} from 'vue';
+<script setup lang="ts">
+import {onMounted, ref} from 'vue';
 import {useRouter} from "vue-router";
-import myAxios from "../../config/myAxios";
-import store from "../../store";
-import {showFailToast, showSuccessToast, showToast,showConfirmDialog} from "vant";
-
+import {showSuccessToast, showToast, showConfirmDialog} from "vant";
+import tagRequest from "../../plugins/request/tagRequest";
+import {userTag} from "@/plugins/request/dao/tag";
+import store from "@/store";
+import userRequest from "@/plugins/request/userRequest";
+import {setToken} from "@/util/cookie";
 
 const router = useRouter();
-
-// 标签列表
-const InitTagList = ref([])
-const InitTag = ref([])
-const tagList = ref([])
+// 展示的标签
+const tagList = ref<treeSelect[]>([])
+const InitTagList = ref<treeSelect[]>([])
 // 已选择的标签
-const activeIds = ref([]);
+const activeIds = ref<number[]>([]);
+
+
 const activeIndex = ref(0);
-const searchTest = ref('');
+const searchTxt = ref('');
+// id 对应的tag
+const tagMap = ref<Map<number, string>>(new Map<number, string>)
 
-onMounted(() => {
-  const user = store.getters.getUser;
-  if (user != null) {
-    let tag
-    try {
-      if (user.tags) {
-        tag = JSON.parse(user.tags);
-      }
-    } catch (e) {
-      try {
-        if (user.tags) {
-          tag = JSON.parse(JSON.stringify(user.tags));
-        }
-      } catch (e) {
-        showFailToast("系统错误");
-        router.back();
-      }
-    }
-    if (tag) {
+interface children {
+  text: string;
+  id: number;
+}
 
-      activeIds.value = tag;
-    }
-  } else {
-    showFailToast("未登录");
+interface treeSelect {
+  text: string;
+  children: children[];
+}
+
+onMounted(async () => {
+  await getLabel();
+})
+const getLabel = async () => {
+  if (!store.getters.getIsLogin) {
+    showToast({message: '未登录', position: 'top',});
     router.back();
   }
-
-  getLabel();
-  tagList.value = InitTagList.value;
-})
-const getLabel = () => {
-
-  myAxios.get('/api/userLabel/getUserLabel').then(res => {
-    if (res.code === 200) {
-      const b = res.data
-      for (let i = 0; i < b.length; i++) {
-
-        const tagData = b[i]
-        const labelList = []
-        for (let label of tagData.label) {
-          let k = {text: label, id: label.toString()}
-          labelList.push(k)
-        }
-        let a = {
-          text: tagData.labelType,
-          children: labelList
-        }
-        InitTagList.value.push(a)
-        InitTag.value.push(a)
-
+  const response = await tagRequest.getUserTag();
+  if (response.code === 200 && response.data) {
+    const data: userTag[] = response.data
+    const transformedData: treeSelect[] = data.map((userTag) => {
+      const tree: treeSelect = {
+        text: userTag.type,
+        children: userTag.tagList.map((userTagList) => {
+          tagMap.value.set(userTagList.id, userTagList.tag);
+          return {
+            text: userTagList.tag,
+            id: userTagList.id,
+          };
+        }),
+      };
+      return tree;
+    });
+    tagList.value.push(...transformedData);
+    InitTagList.value = tagList.value;
+  }
+  const user = store.getters.getUser;
+  if (user.tags) {
+    const tags = JSON.parse(user.tags);
+    for (const t of tags) {
+      const key = [...tagMap.value.keys()].find(key => tagMap.value.get(key) === t);
+      if (key) {
+        activeIds.value.push(key);
       }
     }
-  });
-
+  }
 }
 const onSearch = () => {
+  if (searchTxt.value === '') {
+    return;
+  }
   // 将数据扁平化处理 , 过滤搜索栏里面包含选择的标签
   tagList.value = InitTagList.value.map(parentTag => {
     const tempChildren = [...parentTag.children]
     const tempParenTag = {...parentTag}
-    tempParenTag.children = tempChildren.filter(item => item.text.includes(searchTest.value));
+    tempParenTag.children = tempChildren.filter(item => item.text.includes(searchTxt.value));
     return tempParenTag;
-  })
+  });
 }
 const onCancel = () => {
-  searchTest.value = '';
-  tagList.value = InitTag.value;
+  searchTxt.value = '';
+  tagList.value = InitTagList.value
 }
 const add = () => {
-  console.log(activeIds.value)
+
 }
 const show = ref(true);
 // 移出标签
-const doClose = (tag) => {
+const doClose = (tag: number) => {
   activeIds.value = activeIds.value.filter(item => {
     return tag !== item;
   })
 };
-const updateResult = () => {
+const updateResult = async () => {
   if (activeIds.value.length <= 0) {
-    showToast({message:"请选择标签",position: 'top',})
+    showToast({message: "请选择标签", position: 'top',})
     return;
   }
   showConfirmDialog({
     title: '确认提交吗?',
     message:
         '每天只能提交五次',
-  }).then(() => {
+  }).then(async () => {
     const user = store.getters.getUser;
     let tag;
     try {
       tag = JSON.stringify(activeIds.value);
     } catch (e) {
-      showToast({message:'请求错误请重试',position: 'top'});
-
+      showToast({message: '请求错误请重试', position: 'top'});
       return;
     }
-    myAxios.post("/api/user/update", {
-      id: user.id,
-      tags: tag
-    }).then(resp => {
-      if (resp.code === 200 && resp.data) {
-        store.commit("setUser", resp.data)
-        router.replace({
-          path: '/user'
-        })
-        showSuccessToast("修改成功");
-      } else {
-        showFailToast(resp.description);
-      }
-    }).catch(() => {
-      showFailToast("修改失败")
-    });
+    const response = await userRequest.update({id: user.id, tags: tag});
+    if (response.code === 200 && response.data) {
+      setToken(response.data)
+      const  resp=await userRequest.getCurrentUser();
+      store.commit("setUser", resp.data)
+      await router.replace({
+        path: '/user'
+      })
+      showToast({message: '修改成功', position: 'top'});
+    }
   });
 }
 

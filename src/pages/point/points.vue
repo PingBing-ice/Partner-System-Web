@@ -78,10 +78,13 @@ onMounted(async () => {
   }
 })
 const sign = async () => {
+  if (cheekSign.value===true) {
+    showToast({message:'以签到',position: 'top'});
+  }
   const resp = await recordRequest.sign();
   if (resp.code === 200) {
     showToast({
-      message: '签到成功',
+      message: '签到成功 积分+1',
       position: 'top',
     });
     location.reload();

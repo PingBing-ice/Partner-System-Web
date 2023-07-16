@@ -39,6 +39,22 @@
     </div>
   </van-popup>
   <van-collapse v-model="activeNames" @click="selectFriend">
+
+    <van-collapse-item title="队伍列表" name="2">
+      <van-cell :value="team.name" v-for="team in teamList" center @click="toTeam(team?.teamId,)">
+        <template #title>
+          <van-image
+              round
+              width="40px"
+              height="40px"
+              :src="team.avatarUrl"
+          />
+          <van-tag plain style="margin-right: 8px; margin-top: 8px;color: #42b983" type="danger">
+            {{ team?.captain ? '队长':'队员' }}
+          </van-tag>
+        </template>
+      </van-cell>
+    </van-collapse-item>
     <van-collapse-item title="好友列表" name="1">
       <van-cell v-for="userList in list" center
                 @click="toChat(userList.id,userList.username,userList.avatarUrl)">
@@ -50,28 +66,29 @@
               height="1.8rem"
               :src="userList.avatarUrl"
           />
-
-
           <span class="find-name">
-            {{ userList.userAccount }}
+            <span class="find-username">
+              {{ userList.username }}
+            </span>
+            <span class="find-stu">
+              [{{userList.online ? '在线' : '离线' }}]
+            </span>
           </span>
+
         </template>
         <template #right-icon>
-          <div class="find-status">
-            {{ listStatus.has(userList.id) ? '在线' : '离线' }}
-          </div>
-
         </template>
       </van-cell>
     </van-collapse-item>
   </van-collapse>
 </template>
-<script setup>
+<script setup lang="ts">
 import {inject, onMounted, provide, ref, watch, watchEffect} from "vue";
-import {showSuccessToast, showFailToast, showNotify} from 'vant';
+import {showSuccessToast, showFailToast, showNotify, showToast} from 'vant';
 import {useRoute, useRouter} from "vue-router";
 import myAxios from "../../config/myAxios";
 import store from "../../store";
+import teamRequest from "../../plugins/request/teamRequest";
 
 const router = useRouter();
 const route= useRoute();
@@ -81,29 +98,16 @@ const friendUserListLength = ref(0);
 const user = ref();
 const activeNames = ref(['1']);
 const list = ref([]);
-const reload = inject('reload')
-const ADV = inject('ADV')
+const teamList = ref([]);
 
-const listStatus = ref(new Set("1"));
-watchEffect(() => {
-  const userId = ADV.value.userId
-  const statuts = ADV.value.statuts
-  if (userId && statuts) {
-    listStatus.value.add(userId);
-  } else if (userId && !statuts) {
-    listStatus.value.delete(userId)
-  }
-})
-
-
-onMounted(() => {
+onMounted(async () => {
   if (!store.getters.getIsLogin) {
     showFailToast("未登录");
     router.back();
     return;
   }
   user.value = store.getters.getUser
-  myAxios.get("/partner/friend/userFriend/check").then(res => {
+  myAxios.get("/friend/check").then(res => {
     if (res.code === 200 && res.data) {
       const userList = res.data;
       for (let userListElement of userList) {
@@ -116,10 +120,15 @@ onMounted(() => {
       friendUserListLength.value = friendUserList.value.length;
     }
   })
+   const response = await teamRequest.check();
+  if (response.code === 200) {
+    teamList.value = response.data;
+
+  }
   selectFriends();
 })
 const selectFriends = () => {
-  myAxios.get("/partner/friend/userFriend/select").then(resp => {
+  myAxios.get("/friend/select").then(resp => {
     if (resp.code === 200 && resp.data) {
       list.value = resp.data;
     }
@@ -151,9 +160,9 @@ const reject = async (acceptId, refuseId) => {
       return true;
     })
     --friendUserListLength.value;
-    showSuccessToast("成功");
+    showToast({message: '成功', position: 'top'});
   } else {
-    showFailToast(resp.message);
+    showToast({message: resp.message, position: 'top'});
   }
   show.value = false;
 }
@@ -164,7 +173,7 @@ const addFriend = async (id) => {
 
 const showPopup = () => {
   if (!friendUserList.value || friendUserList.value.length <= 0) {
-    showFailToast("没有好友申请")
+    showToast({message:'无申请',position: 'top'});
     return;
   }
   show.value = true;
@@ -178,17 +187,21 @@ const toChat = (friendId, name, avatarUrl) => {
     path: "/chat",
     query: {
       id: friendId,
+      name: name
     }
   })
 }
+const toTeam = (teamId) => {
+  router.push({
+    path: '/chat/team',
+    query: {
+      id: teamId,
+    },
+    replace: true,
 
+  })
+}
 
-const showNotifyAV = () => {
-  let userAv = {
-    username: user.value.userAccount,
-    av: user.value.avatarUrl,
-  }
-};
 const toUser = () => {
   router.push({path: '/user'})
 }
@@ -198,13 +211,21 @@ const toSearch = () => {
 </script>
 
 <style scoped>
-.find-name {
-  margin-left: 15px;
-  position: absolute;
+.find-username {
+  font-weight: 500;
+  font-size: 1rem;
+  color: black;
 }
-
+.find-name{
+  display: flex;
+  margin-left: 15px;
+  flex-direction: column;
+}
 .find-status {
   color: #777;
   font-size: 13px;
+}
+.find-stu{
+  color: #777;
 }
 </style>

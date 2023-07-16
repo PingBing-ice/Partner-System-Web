@@ -1,118 +1,107 @@
 <template>
-  <van-overlay :show="isFor">
-    <div class="wrapper" @click.stop>
-      <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
-        <div class="wheel"></div>
-        <div class="hamster">
-          <div class="hamster__body">
-            <div class="hamster__head">
-              <div class="hamster__ear"></div>
-              <div class="hamster__eye"></div>
-              <div class="hamster__nose"></div>
+  <div id="search">
+    <van-overlay :show="isFor">
+      <div class="wrapper" @click.stop>
+        <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
+          <div class="wheel"></div>
+          <div class="hamster">
+            <div class="hamster__body">
+              <div class="hamster__head">
+                <div class="hamster__ear"></div>
+                <div class="hamster__eye"></div>
+                <div class="hamster__nose"></div>
+              </div>
+              <div class="hamster__limb hamster__limb--fr"></div>
+              <div class="hamster__limb hamster__limb--fl"></div>
+              <div class="hamster__limb hamster__limb--br"></div>
+              <div class="hamster__limb hamster__limb--bl"></div>
+              <div class="hamster__tail"></div>
             </div>
-            <div class="hamster__limb hamster__limb--fr"></div>
-            <div class="hamster__limb hamster__limb--fl"></div>
-            <div class="hamster__limb hamster__limb--br"></div>
-            <div class="hamster__limb hamster__limb--bl"></div>
-            <div class="hamster__tail"></div>
           </div>
+          <div class="spoke"></div>
         </div>
-        <div class="spoke"></div>
       </div>
+    </van-overlay>
+    <van-action-sheet
+        v-model:show="showTeam"
+        round
+        position="bottom"
+    >
+      <van-divider>{{ '队伍最大人数: ' + max }}</van-divider>
+      <van-divider>队员</van-divider>
+      <user-card-list :userList="userListVo" @userId="showAddUserOn"/>
+    </van-action-sheet>
+    <van-dialog v-model:show="showAddUser" title="确认添加好友吗?" @confirm="sendFriendRequest" @closed="close"
+                show-cancel-button>
+      <van-cell-group inset>
+        <van-field
+            v-model="message"
+            rows="1"
+            autosize
+            label="备注"
+            type="textarea"
+            placeholder="请输入备注"
+        />
+      </van-cell-group>
+    </van-dialog>
 
-      <!--      <van-loading color="#0094ff" text-color="#0094ff" vertical>加载中...</van-loading>-->
-    </div>
-  </van-overlay>
-  <van-action-sheet
-      v-model:show="showTeam"
-      round
-      position="bottom"
-  >
-    <van-divider>{{ '队伍最大人数: ' + max }}</van-divider>
-    <van-divider>队员</van-divider>
-    <user-card-list :userList="userListVo" v-on:userId="showAddUserOn"/>
-  </van-action-sheet>
-  <van-dialog v-model:show="showAddUser" title="确认添加好友吗?" @confirm="sendFriendRequest" @closed="close"
-              show-cancel-button>
-    <van-cell-group inset>
-      <van-field
-          v-model="message"
-          rows="1"
-          autosize
-          label="备注"
-          type="textarea"
-          placeholder="请输入备注"
-      />
-    </van-cell-group>
-  </van-dialog>
-  <van-search
-      v-model="searchTxt"
-      show-action
-      placeholder="请输入搜索关键词"
-      @search="onSearch"
-  >
-    <template #action>
-      <div @click="onSearch">搜索</div>
-    </template>
-  </van-search>
+    <SearchCard @mess="setTxt" @click="onSearch"/>
 
-  <van-tabs v-model:active="active" v-if="userList.length>0||postList.length>0||teamList.length>0">
-    <van-tab title="文章" v-if="postList && postList.length>0">
-      <div v-if="postList && postList.length>0">
+    <van-tabs v-model:active="active" v-if="userList.length>0||postList.length>0||teamList.length>0"
+    >
+      <van-tab title="文章" v-if="postList && postList.length>0">
+        <div v-if="postList && postList.length>0">
         <span v-for="post in postList">
       <div class="fo">
               <div class="txt"
                    v-html="post.content" @click="toDetails(post.id)"/>
       </div>
     </span>
-      </div>
-    </van-tab>
-    <van-tab title="用户" v-if="userList && userList.length>0">
-      <div v-if="userList && userList.length>0">
-        <van-divider
-            :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
-        >
-          用户
-        </van-divider>
-        <user-card-list :user-list="userList" v-on:userId="showAddUserOn"/>
-      </div>
-    </van-tab>
-    <van-tab title="队伍" v-if="teamList && teamList.length>0">
-      <div v-if="teamList && teamList.length>0">
-        <van-divider
-            :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
-        >
-          队伍
-        </van-divider>
-        <team-card-list :teamList="teamList" v-on:addTeam="addTeam"
-                        v-on:teamShow="isShow"/>
-      </div>
-    </van-tab>
-  </van-tabs>
+        </div>
+      </van-tab>
+      <van-tab title="用户" v-if="userList && userList.length>0">
+        <div v-if="userList && userList.length>0">
+          <van-divider
+              :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
+          >
+            用户
+          </van-divider>
+          <user-card-list :user-list="userList" @userId="showAddUserOn"/>
+        </div>
+      </van-tab>
+      <van-tab title="队伍" v-if="teamList && teamList.length>0">
+        <div v-if="teamList && teamList.length>0">
+          <team-card-list :teamList="teamList" @addTeam="addTeam"
+                          @teamShow="isShow"/>
+        </div>
+      </van-tab>
+    </van-tabs>
 
-  <div v-if="userList.length<=0&&postList.length<=0&&teamList.length<=0">
-    <van-empty description="查无数据"/>
+    <div v-if="userList.length<=0&&postList.length<=0&&teamList.length<=0&&!isSearch">
+      <van-empty description="查无数据"/>
+    </div>
   </div>
+
 </template>
 
-<script setup>
-import {ref} from 'vue';
+<script setup lang="ts">
+import {nextTick, onMounted, ref} from 'vue';
 import postRequest from "../../plugins/request/postRequest";
 import teamRequest from "../../plugins/request/teamRequest";
 import userRequest from "../../plugins/request/userRequest";
 import UserCardList from "../../components/UserCardList.vue";
-import myAxios from "../../config/myAxios";
-import {showFailToast, showSuccessToast} from "vant";
+import {showToast} from "vant";
 import TeamCardList from "../../components/TeamCardList.vue";
 import {useRouter} from "vue-router";
+import SearchCard from "../../components/SearchCard.vue";
 
 const router = useRouter()
 const postList = ref([])
-const userList = ref([])
-const teamList = ref([])
+const userList = ref<any>([])
+const teamList = ref<any>([])
 const userListVo = ref([])
-const userId = ref('')
-const teamID = ref('')
+const userId = ref<number>(0)
+const teamID = ref<number>()
 const message = ref('')
 const showAddUser = ref(false);
 const showTeam = ref(false);
@@ -122,20 +111,37 @@ const teamStatus = ref(0);
 const max = ref(0);
 const active = ref(0);
 const isFor = ref(false);
+const isSearch = ref(true);
 let txt = '';
-const searchTxt = ref('');
+const searchTxt = ref<string>('');
+onMounted(()=>{
+  nextTick(() => {
+    const searchCard = document.getElementById("searchCard");
+    if (searchCard) {
+      searchCard.focus();
+    }
+  })
+})
 
+const setTxt = (value:string) => {
+  searchTxt.value = value;
+}
 const onSearch = async () => {
-
-  if (searchTxt.value === '' || txt === searchTxt.value) {
-    return;
+  if (searchTxt.value === '') {
+    showToast({message: '请输入内容', position: 'top'});
+  } else if (txt === searchTxt.value) {
+    showToast({message: '内容重复', position: 'top'});
+  } else {
+    isFor.value = true;
+    isSearch.value = true;
+    await getUser();
+    await getPost()
+    await getTeam();
+    isFor.value = false;
+    txt = searchTxt.value;
+    isSearch.value = false;
   }
-  isFor.value = true;
-  await getUser();
-  await getPost()
-  await getTeam();
-  isFor.value = false;
-  txt = searchTxt.value;
+
 }
 const getPost = async () => {
   const resp = await postRequest.search(null, searchTxt.value)
@@ -144,11 +150,11 @@ const getPost = async () => {
   }
 }
 const getTeam = async () => {
-  const resp = await teamRequest.searchTeam(searchTxt.value)
+  const resp = await teamRequest.searchTeam({searchTxt:searchTxt.value})
   if (resp.code === 200 && resp.data) {
     teamList.value = resp.data;
     if (teamList.value.length >= 0) {
-      teamList.value.forEach(team => {
+      teamList.value.forEach((team: { expireTime: string; userVo: any[]; }) => {
         team.expireTime = team.expireTime.split(" ")[0];
         if (team.userVo && team.userVo.length > 0)
           team.userVo.forEach(user => {
@@ -165,11 +171,11 @@ const getUser = async () => {
   if (resp.code === 200 && resp.data) {
     const list = resp.data.records;
     for (let i = 0; i < list.length; i++) {
-      const user= list[i]
+      const user = list[i]
       if (user.tags) {
         try {
           user.tags = JSON.parse(user.tags);
-        } catch (e){
+        } catch (e) {
 
         }
       }
@@ -178,66 +184,51 @@ const getUser = async () => {
   }
 
 }
-const toDetails = (id) => {
+const toDetails = (id:number) => {
   router.push({
-    path: "/space/details",
+    path: "/post/details",
     query: {
       id: id,
     }
   })
 }
-const showAddUserOn = (id) => {
+const showAddUserOn = (id:number) => {
   showAddUser.value = true;
   userId.value = id;
 }
-const sendFriendRequest = () => {
-  if (userId.value === '') {
+const sendFriendRequest =async () => {
+  if (userId.value === 0) {
     return;
   }
-  myAxios.post("/partner/friend/userFriend/friend", {
-    toUserId: userId.value,
-    message: message.value,
-  }).then(resp => {
-
-    if (resp.code === 200) {
-      showSuccessToast("发送成功")
-    } else {
-      if (resp.description) {
-        showFailToast(resp.description);
-      }
-    }
-  }).catch(resp => {
-    showFailToast("发送失败");
-  });
+  const resp =await userRequest.addFriend(userId.value, message.value);
+  if (resp.code===200) {
+    showToast({message: '发送成功', position: 'top'});
+  }
 }
 const close = () => {
   message.value = '';
-  userId.value = '';
+  userId.value = 0;
 }
 
 /**
  * 加入队伍
  */
-const addTeam = async (id, status) => {
+const addTeam = async (id:number, status:number) => {
 
   if (status === 2) {
     teamPassword.value = '';
     addPasswordTeam.value = true;
     teamID.value = id
   } else {
-    const res = await myAxios.post("/partner/team/join", {
-      teamId: id,
-    });
+    const res=await teamRequest.join(id, null);
     if (res?.code === 200) {
-      showSuccessToast("加入成功");
-    } else {
-      showFailToast(res.description);
+      showToast({message: '发送成功', position: 'top'});
     }
   }
 
 }
 
-const isShow = (id, status) => {
+const isShow = (id:number, status:number) => {
   teamStatus.value = status;
   showTeam.value = true;
   for (let i = 0; i < teamList.value.length; i++) {
@@ -305,6 +296,11 @@ const isShow = (id, status) => {
 .hamster div,
 .spoke {
   position: absolute;
+}
+
+#search {
+  overflow-y: auto;
+  height: 100%;
 }
 
 .wheel,

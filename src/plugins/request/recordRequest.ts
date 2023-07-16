@@ -1,4 +1,4 @@
-import myAxios from "../../config/myAxios";
+import myAxios from "@/config/myAxios";
 
 const mathSign = async () => {
     return await myAxios.get("/mathSign");

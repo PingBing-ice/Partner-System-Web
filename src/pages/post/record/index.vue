@@ -1,5 +1,11 @@
 <template>
-
+  <div id="record">
+    <van-list
+        v-model:loading="loading"
+        :finished="finished"
+        finished-text="没有更多了"
+        @load="onLoad"
+    >
     <span v-if="postList.length>0" v-for="post in postList">
       <div class="fo">
               <div class="txt"
@@ -7,30 +13,48 @@
       </div>
       <div class="van-hairline--bottom"></div>
     </span>
-  <van-empty v-if="postList.length<=0" description="数据为空请先收藏"/>
+    </van-list>
+
+    <van-empty v-if="postList.length<=0" description="数据为空"/>
+  </div>
+
 </template>
 
 <script setup>
 
 import {onMounted, ref} from "vue";
-import postRequest from "../../plugins/request/postRequest";
+import postRequest from "../../../plugins/request/postRequest";
 import {useRouter} from "vue-router";
-
+const loading = ref(false);
+const finished = ref(false);
 const router = useRouter()
 const postList = ref([]);
+let total = 0;
+let page = 1;
 onMounted(async () => {
-  const response = await postRequest.getPostCollect();
-  if (response.code === 200 && response.data) {
-    postList.value = response.data
-  }
+
 })
 const toDetails = (id) => {
   router.push({
-    path: "/space/details",
+    path: "/post/details",
     query: {
       id: id,
     }
   })
+}
+const onLoad =async () => {
+  const response = await postRequest.getPostByRecord(page,10);
+  if (response.code === 200 && response.data) {
+    for (let post of response.data.list) {
+      postList.value.push(post)
+    }
+    total=response.data.total
+    page++;
+  }
+  loading.value = false;
+  if (postList.value.length >= total) {
+    finished.value = true;
+  }
 }
 </script>
 
@@ -60,5 +84,10 @@ const toDetails = (id) => {
   word-wrap: break-word;
   white-space: pre-wrap;
 
+}
+#record{
+  height: 88vh;
+  width: 100%;
+  overflow-y: auto;
 }
 </style>

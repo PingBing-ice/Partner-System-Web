@@ -1,188 +1,180 @@
 <template>
-  <van-nav-bar style="height: 7%;width: auto"
-               :title="titleName"
-               left-arrow
-               @click-left="onClickLeft"
-               @click-right="onClickRightTeam"
-  >
-    <template #right>
-      <van-icon name="friends-o" size="18"/>
-    </template>
-  </van-nav-bar>
-  <chat-card-box :chatList="testData" :userId="userId"/>
-
-
-  <div style="width: 100%;display: flex;justify-content: center;">
-    <div class="chatBut">
-      <div class="sendBut">
-        <input type="text" placeholder="善语结善缘" v-model="messages" class="chatIput" >
-        <van-button size="small"  type="primary" @click="getSend">发送</van-button>
-      </div>
-
+  <div class="content_box">
+    <van-nav-bar class="chat_hat"
+                 :title="titleName"
+                 left-arrow
+                 @click-left="onClickLeft"
+                 @click-right="onClickRightTeam"
+    >
+      <template #right>
+        <van-icon name="friends-o" size="18"/>
+      </template>
+    </van-nav-bar>
+    <div class="content_box">
+      <chat-card-box :chatList="chatData" :userId="user.id"/>
+      <MsgInput @input="setValue" @but="getSend"/>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
 
-import {showFailToast} from "vant";
-import {nextTick, onActivated, onMounted, ref} from "vue";
+import {showFailToast, showToast} from "vant";
+import {nextTick, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import myAxios from "../../config/myAxios";
-import webSocketConfig from "../../config/webSocketConfig";
-import {getMessages} from "../../services/MeesageUtils";
-import {messageType} from "../../services/MessageType";
-import {chatStateEnum} from "../../states/chat";
-import store from "../../store";
-import ChatCardBox from "../../components/ChatCardBox.vue";
+
+import store from "@/store";
+import MsgInput from "@/components/MsgInput.vue";
+import {worker} from "@/util/socket/initWorker";
+import {chatStateEnum} from "@/states/chat";
+import {ChatMessageResp, messageType} from "@/services/MessageType";
+import chatRequest from "@/plugins/request/chatRequest";
+import ChatCardBox from "@/components/chat/ChatCardBox.vue";
+import {chatList} from "@/plugins/request/dao/chat";
 
 const messages = ref("")
 const route = useRoute()
 const router = useRouter()
-const friendUrl = ref('')
-const friendName = ref('')
-const titleName = ref('')
-const friendId = route.query.id + ""
-
-const userId = ref("")
-const userName = ref("")
-const AvatarUrl = ref("")
-const current = ref("")
-const recordList = ref([]);
-let socket: any = null;
-const testData: any = ref([])
-
+const titleName = ref<string>(String(route.query.name));
+const fid = ref<number>(Number(route.query.id??0));
+const chatData = ref<chatList[]>([])
+const user = store.getters.getUser
+let curr = 0;
+let isCurr = true;
+let isLast = false;
 onMounted(async () => {
   if (!store.getters.getIsLogin) {
     showFailToast("未登录");
     router.back();
     return;
   }
-  const user = store.getters.getUser
-  if (user != null) {
-    userId.value = user.id;
-    current.value = userId.value;
-    userName.value = user.username;
-    AvatarUrl.value = user.avatarUrl;
-    await webSocketConfig.initSocket();
-    socket = webSocketConfig.getSocket();
-    getOnMessage(userId.value);
-
-    //  加载聊天记录
-    const response: any = await myAxios.get("/partner/record/chat", {
-      params: {
-        friendId: friendId,
-      }
-    })
-    console.log(response.data)
-    if (response.code === 200 && response.data) {
-      recordList.value = response.data.chat;
-      friendUrl.value = response.data.avatarUrl;
-      friendName.value = response.data.name;
-      titleName.value = friendName.value;
-      recordList.value.forEach((record: any) => {
-        if (record.userId == userId.value) {
-          let userData = {
-            id: userId.value,
-            name: userName.value,
-            images: AvatarUrl.value,
-            message: record.message,
-          };
-
-          testData.value.push(userData);
-        }
-        if (record.userId == friendId) {
-          let FriendData = {
-            id: friendId,
-            name: friendName.value,
-            images: friendUrl.value,
-            message: record.message,
-          };
-          testData.value.push(FriendData,);
-        }
-      })
-    } else {
-      await router.back();
-
-      showFailToast("数据有误");
-    }
-
-  } else {
-    showFailToast("请先登录...");
+  worker.addEventListener("message", onMessage);
+  //  加载聊天记录
+  await getMessage(curr);
+  const chatInfo = document.getElementById("chatInfo");
+  if (chatInfo) {
+    chatInfo.addEventListener('scroll', sss)
   }
-  await nextTick(() => {
-    // @ts-ignore
-    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
-  })
 })
-
-const getOnMessage = (id: string) => {
-  if (socket == null) {
-    webSocketConfig.initSocket()
-    socket = webSocketConfig.getSocket()
-  }
-
-  socket.onmessage = (msg: any) => {
-
-    const chatRecord: messageType = JSON.parse(msg.data)
-
-    const friend = chatRecord.chatRecord.message;
-    if (chatRecord.type === chatStateEnum.HY || chatRecord.type === chatStateEnum.SYSTEM) {
-      if (route.path === '/toChat') {
-        let userData = {
-          id: friendId,
-          name: friendName.value,
-          images: friendUrl.value,
-          message: friend,
-        }
-        testData.value.push(userData)
-        titleName.value = friendName.value;
-        nextTick(() => {
-          // @ts-ignore
-          document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
-        })
-      }
+const sss = async () => {
+  const chatInfo = document.getElementById("chatInfo");
+  if (chatInfo && chatInfo.scrollTop === 0 && isCurr && !isLast) {
+    isCurr = false;
+    const he = chatInfo.scrollHeight;
+    await getMessage(curr);
+    if (!isLast) {
+      chatInfo.scrollTop = he;
     }
-
-
+    isCurr = true;
   }
 }
 
-
-const getSend = () => {
+const getSend = async () => {
   if (messages.value === "") {
     return
   }
-  if (userId.value == null || friendUrl.value === '' || friendName.value === '') {
-    showFailToast("未登录")
+  if (!store.getters.getIsLogin) {
+    showFailToast("未登录");
     router.back();
     return;
   }
   let mss = messages.value
   messages.value = "";
-  let userData = {
-    id: userId.value,
-    name: userName.value,
-    images: AvatarUrl.value,
-    message: mss
+  let message:ChatMessageResp= {
+    userInfo: {
+      username: user.userAccount,
+      uid: user.id,
+      avatar: user.avatarUrl
+    },
+    message: {
+      id: 0,
+      sendTime: new Date().getTime(),
+      content: mss,
+      status: 0,
+      reply: undefined
+    }
   }
-  testData.value.push(userData)
-  let message;
-  if (friendId == "1") {
-    message = getMessages(chatStateEnum.SYSTEM, userId.value, friendId, mss);
-    titleName.value = "AI正在思考中..."
-  } else {
-    message = getMessages(chatStateEnum.HY, userId.value, friendId, mss, AvatarUrl.value, userName.value);
+  pushChatData(message)
+  goTop();
+  const response = await chatRequest.sendMsg(mss, fid.value, null);
+  if (response.code !== 200) {
+    chatData.value.pop();
   }
-  webSocketConfig.sendSocket(JSON.stringify(message));
 
+}
+const goTop = () => {
   nextTick(() => {
-    // @ts-ignore
-    document.getElementById('chatInfo').scrollTop = document.getElementById('chatInfo').scrollHeight
+    const chatInfo = document.getElementById("chatInfo");
+    if (chatInfo) {
+      chatInfo.scrollTop = chatInfo.scrollHeight;
+    }
   })
 }
+const setValue = (value: string) => {
+  messages.value = value;
+}
+const onMessage = (e: MessageEvent) => {
+  const data = parseME(e);
+  if (!data) {
+    return;
+  }
+  pushChatData(data)
+  goTop();
+}
+const parseME = (e: MessageEvent) => {
+  const params: { type: string; value: unknown } = JSON.parse(e.data)
+  if ("message" === params.type) {
+    const param: messageType<ChatMessageResp> = JSON.parse(params.value as string);
+    if (param.type === chatStateEnum.HY) {
+      return param.data;
+    }
+  }
+}
+const getMessage = async (cursor: number) => {
+  if (fid.value <= 0 || !fid.value) {
+    showToast({message: '数据有误', position: 'top'});
+    await router.replace("/index");
+    return;
+  }
+  const response = await chatRequest.chatUserList(fid.value, 20, cursor);
+  if (response.code === 200 && response.data) {
+    curr = response.data.cursor
+    isLast = response.data.isLast
+    const data: ChatMessageResp[] = response.data.data;
+    const chatList = buildChatList(data);
+    pushChatDataList(chatList);
+    if (cursor == 0) {
+      goTop();
+    }
+  } else {
+    await router.replace("/index");
+    showToast({message: '数据有误', position: 'top'});
+  }
+}
 
+const pushChatData = (messageResp: ChatMessageResp) => {
+  const userInfo = messageResp.userInfo;
+  const message = messageResp.message;
+  chatData.value.push({
+    id: message.id, userId: userInfo.uid, name: userInfo.username, images: userInfo.avatar,
+    message: message.content
+  });
+}
+const buildChatList = (messageResp: ChatMessageResp[]) => {
+  const chatList: chatList[] = []
+  for (let chatMessageResp of messageResp) {
+    const userInfo = chatMessageResp.userInfo;
+    const message = chatMessageResp.message;
+    chatList.push({
+      id: message.id, userId: userInfo.uid, name: userInfo.username, images: userInfo.avatar,
+      message: message.content
+    })
+  }
+  return chatList;
+}
+const pushChatDataList = (chatList: chatList[]) => {
+  chatData.value = [...chatList, ...chatData.value];
+}
 const onClickLeft = () => {
   router.back();
 }
@@ -190,11 +182,20 @@ const onClickRightTeam = () => {
   router.push({
     path: '/show',
     query: {
-      friendId: friendId
+      friendId: fid.value
     },
   })
 }
 </script>
 <style scoped>
+.chat_hat {
+  height: var(--van-tabs-line-height)
+}
 
+
+.content_box {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 50px);
+}
 </style>

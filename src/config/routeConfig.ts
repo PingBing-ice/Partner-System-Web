@@ -1,9 +1,6 @@
 import * as VueRouter from "vue-router";
 import BasicLayout from "../layouts/BasicLayout.vue"
 import store from "../store";
-import {getCurrentUser} from "../services/users";
-import myAxios from "./myAxios";
-import userRequest from "../plugins/request/userRequest";
 import {showToast} from "vant";
 
 
@@ -15,7 +12,6 @@ const routes = [
         component: BasicLayout,
         redirect: '/index',
         meta: {
-            keepAlive: true,
             isHeardAv: true,
             isLogin: false
         },
@@ -24,16 +20,17 @@ const routes = [
                 path: '/index',
                 name: '主页',
                 component: () => import('../pages/Index.vue')
-            }
+            },
+
         ]
 
     },
+
     {
         path: '/team',
         name: '队伍',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: true,
             isLogin: true
         },
@@ -41,28 +38,39 @@ const routes = [
             {
                 path: '/team',
                 name: '队伍',
-                component: () => import('../pages/team/Team.vue')
+                component: () => import('../pages/team/team/index.vue')
+            },
+            {
+                path: '/team/post',
+                name: '队伍文章',
+                meta: {
+                    isHeardAv: true,
+                    isLogin: true
+                },
+                component: () => import('../pages/team/post/index.vue')
             }
         ]
 
     },
     {
-        path: '/userTeam',
+        path: '/user/team',
         name: '队伍管理',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: false,
             isLogin: true
         },
         children: [
             {
-                path: '/userTeam',
+                path: '/user/team',
                 name: '队伍管理',
-                component: () => import('../pages/team/UserTeam.vue')
+                meta:{
+                    isHeardAv: true,
+                },
+                component: () => import('../pages/team/user/index.vue')
             },
             {
-                path: '/userTeam/add',
+                path: '/user/team/add',
                 name: '修改队伍',
                 component: () => import('../pages/team/userTeamEditPage.vue')
             },
@@ -78,7 +86,6 @@ const routes = [
         name: '个人信息',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: false,
             isLogin: true
         },
@@ -97,7 +104,7 @@ const routes = [
             {
                 path: '/collect',
                 name: '我的收藏',
-                component: () => import('../pages/post/postCollect.vue')
+                component: () => import('../pages/post/collect/index.vue')
             },
             {
                 path: '/edit',
@@ -117,7 +124,6 @@ const routes = [
         name: '个人中心',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: false,
             isNotHeard: true,
             isLogin: true
@@ -126,17 +132,36 @@ const routes = [
             {
                 path: '/space',
                 name: '个人中心',
-                component: () => import('../pages/user/Space.vue')
+                component: () => import('../pages/user/space/index.vue')
             },
         ]
     },
-
+    {
+        path: '/score',
+        name: '积分',
+        component: BasicLayout,
+        meta: {
+            isHeardAv: false,
+            isLogin: false
+        },
+        children: [
+            {
+                path: '/score',
+                name: '积分管理',
+                component: () => import('../pages/score/score.vue')
+            },
+            {
+                path: '/rec',
+                name: '积分充值',
+                component: () => import('../pages/score/recharge.vue')
+            },
+        ]
+    },
     {
         path: '/post',
         name: '文章',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: false,
             isLogin: true
         },
@@ -144,22 +169,30 @@ const routes = [
             {
                 path: '/post/details',
                 name: '详情',
-                component: () => import('../pages/post/PostDetails.vue')
+                component: () => import('../pages/post/details/index.vue')
 
             },
             {
-                path: '/addPost',
+                path: '/post/add',
                 name: '添加文章',
-                component: () => import('../pages/post/addPost.vue')
+                meta: {
+                    isHeardAv: true,
+                    isLogin: true
+                },
+                component: () => import('../pages/post/add/index.vue')
             },
             {
                 path: '/record',
                 name: '历史记录',
-                component: () => import('../pages/post/postRecord.vue')
+                component: () => import('../pages/post/record/index.vue')
             },
             {
                 path: '/points',
                 name: '签到中心',
+                meta: {
+                    isHeardAv: false,
+                    isLogin: true
+                },
                 component: () => import('../pages/point/points.vue')
             },
 
@@ -171,7 +204,6 @@ const routes = [
         name: '搜索',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: false,
             isLogin: true
         },
@@ -187,7 +219,6 @@ const routes = [
         name: '通讯录',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isHeardAv: true,
             isLogin: true
         },
@@ -199,26 +230,24 @@ const routes = [
         path: '/toChat',
         component: BasicLayout,
         meta: {
-            keepAlive: false,
             isChat: true,
             isHeardAv: true,
             isLogin: true
         },
         children: [
             {path: '/chat', component: () => import('../pages/chat/toChat.vue')},
-            {path: '/chatTeam', component: () => import('../pages/chat/toChatTeam.vue')},
-
+            {path: '/chat/team', component: () => import('../pages/chat/toChatTeam.vue')},
+            {path: '/hall', name:'大厅', component: () => import('../pages/chat/ChatHall.vue')},
         ]
     },
     {path: '/login', component: () => import('../pages/user/login/UserLogin.vue')},
     {path: '/forget', component: () => import('../pages/user/login/UserForget.vue')},
     {path: '/register', component: () => import('../pages/user/login/UserRegister.vue')},
-    {path: '/test', component: BasicLayout,children:[{path:'/test',component: () => import('../pages/Test.vue')}]},
 ]
 
 const router = VueRouter.createRouter({
     // 4. 内部提供了 history 模式的实现。为了简单起见，我们在这里使用 hash 模式。
-    history: VueRouter.createWebHashHistory(),
+    history: VueRouter.createWebHistory(),
     routes: routes, // `routes: routes` 的缩写
 })
 

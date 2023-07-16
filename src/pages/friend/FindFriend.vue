@@ -13,19 +13,10 @@
     </van-cell-group>
   </van-dialog>
   <form action="/">
-    <van-search
-        v-model="searchValue"
-        show-action
-        placeholder="请输入搜索关键词"
-        @search="onSearch"
-    >
-      <template #action>
-        <div @click="onSearch">搜索</div>
-      </template>
-    </van-search>
+    <SearchCard @mess="setTxt" @click="onSearch" :placeholder="'请输入好友昵称'"/>
   </form>
   <div v-if="searchUserList&&searchUserList.length>0">
-    <user-card-list :user-list="searchUserList" v-on:userId="showAddUserOn"/>
+    <user-card-list :user-list="searchUserList" @userId="showAddUserOn"/>
   </div>
   <van-empty v-if="searchUserList.length<=0" description="无数据"/>
   <div v-if="is">
@@ -35,32 +26,36 @@
 
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref, onMounted} from "vue";
-import {showFailToast, showSuccessToast, showToast} from 'vant';
+import {showToast} from 'vant';
 import {useRouter} from "vue-router";
-import myAxios from "../../config/myAxios";
-import UserCardList from "../../components/UserCardList.vue";
-import store from "../../store";
+import SearchCard from "@/components/SearchCard.vue";
+import UserCardList from "@/components/UserCardList.vue";
+import store from "@/store";
+import userRequest from "@/plugins/request/userRequest";
 
 const user = ref();
 const is = ref(false);
 const showAddUser = ref(false);
 const searchValue = ref("");
-const userId = ref("");
+const userId = ref<number>(0);
 const searchUserList = ref([]);
 const router = useRouter();
+const message = ref('');
 
+const setTxt = (value:string) => {
+  searchValue.value = value;
+}
 onMounted(async () => {
   if (!store.getters.getIsLogin) {
-    showToast({message: '未登录!', position: 'top'});
+    showToast({message: '未登录', position: 'top'});
     router.back();
     return;
   }
   user.value = store.getters.getUser
 })
 
-const message = ref('');
 
 const onSearch = async () => {
   if (user.value == null || searchValue.value === '') {
@@ -68,53 +63,40 @@ const onSearch = async () => {
     return;
   }
   is.value = true;
-  const response = await myAxios.post('/api/user/search', {
-    pageNum: 1,
-    pageSize: 10,
-    userName: searchValue.value
-  });
+  const response = await userRequest.search(1, 10, searchValue.value);
   if (response.code === 200 && response.data) {
     const userList = response.data.records;
     for (let userListElement of userList) {
       userListElement.tags = JSON.parse(userListElement.tags)
     }
     searchUserList.value = userList;
-  } else {
-    showFailToast(response.description)
-    is.value = false;
   }
   is.value = false;
 }
-const showAddUserOn = (id) => {
+const showAddUserOn = (id:number) => {
   showAddUser.value = true;
   userId.value = id;
 }
 const sendFriendRequest = async () => {
-  if (userId.value === '') {
+  if (userId.value === 0) {
     return;
   }
-  const resp = await myAxios.post("/partner/friend/userFriend/friend", {
-    toUserId: userId.value,
-    message: message.value,
-  })
-  console.log(resp.code)
-  console.log(resp.data)
-  debugger
-  if (resp.code === 200) {
-    if (resp.data === 1) {
+  const response = await userRequest.addFriend(userId.value, message.value);
+  if (response.code === 200) {
+    if (response.data === 1) {
       showToast({message: '同意好友申请', position: 'top'});
       return;
     }
     showToast({message: '发送成功', position: 'top'});
   } else {
-    if (resp.description) {
-      showToast({message: resp.description, position: 'top'});
+    if (response.description) {
+      showToast({message: response.description, position: 'top'});
     }
   }
 }
 const close = () => {
   message.value = '';
-  userId.value = '';
+  userId.value = 0;
 }
 </script>
 

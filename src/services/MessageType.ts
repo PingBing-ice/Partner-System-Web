@@ -1,17 +1,26 @@
-export type messageType = {
-    type: number;
-    chatRecord: ChatRecordVo;
-    ext?: object;
+import {chatStateEnum} from "@/states/chat";
+
+export type  messageType<T> = {
+    type: chatStateEnum;
+    data: T;
+}
+export type ChatMessageResp={
+    userInfo: UserInfo;
+    message: Message
+}
+export type UserInfo = {
+    // 用户id
+    username: string;
+    // 发送的id
+    uid: number;
+    avatar: string;
+}
+export type Message={
+    id: number;
+    sendTime: number;
+    content: string;
+    status: number;
+    reply: any;
 }
 
-type ChatRecordVo = {
-    // 用户id
-    userId?: string;
-    // 发送的id
-    sendId?: string;
-    sendUrl?: string;
-    sendName?: string;
-    // 消息
-    message?: string;
-}
 

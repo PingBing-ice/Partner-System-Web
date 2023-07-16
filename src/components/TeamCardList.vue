@@ -3,7 +3,7 @@
     <van-card v-for="team in props.teamList"
               :desc="team.description"
               :title="team.name"
-              thumb="https://pic1.zhimg.com/80/v2-88c46f9f5b2aa6d6e04469fb989b7b54_720w.jpg"
+              :thumb="team.avatarUrl"
     >
       <template #tags>
         <van-tag plain style="margin-right: 8px; margin-top: 8px;color: #42b983" type="danger">
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import {TeamType} from "../models/team";
+import {TeamType} from "../plugins/request/dao/team";
 import {teamStateEnum} from "../states/team";
 import {ref} from "vue";
 

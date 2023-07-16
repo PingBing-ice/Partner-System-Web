@@ -1,16 +1,20 @@
 <template>
   <div v-if="props.images">
     <viewer :images="props.images" @ready="readys" @shown="shown" @hidden="hidden">
+
       <div class="imageF">
         <img
             :key="index"
             v-for="(item,index) in props.images"
             :src="item"
             class="indexImage"
-            alt=""/>
+            alt="" v-lazy="item"/>
       </div>
-
     </viewer>
+    <div class="imageL">
+      <van-loading v-if="props.isLoad" size="24px">加载中...</van-loading>
+      <div v-if="!props.finished">没有更多了...</div>
+    </div>
   </div>
 
 </template>
@@ -20,12 +24,21 @@ import {Base64} from "js-base64";
 
 onMounted(() => {
 })
-
 const props = defineProps({
   images: {
     type: Object,
     required: true,
     default: Object,
+  },
+  isLoad: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  finished: {
+    type: Boolean,
+    required: true,
+    default: true,
   }
 })
 
@@ -50,7 +63,6 @@ const readys = () => {
   }
 }
 const shown = () => {
-  console.log("asd")
 }
 const xz = () => {
   const canvas = document.querySelector('.viewer-canvas');
@@ -59,13 +71,27 @@ const xz = () => {
     if (images) {
       const url = images.src
       const str = Base64.encode(url);
-      const name = str.substring(0, 10)+Date.now();
-      downloadByBlob(url, name)
+      const name = str.substring(0, 10) + Date.now();
+      downloadByBlob(url,name);
     }
   }
 }
 const hidden = () => {
 
+}
+const downA = (url) => {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+}
+const dow = () => {
+  const element = document.createElement("canvas");
+  const context = element.getContext('2d');
+  const image = new Image();
 }
 const downloadByBlob = (url, name) => {
   let image = new Image()
@@ -76,14 +102,13 @@ const downloadByBlob = (url, name) => {
     let canvas = document.createElement('canvas')
     canvas.width = image.width
     canvas.height = image.height
-    let ctx = canvas.getContext('2d')
-    ctx.drawImage(image, 0, 0, image.width, image.height)
-    canvas.toBlob((blob) => {
-      let url = URL.createObjectURL(blob)
-      download(url, name)
-      // 用完释放URL对象
-      URL.revokeObjectURL(url)
-    })
+    let context = canvas.getContext('2d')
+    context.drawImage(image, 0, 0, image.width, image.height)
+    const ul = canvas.toDataURL('image/png')
+    const a = document.createElement('a');
+    a.download = name || 'photo' // 设置图片名称
+    a.href = ul // 将生成的URL设置为a.href属性
+    a.click()
   }
 }
 const download = (href, name) => {
@@ -106,5 +131,13 @@ img {
   justify-content: space-between;
   flex-wrap: wrap;
   padding: 4px 20px 0 20px;
+}
+
+.imageL {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 </style>

@@ -92,7 +92,7 @@
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref, watchEffect} from "vue";
 import myAxios from "../../config/myAxios";
-import { showSuccessToast, showFailToast } from 'vant';
+import {showSuccessToast, showFailToast, showToast} from 'vant';
   import store from "../../store";
 
 
@@ -141,7 +141,8 @@ const sendEmail =async () => {
   if (response.code === 200) {
     isTime.value = true;
     subValue.value = false;
-    showSuccessToast("发送成功，请注意查收");
+    showToast({message: '发送成功，请注意查收', position: 'top'});
+
   }else {
     if (response.description) {
       subValue.value = false;
@@ -166,14 +167,15 @@ const onSubmit = async () => {
   }
   const currentUser =store.getters.getUser
   const res = await myAxios.post("/api/user/update", {
-    "id": currentUser.id,
+    id: currentUser.id,
     [editUser.value.editKey]: editUser.value.currentValue,
-    "code": emailCode.value,
+    code: emailCode.value,
   });
 
   if (res.code === 200 && res.data ) {
     store.commit("setUser",res.data)
-    showSuccessToast('修改成功');
+    showToast({message: '修改成功', position: 'top'});
+
     router.back();
   }else {
     showFailToast("修改失败");

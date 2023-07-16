@@ -15,12 +15,75 @@
     word-wrap: break-word;
 
 }
-body{
-    overflow: hidden;
-    font-family: "Arial","Microsoft YaHei","黑体","宋体",sans-serif;
+
+.is_contents {
+    overflow-y: auto;
+    height: 93%;
+    width: auto;
+    text-align: left;
+}
+
+.content {
+    height: 100%;
     width: 100%;
+}
+
+.con {
+    height: 100%;
+    width: 100%;
+}
+
+.head {
+    height: 7%;
+}
+
+:root .van-tabs {
     height: 100%;
 }
+
+:root .van-tabs__content--animated {
+    overflow: auto;
+    height: calc(100% - 44px);
+}
+
+:root .van-tab__panel {
+    height: 100%;
+}
+
+.tail {
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 7%;
+}
+
+.indexBut {
+    width: 32px;
+    height: 25px;
+    background-color: #fff;
+    border-radius: 9px;
+    border: 2px solid #575757;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bx {
+    width: 65px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+:root body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
 .van-popup--top {
     top: 10px;
     left: 0;
@@ -34,12 +97,31 @@ body{
 
 }
 
+:root .ck.ck-editor {
+    height: 100%;
+}
+
 .ck-editor__editable {
-    min-height: 200px;
+    height: 100%;
+}
+
+:root .ck.ck-editor__main {
+    height: calc(100% - 38px);
 }
 
 .ck-content .table table {
     overflow: hidden;
+}
+
+:root .ck.ck-editor__editable_inline {
+    border-right: 0;
+    border-left: 0;
+}
+
+:root .ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {
+    border-right: 0;
+    border-left: 0;
+    box-shadow: 0 0;
 }
 
 table {
@@ -104,123 +186,22 @@ ul li {
     list-style-position: inside;
 }
 
-#chat .chatInfo {
-    width: 100%;
-    height: 100%;
-    margin: auto;
-    overflow: auto;
+
+:root .van-dialog__content {
+    display: flex;
+    justify-content: center;
     flex-direction: column;
-}
-
-#chat .chatBox {
-
-    background-color: #fff;
-    overflow: hidden;
-    border-radius: 0.625rem;
-}
-
-#chat .chatUser-box {
-    width: 100%;
-    margin-bottom: 12px;
-    display: flex;
-    flex-direction: row;
-}
-
-#chat {
-    height: 79%;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column-reverse;
+    align-items: center;
 }
 
 
-#chat .chatBox-middle {
-    width: 100%;
-    height: 80%;
-    background-color: #fff;
-    /*border-bottom: 0.0625rem solid #2B3D63;*/
-}
-
-
-#chat .chatBox-infoDesk {
-    width: 100%;
-    height: 10rem;
-}
-
-#chat .chatBox-textarea {
-    width: 100%;
-    height: 6.25rem;
-}
-
-#chat .chatBox-sendOut {
-    margin-top: 0.625rem;
-    width: 100%;
-    height: 3.125rem;
-    text-align: right;
-}
-
-#chat .sendOut {
-    padding: 0 1.25rem;
-    height: 2.1875rem;
-    margin: 0.3125rem 1.25rem 0 0;
-}
-
-
-#chat .chatUser-box-img {
-    display: flex;
-}
-
-#chat .chatUser-info {
-    margin: 0 0.6rem;
-    /*距离底部0*/
-    bottom: 0;
-}
-
-#chat .chatUser-info-name {
-    font-size: 0.875rem;
-    color: #888;
-    display: flex;
-    flex-direction: row;
-}
-
-#chat .nowDate {
-    margin: 0 0.625rem;
-}
-
-#chat .chatUser-info-text {
-    margin-top: 0;
-    max-width: 20rem;
-    padding: 0.5rem;
-    background-color: #f4f6f8;
-    border-radius: 6px;
-    float: left;
-    table-layout: fixed;
-    word-break: break-all;
-    overflow: hidden;
-}
-
-#chat .chatUser-info-text span {
-    font-size: 0.9375rem;
-    line-height: 1.5625rem;
-}
-
-#chat .chatUser-box1 {
-    flex-direction: row-reverse;
-}
-
-#chat .chatUser-info-name1 {
-    flex-direction: row-reverse;
-}
-
-#chat .chatUser-info-text1 {
-    float: right;
-}
 
 .van-stepper {
     display: flex;
     -webkit-user-select: none;
     user-select: none;
 }
+
 .addUser {
     display: block;
     width: 80%;
@@ -235,25 +216,25 @@ ul li {
     transition: 0.3s;
     transform: translateZ(0);
 }
+
 .adduserF {
     display: flex;
     justify-content: center;
 }
-:root .addUser:hover{
+
+:root .addUser:hover {
     transform: scale(1.01);
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 
 }
+
 .van-radio-group--horizontal, .van-checkbox-group--horizontal {
     display: flex;
     flex-wrap: wrap;
 }
 
 #postCardList {
-    background-color: #f0f2f5;
-    padding-top: 5px;
-    /*overflow: auto;*/
-    /*height: 74vh*/
+    background-color: var(--card-background);
 }
 
 .van-tabs__wrap {
@@ -261,7 +242,7 @@ ul li {
 
 }
 
-.contents[data-v-d4ba89ee] {
+.contents {
     overflow: hidden;
     height: 100%;
     width: 100%;
@@ -304,20 +285,22 @@ ul li {
 }
 
 .indexUserListCard {
-    padding-top: 5px;
-    background-color: #f0f2f5;
+    padding: 10px;
+    background-color: var(--card-background);
 }
-.card{
+
+.card {
     overflow: auto;
     height: calc(100vh - 186px);
 }
+
 .van-empty {
     background-color: #ffffff;
     height: 100%;
 }
 
 .teamCard {
-    background-color: #f0f2f5;
+    background-color: var(--card-background);
     padding-top: 5px;
     padding-bottom: 5px;
 }
@@ -335,7 +318,10 @@ ul li {
 }
 
 .title {
+    width: 150px;
+    display: flex;
     text-align: center;
+    justify-content: space-around;
 }
 
 .contents_chat {
@@ -346,12 +332,13 @@ ul li {
 /*    flex-direction: column;*/
 
 /*}*/
-:root .van-tabs .van-tabs--card{
+:root .van-tabs .van-tabs--card {
     position: sticky;
     top: 0;
     z-index: 100;
     background-color: #ffffff;
 }
+
 .van-tabs__wrap {
     /*padding: 3px 0 3px 0;*/
 
@@ -364,86 +351,102 @@ ul li {
 
 }
 
-:root {
-    --van-border-width: 0;
-    --van-blue: #4a94af;
-    --van-popover-action-height: 50px
-}
-:root  .van-tab--card.van-tab--active{
+
+:root .van-tab--card.van-tab--active {
     border-radius: 7px;
     height: 21px;
     background-color: #73a7c6;
 }
-:root .van-tab--card{
+
+:root .van-tab--card {
     color: black;
 }
-.van-tabs__nav--card.van-tabs__nav--shrink{
+
+.van-tabs__nav--card.van-tabs__nav--shrink {
     align-items: center;
 }
-:root .van-button--primary{
+
+:root .van-button--primary {
     background: #4a94af;
     color: #fff;
 }
-:root .van-button--plain.van-button--primary{
+
+:root .van-button--plain.van-button--primary {
     color: #fff;
 }
-#indexTags{
-    background-color: #f0f2f5;
-    overflow: auto;
-    height: calc(100vh - 117px);
+
+#indexTags {
+    height: 100%;
+    overflow-y: auto;
 }
-.avatar{
-    width:30px;
-    height:30px;
-    border-radius: 50%;
-}
-:root .van-hairline--right{
-    border-right:1px solid #999999
-}
-:root .indexTitle{
-    font-size: 2px;
+
+.addPostTop {
+
+    position: fixed;
+    z-index: 200;
+    right: 6%;
+    top: 86%;
+    height: 80px;
 
 }
-.indexImage{
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+:root .van-hairline--right {
+    border-right: 1px solid #999999
+}
+
+:root .indexTitle {
+
+}
+
+.indexImage {
     object-fit: contain;
     width: 6rem;
     height: 14rem;
     padding: 5px;
 }
-:root .van-tabs__wrap{
-    background-image: linear-gradient(to left,#fbf7f8, #f5f9fc)
-}
-:root .van-tabs__nav--card{
-    background-image: linear-gradient(to left,#fbf7f8, #f5f9fc)
 
+:root .van-tabs__wrap {
+    background-image: var(--tab);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-radius: 7px;
+}
+
+:root .van-tabs__nav--card {
+    background-image: var(--gradient);
 }
 
 :root .van-tabs__nav--line {
-    background-image: linear-gradient(to left,#fbf7f8, #f5f9fc)
+    background-image: var(--gradient);
 }
-:root .van-nav-bar__content{
-    background-image: linear-gradient(to left,#fbf7f8, #f5f9fc);
-    height: 44px;
+
+:root .van-nav-bar__content {
+    background-image: var(--gradient);
+    height: var(--van-tabs-line-height);
 
 }
-#addPost{
-    overflow: auto;
-    height: 80vh;
-}
-:root .van-popover__content{
-    overflow: auto;
-    height: 100%;
-}
-#space{
-    height: 100vh;
+
+
+
+
+#space {
+    height: calc(100% - 92px);
     overflow-x: hidden;
     overflow-y: auto;
 }
+
 #Login {
     overflow: hidden;
     height: 200vh;
     width: 100%;
-    background-image: linear-gradient(to left, #fbf7f8, #f5f9fc);
+    background-image: var(--gradient);
 }
 
 .loginTitle {
@@ -528,19 +531,19 @@ ul li {
 .icon_close {
     width: 16px;
     height: 16px;
-    background: url("./public/close.png") no-repeat 50%/cover;
+    background: url("../assets/close.png") no-repeat 50%/cover;
 }
 
 .icon_eyes {
     width: 16px;
     height: 16px;
-    background: url("./public/eyes.png") no-repeat 50%/cover;
+    background: url("../assets/eyes.png") no-repeat 50%/cover;
 }
 
 .icon_noeyes {
     width: 16px;
     height: 16px;
-    background: url("./public/noeyes.png") no-repeat 50%/cover;
+    background: url("../assets/noeyes.png") no-repeat 50%/cover;
 }
 
 .login_but {
@@ -562,9 +565,7 @@ ul li {
 }
 
 .lower {
-    position: absolute;
-    top: 85%;
-    width: 100%;
+    margin-top: 151%
 }
 
 .qt {
@@ -584,19 +585,19 @@ ul li {
 .qq_icon {
     width: 20px;
     height: 20px;
-    background: url("./public/QQ.png") no-repeat 50%/cover;
+    background: url("../assets/QQ.svg") no-repeat 50%/cover;
 }
 
 .zc_icon {
     width: 20px;
     height: 20px;
-    background: url("./public/add.png") no-repeat 50%/cover;
+    background: url("../assets/add.svg") no-repeat 50%/cover;
 }
 
 .wj_icon {
     width: 20px;
     height: 20px;
-    background: url("./public/elipsis.png") no-repeat 50%/cover;
+    background: url("../assets/elipsis.png") no-repeat 50%/cover;
 }
 
 .xb {
@@ -636,29 +637,155 @@ ul li {
 }
 
 .box_txt {
-    font-size: 14px;
-}
-:root .van-notice-bar{
-    margin-right: 4px;
-    margin-left: 4px;
-    border-radius: 7px;
-    box-shadow: rgba(99, 99, 99, 0.1) 0 2px 8px 0;
+    margin-left: 3px;
+    font-size: 12px;
+
 }
 
+:root .van-cell__title {
+    display: flex;
+    align-items: center;
+}
+
+
 .sendBut {
+    min-height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.chatBut {
-    height: 32px;
-    border: 1px solid #1890ff;
-    border-radius: 15px;
-    width: 90%;
+.chatbuts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 9px;
+
 }
-.chatIput{
-    height: 28px;
+
+.chatBut {
+    width: 78%;
+    border: 0;
+    background: var(--input-chat);
+    margin-right: 8px;
+    border-radius: 15px;
+}
+
+.chatIput {
+    background: var(--input-chat);
+    height: 24px;
     width: 80%;
     border: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    resize: none;
+    font-size: 14px;
+}
+
+.chatButt {
+    padding: 0;
+    border-top: 1px solid #cbcbcb;
+    width: 100%;
+
+    /*position: absolute;*/
+    /*bottom: 56px;*/
+    /*left: 0;*/
+}
+
+:root .van-popover[data-popper-placement=bottom-end] .van-popover__arrow {
+    right: 6px;
+}
+
+:root .van-popover__action-text {
+    border-bottom: 1px solid #c9c9c96b;
+}
+
+:root .van-popover__action {
+    /*padding: 0;*/
+}
+
+:root .van-tabbar--fixed {
+    box-shadow: 0 0 1px 0 rgba(24, 94, 224, 0.15);
+    align-items: center;
+}
+
+:root .van-tabbar-item--active .van-tabbar-item__icon {
+    z-index: 2;
+}
+
+:root .van-tabbar-item__icon {
+    z-index: 2;
+}
+
+:root .van-tabbar-item__text {
+    z-index: 2;
+}
+
+:root .van-tabbar-item--active {
+    color: #185ee0;
+}
+
+:root .van-tabbar-item--active:before {
+    position: absolute;
+    content: '';
+    display: flex;
+    height: 43px;
+    width: 72px;
+    background-color: #e6eef9;
+    z-index: 1;
+    border-radius: 99px;
+    animation: loadingComment 0.25s ease-in-out forwards;
+}
+
+@keyframes loadingComment {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    75% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.chatInput {
+    width: 90%;
+    font-size: 0.9375rem;
+    outline: 0;
+    max-height: 60px;
+    overflow-y: auto;
+    height: 21px;
+    box-sizing: border-box;
+    background-color: var(--input-chat);
+    border: none;
+}
+
+::-webkit-scrollbar {
+    width: 1px;
+}
+
+.chatInput:empty::before {
+    content: "善语结善缘";
+    color: #999999;
+}
+
+.chatInput:focus::before {
+    content: none;
+}
+
+.chat_hat {
+    height: var(--van-tabs-line-height)
+}
+
+
+:root .van-notice-bar__wrap {
+    justify-content: center;
 }

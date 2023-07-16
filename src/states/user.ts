@@ -1,4 +1,4 @@
-import {UserType} from "../models/user";
+import {UserType} from "@/plugins/request/dao/user";
  
 
 let chatUserState: UserType[] = [];

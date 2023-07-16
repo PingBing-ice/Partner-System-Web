@@ -6,11 +6,12 @@
             :thumb="user.avatarUrl"
   >
     <template #tags>
-      <van-tag plain style="margin-right: 8px; margin-top: 8px;color: #42b983" type="danger" v-for="tag in user.tags">
+      <van-tag plain style="margin-right: 8px; margin-top: 10px;color: #4a94af;border-radius: 10px;" type="danger"
+               v-for="tag in user.tags">
         {{ tag }}
       </van-tag>
     </template>
-    <template #footer>
+    <template #num>
       <van-button size="mini" @click="isShow(user.id)">添加好友</van-button>
     </template>
   </van-card>
@@ -30,58 +31,50 @@
 </template>
 
 <script setup lang="ts">
-import {UserType} from "../models/user";
-import myAxios from "../config/myAxios";
-import {showSuccessToast, showFailToast, showToast} from 'vant';
+import {UserType} from "@/plugins/request/dao/user";
+import {showToast} from 'vant';
 import {ref} from "vue";
+import userRequest from "@/plugins/request/userRequest";
 
 const show = ref(false);
 const message = ref('');
-const userId = ref('');
+const userId = ref<number>(0);
+
+const emits = defineEmits(['userId'])
 
 interface UserCardListType {
   userList: UserType[];
 }
-const emits = defineEmits(['userId'])
 
-const props = withDefaults(defineProps<UserCardListType>(), {
-  // @ts-ignore
-  userList: [] as UserType[],
+const props: UserCardListType = withDefaults(defineProps<UserCardListType>(), {
+  userList: [] as any,
 })
 
-const sendFriendRequest = () => {
-  if (userId.value === '') {
+const sendFriendRequest =async () => {
+  if (userId.value === 0) {
     return;
   }
-  myAxios.post("/partner/friend/userFriend/friend", {
-    toUserId: userId.value,
-    message: message.value,
-  }).then(resp => {
-    // @ts-ignore
-    if (resp.code == 200) {
-      if (resp.data&&resp.data === 1) {
-        showToast({message:'发送成功!',position: 'top'});
-        return
-      }
-      showToast({message:'同意好友申请!',position: 'top'});
-    } else {
-      // @ts-ignore
-      if (resp.description) {
-        // @ts-ignore
-        showToast({message:resp.description,position: 'top'});
-      }
-    }
-  }).catch(resp=>{
-    showToast({message:'发送失败!',position: 'top'});
+  const resp =await userRequest.addFriend(userId.value, message.value);
 
-  });
+  if (resp.code == 200) {
+    if (resp.data && resp.data === 1) {
+      showToast({message: '发送成功', position: 'top'});
+      return
+    }
+    showToast({message: '同意好友申请', position: 'top'});
+  } else {
+    if (resp.description) {
+      showToast({message: resp.description, position: 'top'});
+    }
+  }
+
 }
 const close = () => {
   message.value = '';
-  userId.value = '';
+  userId.value = 0;
 }
 const isShow = (id: string) => {
-  emits("userId",id)
+  emits("userId", id)
 }
 </script>
 

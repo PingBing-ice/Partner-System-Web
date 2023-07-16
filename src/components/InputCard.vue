@@ -11,9 +11,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref, watch, defineEmits} from "vue";
 const isPassword_icon = ref(true)
+
 const props=defineProps({
   value: {
     type:String,
@@ -59,13 +60,13 @@ const pass = () => {
 .icon_eyes {
   width: 16px;
   height: 16px;
-  background: url("./public/eyes.png") no-repeat 50%/cover;
+  background: url("../assets/eyes.png") no-repeat 50%/cover;
 }
 
 .icon_noeyes {
   width: 16px;
   height: 16px;
-  background: url("./public/noeyes.png") no-repeat 50%/cover;
+  background: url("../assets/noeyes.png") no-repeat 50%/cover;
 }
 .input_con {
   box-shadow: rgba(99, 99, 99, 0.1) 0 2px 8px 0;
@@ -101,7 +102,7 @@ const pass = () => {
 .icon_close {
   width: 16px;
   height: 16px;
-  background: url("./public/close.png") no-repeat 50%/cover;
+  background: url("../assets/close.png") no-repeat 50%/cover;
 }
 
 

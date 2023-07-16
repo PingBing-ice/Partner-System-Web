@@ -3,21 +3,58 @@ import App from './App.vue'
 import Vant from 'vant';
 import route from "./config/routeConfig";
 import 'vant/lib/index.css';
-import "/src/global.css"
+import "/src/style/global.css"
+import "/src/style/var.css"
+// =============================
+import '../public/tinymce/skins/content/dark/content.css'
+import '../public/tinymce/skins/content/dark/content.css'
+import '../public/tinymce/skins/content/default/content.css'
+import '../public/tinymce/skins/content/document/content.css'
+import '../public/tinymce/skins/content/tinymce-5/content.css'
+import '../public/tinymce/skins/content/tinymce-5-dark/content.css'
+import '../public/tinymce/skins/content/writer/content.css'
+
+import '../public/tinymce/skins/ui/oxide/content.css'
+import '../public/tinymce/skins/ui/oxide/content.inline.css'
+import '../public/tinymce/skins/ui/oxide/skin.css'
+import '../public/tinymce/skins/ui/oxide/skin.shadowdom.css'
+//
+import '../public/tinymce/skins/ui/oxide-dark/content.css'
+import '../public/tinymce/skins/ui/oxide-dark/content.inline.css'
+// import './assets/tinymce/skins/ui/oxide-dark/skin.css'
+import '../public/tinymce/skins/ui/oxide-dark/skin.shadowdom.css'
+//
+import '../public/tinymce/skins/ui/tinymce-5/content.css'
+import '../public/tinymce/skins/ui/tinymce-5/content.inline.css'
+import '../public/tinymce/skins/ui/tinymce-5/skin.css'
+import '../public/tinymce/skins/ui/tinymce-5/skin.shadowdom.css'
+//
+import '../public/tinymce/skins/ui/tinymce-5-dark/content.css'
+import '../public/tinymce/skins/ui/tinymce-5-dark/content.inline.css'
+// import './assets/tinymce/skins/ui/tinymce-5-dark/skin.css'
+import '../public/tinymce/skins/ui/tinymce-5-dark/skin.shadowdom.css'
+
+import '../src/assets/style/prism.css'
 // ============================================
-import CKEditor from '@ckeditor/ckeditor5-vue';
 // @ts-ignore
 import shake from './assets/style/shake.js'
+import './util/socket/websocket'
 // =============================================
-import {ActionBar, ActionBarIcon, ActionBarButton, Toast,Notify ,Sticky,Swipe, SwipeItem } from 'vant';
+import {ActionBar, ActionBarIcon, ActionBarButton, Toast, Notify, Sticky, Swipe, SwipeItem, Lazyload} from 'vant';
 import store from './store';
 import {PullRefresh} from 'vant';
 import moment from 'moment'
 const app = createApp(App)
+
 import VueViewer from "v-viewer";
 import 'viewerjs/dist/viewer.css'
+
+
 shake(app)
-app.use(VueViewer, {defaultOptions:{
+// app.use(ColorThief)
+app.use(Lazyload);
+app.use(VueViewer, {
+    defaultOptions: {
         'inline': false,
         'button': true, //右上角按钮
         "navbar": true, //底部缩略图
@@ -31,12 +68,12 @@ app.use(VueViewer, {defaultOptions:{
         "transition": true, //使用 CSS3 过度
         "fullscreen": true, //播放时是否全屏
         "keyboard": true, //是否支持键盘
-    }});
+    }
+});
 
 app.use(Swipe);
 app.use(SwipeItem);
 app.use(ActionBar);
-app.use(CKEditor);
 app.use(ActionBarIcon);
 app.use(ActionBarButton);
 app.use(Vant);

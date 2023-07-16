@@ -1,34 +1,43 @@
-export const chatStateEnum = {
+export enum chatStateEnum  {
     /**
      * 连接
      */
-    LJ: 0,
+    LJ = 0,
 
     /**
      * 好友
      */
-    HY: 1,
+    HY = 1,
     /**
      * 队伍
      */
-    DW: 2,
+    DW = 2,
 
     /**
      * 心跳
      */
-    XT: 3,
+    XT = 3,
 
     /**
      * 系统
      */
-    SYSTEM: 999,
+    SYSTEM = 999,
     /**
-     * 上线通知
+     * token失效
      */
-    ADV: 4,
+    XX = 5,
+    /**
+     * 上线下线通知
+     */
+    ADV = 4,
     /**
      * 大厅
      */
-    HAL: 6,
+    HAL = 6,
+    /**
+     * 智能助手
+     */
+    GP=7
+
 
 }

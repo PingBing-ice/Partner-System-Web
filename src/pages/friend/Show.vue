@@ -45,7 +45,7 @@ const userName = {
   createTime: '添加时间'
 }
 onMounted(async ()=>{
-  const res = await myAxios.get("/partner/friend/userFriend/getFriendUser",{
+  const res = await myAxios.get("/friend/details",{
     params:{
       friendId:friendId
     }
