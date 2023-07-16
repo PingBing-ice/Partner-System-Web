@@ -1,0 +1,53 @@
+.post-tabs {
+  width: 100%;
+  overflow-x: auto;
+  position: sticky;
+  white-space: nowrap;
+  background-color: #fff;
+  padding: 8px 0;
+  top: 0;
+  z-index: 100;
+  //box-shadow: rgba(99, 99, 99, 0.1) 0 2px 8px 0;
+}
+
+.post-tab {
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 5px;
+  //padding: 7px 10px;
+}
+
+.post-tab-txt {
+  display: block;
+  //color: red;
+  border-radius: 10px;
+  background-color: #f3f5f4;
+
+  padding: 7px 10px;
+}
+
+.post-tab input[type="radio"]:checked + label{
+  //transition: color 0.15s ease-in;
+  background-color: #3b4159;
+  color: #fff;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+// ============
+
+
+.glider {
+  position: absolute;
+  height: 30px;
+  width: 50px;
+  background-color: #e6eef9;
+  z-index: 1;
+  border-radius: 99px;
+  transition: 0.25s ease-out;
+}
+
+
+

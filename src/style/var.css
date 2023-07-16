@@ -1,0 +1,10 @@
+:root {
+    --van-border-width: 0;
+    --van-blue: #4a94af;
+    --van-popover-action-height: 50px;
+    --tab: linear-gradient(to left, #fbf7f8, #f5f9fc);
+    --van-radius-sm: 7px;
+    --gradient: linear-gradient(to left, #fbf7f8, #f5f9fc);
+    --card-background: #f0f2f5;
+    --input-chat: #f3f3f3;
+}

@@ -1,0 +1,301 @@
+#content {
+    margin: 3px 0 14px 0;
+    display: -webkit-box; /*必须结合的属性,将对象作为弹性伸缩盒子模型显示*/
+    -webkit-line-clamp: 6; /*设置多少行*/
+    -webkit-box-orient: vertical; /*必须结合的属性,设置或检索伸缩盒对象的子元素的排列方式*/
+    overflow: hidden; /*文本会被修剪，并且剩余的部分不可见*/
+    text-overflow: ellipsis; /*显示省略号来代表被修剪的文本*/
+    font-size: 14px;
+}
+
+.comment-containers {
+    margin-top: 12px;
+    padding-left: 0;
+    padding-right: 25px;
+    display: flex;
+}
+
+.text-area-wrapper {
+    width: 100%;
+    box-sizing: border-box
+}
+
+.comment-container {
+    display: flex;
+    position: relative;
+    border: 1px solid var(--van-blue);
+    padding-top: 1px;
+    background-color: #fff;
+    width: 100%;
+    height: 25px;
+}
+
+.ql-container {
+    border: none;
+    font-size: 14px !important;
+    height: 90%;
+    width: 98%;
+}
+
+.submit-btn {
+    margin-left: 8px;
+    line-height: 23px;
+    width: 60px;
+    background: var(--van-blue);
+    box-shadow: 0 1px 2px #0000000d;
+    border-radius: 2px;
+    text-align: center;
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.comment-f {
+
+}
+
+
+.footer {
+    font-size: 1px;
+    color: #757575;
+    margin-top: 6px;
+    margin-left: 3px
+}
+
+.tagTxt {
+    margin-top: 10px;
+
+}
+
+
+.fixed-button a {
+    color: white;
+    font-size: 40px;
+    text-decoration: none;
+}
+
+.txt {
+    font-size: 14px;
+    line-height: 24px;
+    color: #5a5c66;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.commentName {
+    color: #567895;
+    cursor: pointer
+}
+
+.commentContent {
+    color: #5a5c66;
+}
+
+
+.commentMap {
+    background-color: #f7f9fa;
+    margin-top: 10px
+}
+
+
+.postIcon {
+    display: flex;
+    width: 48%;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 3px;
+    justify-content: space-between;
+}
+
+.heard_bar {
+    height: calc(100% - 50px)
+}
+
+/***************/
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    transition: 100ms;
+}
+
+svg {
+    fill: #666;
+
+}
+
+.post-username {
+    margin-bottom: 12px;
+    color: #567895;
+    font-size: 15px;
+    line-height: 24px;
+    margin-top: 3px
+}
+
+.postHead {
+    display: flex;
+    max-width: 100%;
+    height: auto;
+    align-items: center;
+}
+
+.post-av {
+    margin-right: 10px
+}
+
+.checkmark {
+    top: 0;
+    left: 0;
+    height: 16px;
+    width: 16px;
+    transition: 100ms;
+    /*animation: dislike_401 400ms ease;*/
+}
+
+.container input:checked ~ .checkmark path {
+    fill: #8bdcfb;
+    stroke-width: 1.2;
+}
+
+.container input:checked ~ .checkmark {
+    animation: like_401 500ms ease;
+}
+
+.container:hover {
+    transform: scale(1.1);
+}
+
+@keyframes like_401 {
+    0% {
+        transform: scale(0);
+    }
+    25% {
+        transform: scale(0.5);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    75% {
+        transform: scale(0.5);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes dislike_401 {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.post-content {
+    width: auto;
+    height: auto;
+    font-size: 15px
+}
+
+/**************/
+
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.container svg {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    transition: all 0.3s;
+    fill: #666;
+}
+
+.container svg:hover {
+}
+
+.container input:checked ~ svg {
+    fill: #8bdcfb;
+    animation: pop_42 0.5s ease-out;
+}
+
+@keyframes pop_42 {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.5);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.postUserVoHead {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 30%;
+    margin-bottom: 24px
+}
+
+.postUserImage {
+    position: absolute;
+    top: -27px;
+}
+
+.head2 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 45px;
+}
+
+.num {
+    font-size: 98%;
+    color: #212121;
+    line-height: 4.26667vmin;
+}
+
+.type {
+    font-size: 80%;
+    color: #999;
+}
+
+.fans {
+    width: 30%;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+}

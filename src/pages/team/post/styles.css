@@ -1,0 +1,174 @@
+#teamPost {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 20%;
+    overflow-x: hidden;
+    position: fixed;
+    z-index: -1;
+    filter: blur(0vh);
+}
+
+.team_post_Tab {
+    position: fixed;
+    display: flex;
+    top: 10px;
+    left: 32%;
+    right: 38%;
+    width: 150px;
+    justify-content: space-evenly;
+    align-items: center;
+    transition: 0.25s ease-out;
+
+}
+
+.team_post_Tab_line {
+    position: absolute;
+    bottom: -8px;
+    left: 19px;
+    z-index: 1;
+    width: var(--van-tabs-bottom-bar-width);
+    height: var(--van-tabs-bottom-bar-height);
+    background: var(--van-tabs-bottom-bar-color);
+    border-radius: var(--van-tabs-bottom-bar-height);
+    display: flex;
+    transition: 0.25s ease-out;
+}
+
+.team_post_Tab input[type="radio"] {
+    display: none;
+}
+
+.team_post_Tab input[id="radio-1"]:checked ~ .team_post_Tab_line {
+    transform: translateX(0);
+}
+
+.team_post_Tab input[id="radio-2"]:checked ~ .team_post_Tab_line {
+    transform: translateX(160%);
+}
+
+#teamPost:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    background-color: rgb(0 0 0 / 64%);
+    opacity: 0.4;
+}
+
+.heard_team_icon {
+    width: 100%;
+    height: 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.heard_team_left {
+    margin-left: 10px;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.heard_team_left_name {
+    margin-left: 8px;
+    font-size: 14px;
+}
+
+.heard_team_right {
+    /*margin-right: 30px;*/
+}
+
+.heard_team_icon_is {
+    display: flex;
+    width: 90px;
+    justify-content: space-around;
+}
+
+#content_team {
+    width: 100%;
+    height: calc(95% - 50px);
+    overflow: auto;
+}
+
+.image_back {
+    position: relative;
+    height: 15%;
+    width: 100%;
+
+}
+
+.imag_heard {
+    display: flex;
+    align-items: center;
+    padding: 0 0 20px 10px;
+    position: absolute;
+    bottom: 0;
+}
+
+.imag_title {
+    height: 100%;
+    width: 100%;
+    font-size: 10px;
+    padding-left: 10px;
+
+}
+
+.team_post_core {
+    overflow-x: hidden;
+    background-color: rgb(240, 242, 245);
+}
+
+.post_team {
+    height: calc(100% - 10px);
+    /*margin: 10px 0;*/
+}
+
+.av {
+    border-radius: 10px;
+}
+
+
+.post_team_tab {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #FFFFFF;
+}
+
+
+.team_title_name_is {
+    font-size: 18px;
+    color: #FFFFFF;
+}
+
+.heard_team_left_name {
+    animation: loadingComment 0.2s ease-in-out forwards;
+}
+
+@keyframes loadingComment {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    75% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+
