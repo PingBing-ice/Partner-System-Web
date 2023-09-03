@@ -1,7 +1,7 @@
 <template>
-  <div class="addPostTop">
-    <van-button icon="plus" round @click="toAddTeam" type="primary"/>
-  </div>
+<!--  <div class="addPostTop">-->
+<!--    <van-button icon="plus" round @click="toAddTeam" type="primary"/>-->
+<!--  </div>-->
   <van-nav-bar :title="route.name">
     <template #right>
       <van-icon name="search" size="18" @click="toSearch"/>

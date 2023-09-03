@@ -11,14 +11,16 @@ const routes = [
         name: '主页',
         component: BasicLayout,
         redirect: '/index',
-        meta: {
-            isHeardAv: true,
-            isLogin: false
-        },
         children: [
             {
                 path: '/index',
                 name: '主页',
+                meta: {
+                    isHeardAv: true,
+                    isLogin: false,
+                    keepAlive: true,
+                    tail: true,
+                },
                 component: () => import('../pages/Index.vue')
             },
 
@@ -38,6 +40,9 @@ const routes = [
             {
                 path: '/team',
                 name: '队伍',
+                meta: {
+                    tail: true,
+                },
                 component: () => import('../pages/team/team/index.vue')
             },
             {
@@ -45,7 +50,8 @@ const routes = [
                 name: '队伍文章',
                 meta: {
                     isHeardAv: true,
-                    isLogin: true
+                    isLogin: true,
+
                 },
                 component: () => import('../pages/team/post/index.vue')
             }
@@ -126,7 +132,8 @@ const routes = [
         meta: {
             isHeardAv: false,
             isNotHeard: true,
-            isLogin: true
+            isLogin: true,
+            tail: true,
         },
         children: [
             {
@@ -220,7 +227,8 @@ const routes = [
         component: BasicLayout,
         meta: {
             isHeardAv: true,
-            isLogin: true
+            isLogin: true,
+            tail: true,
         },
         children: [
             {path: '/find', name: '通讯录', component: () => import('../pages/friend/Find.vue')},

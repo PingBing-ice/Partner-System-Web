@@ -1,79 +1,79 @@
 <template>
-  <div class="addPostTop" style="top: 81%;right: 8%">
-    <van-button v-if="isTop&&active!=='队伍'" class="backTop" icon="arrow-up" @click="backTop" type="primary"
-                size="small"
-                round></van-button>
-    <van-button v-if="isPostTop&&active==='首页'" class="backTop" icon="arrow-up" @click="backTop" type="primary"
-                size="small"
-                round></van-button>
-  </div>
-  <div class="addPostTop">
-    <van-button icon="plus" round @click="toAddPost" type="primary"/>
-  </div>
+    <div class="addPostTop" style="top: 81%;right: 8%">
+      <van-button v-if="isTop&&active!=='队伍'" class="backTop" icon="arrow-up" @click="backTop" type="primary"
+                  size="small"
+                  round></van-button>
+      <van-button v-if="isPostTop&&active==='首页'" class="backTop" icon="arrow-up" @click="backTop" type="primary"
+                  size="small"
+                  round></van-button>
+    </div>
+<!--    <div class="addPostTop">-->
+<!--      <van-button icon="plus" round @click="toAddPost" type="primary"/>-->
+<!--    </div>-->
 
-  <van-dialog z-index="100" v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
-    <van-field
-        z-index="102"
-        v-model="teamPassword"
-        name="password"
-        label="队伍密码"
-        placeholder="请输入密码"
-    />
-  </van-dialog>
-  <van-dialog v-model:show="showAddUser" title="确认添加好友吗?" @confirm="sendFriendRequest" @closed="close"
-              show-cancel-button>
-    <van-cell-group inset>
+    <van-dialog z-index="100" v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
       <van-field
-          v-model="message"
-          rows="1"
-          autosize
-          label="备注"
-          type="textarea"
-          placeholder="请输入备注"
-      />
-    </van-cell-group>
-  </van-dialog>
-
-  <van-action-sheet
-      v-model:show="showTeam"
-      round
-      position="bottom"
-  >
-    <van-divider>{{ '队伍最大人数: ' + max }}</van-divider>
-    <van-divider>队员</van-divider>
-    <user-card-list :userList="userListVo" @userId="showAddUserOn"/>
-  </van-action-sheet>
-
-  <van-dialog v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
-    <van-cell-group inset>
-      <van-field
+          z-index="102"
           v-model="teamPassword"
           name="password"
           label="队伍密码"
           placeholder="请输入密码"
       />
-    </van-cell-group>
-  </van-dialog>
-  <van-popup
-      v-model:show="showPostUserVo"
-      round
-      style="overflow: visible; "
-      position="bottom"
-      :style="{ height: '30%' }"
-  >
-    <div class="postUserVoHead">
-      <van-image
-          class="postUserImage"
-          round
-          width="4rem"
-          height="4rem"
-          :src="postUserVo.avatarUrl"
-      />
-      <div style="position: absolute;top: 52px">
-        {{ postUserVo.username }}
+    </van-dialog>
+    <van-dialog v-model:show="showAddUser" title="确认添加好友吗?" @confirm="sendFriendRequest" @closed="close"
+                show-cancel-button>
+      <van-cell-group inset>
+        <van-field
+            v-model="message"
+            rows="1"
+            autosize
+            label="备注"
+            type="textarea"
+            placeholder="请输入备注"
+        />
+      </van-cell-group>
+    </van-dialog>
+
+    <van-action-sheet
+        v-model:show="showTeam"
+        round
+        position="bottom"
+    >
+      <van-divider>{{ '队伍最大人数: ' + max }}</van-divider>
+      <van-divider>队员</van-divider>
+      <user-card-list :userList="userListVo" @userId="showAddUserOn"/>
+    </van-action-sheet>
+
+    <van-dialog v-model:show="addPasswordTeam" title="密码" show-cancel-button @confirm="JoinTeam">
+      <van-cell-group inset>
+        <van-field
+            v-model="teamPassword"
+            name="password"
+            label="队伍密码"
+            placeholder="请输入密码"
+        />
+      </van-cell-group>
+    </van-dialog>
+    <van-popup
+        v-model:show="showPostUserVo"
+        round
+        style="overflow: visible; "
+        position="bottom"
+        :style="{ height: '30%' }"
+    >
+      <div class="postUserVoHead">
+        <van-image
+            class="postUserImage"
+            round
+            width="4rem"
+            height="4rem"
+            :src="postUserVo.avatarUrl"
+        />
+        <div style="position: absolute;top: 52px">
+          {{ postUserVo.username }}
+        </div>
       </div>
-    </div>
-    <div class="head2">
+      <div class="head2">
         <span class="van-hairline--right">
           <span class="num">
             {{ postUserVo.joinTime }}
@@ -82,170 +82,172 @@
           <span class="type">加入天数</span>
         </span>
 
-      <span class="van-hairline--right">
+        <span class="van-hairline--right">
           <span class="num">
             {{ postUserVo.postTotal }}
           </span>
           <br>
           <span class="type">发表主题</span>
         </span>
-      <span class="fans">
+        <span class="fans">
           <span class="num">
             {{ postUserVo.thumbTotal }}
           </span>
           <br>
           <span class="type">获赞数</span>
         </span>
-    </div>
-    <div class="adduserF">
-      <button class="addUser" @click="showAddUserOn(postUserVo.id)">添加好友</button>
-    </div>
-  </van-popup>
+      </div>
+      <div class="adduserF">
+        <button class="addUser" @click="showAddUserOn(postUserVo.id)">添加好友</button>
+      </div>
+    </van-popup>
 
-  <div class="indexTabs">
-    <van-tabs v-model:active="active" @change="onTabChange" animated>
-      <template #nav-bottom>
-      </template>
-      <template #nav-left>
-        <div style="display: flex;align-items: center;padding: 0 50px 0 16px">
-          <img @click="toUser" :src="user?.avatarUrl" alt="" class="avatar" v-if="store.getters.getIsLogin">
-        </div>
-      </template>
+    <div class="indexTabs">
+      <van-tabs v-model:active="active" @change="onTabChange" animated>
+        <template #nav-bottom>
+        </template>
+        <template #nav-left>
+          <div style="display: flex;align-items: center;padding: 0 50px 0 16px">
+            <img @click="toUser" :src="user?.avatarUrl" alt="" class="avatar" v-if="store.getters.getIsLogin">
+          </div>
+        </template>
 
-      <van-tab title="用户" name="用户">
-        <div id="userList">
-          <van-cell style="background-image: linear-gradient(to left,#fbf7f8, #f5f9fc);" center
-                    :title="isMatchMode? '推荐模式':'普通模式'">
-            <template #right-icon>
-              <div class="checkbox-wrapper-5">
-                <div class="check">
-                  <input type="checkbox" id="check-5" v-model="isMatchMode">
-                  <label for="check-5"></label>
+        <van-tab title="用户" name="用户">
+          <div id="userList">
+            <van-cell style="background-image: linear-gradient(to left,#fbf7f8, #f5f9fc);" center
+                      :title="isMatchMode? '推荐模式':'普通模式'">
+              <template #right-icon>
+                <div class="checkbox-wrapper-5">
+                  <div class="check">
+                    <input type="checkbox" id="check-5" v-model="isMatchMode">
+                    <label for="check-5"></label>
+                  </div>
+                </div>
+              </template>
+            </van-cell>
+            <van-tabs v-if="userList||userList.length>0 && tagUserList|| tagUserList.length>0"
+                      v-model:active="activeName"
+                      @click-tab="onClickTag">
+              <van-tab title="全部" name="a">
+
+                <div class="indexUserListCard card">
+                  <user-card-list :user-list="userList" @userId="showAddUserOn"/>
+                </div>
+
+              </van-tab>
+              <van-tab class="userTabs" v-for="tag in tagList" :title="tag" :name="tag">
+                <div class="indexUserListCard card">
+                  <user-card-list v-if=" tagUserList || tagUserList.length>0" :user-list="tagUserList"/>
+                </div>
+              </van-tab>
+            </van-tabs>
+          </div>
+
+        </van-tab>
+        <van-tab title="首页" name="首页">
+          <div class="sy" @scroll="postScroll">
+            <van-swipe :autoplay="3000" lazy-render class="post-banner">
+              <van-swipe-item>
+                <div class="banner1 ac">
+                </div>
+              </van-swipe-item>
+              <van-swipe-item>
+                <div class="banner2 ac">
+                </div>
+              </van-swipe-item>
+            </van-swipe>
+            <van-notice-bar @click="notices" left-icon="volume-o" :scrollable="false" color="rgb(56 121 186)"
+                            ref="noticeBarRef" background="#f0f9fe">
+              <van-swipe
+                  vertical
+                  class="notice-swipe"
+                  :autoplay="3000"
+                  :touchable="false"
+                  :show-indicators="false"
+              >
+                <div v-if="notice.length>0">
+                  <van-swipe-item :key="key" v-for="(n,key) in notice">{{ n }}</van-swipe-item>
+
+                </div>
+                <div v-else>
+                  <van-swipe-item :key="key" v-for="(n,key) in 2">{{ '暂无公告' }}</van-swipe-item>
+
+                </div>
+              </van-swipe>
+            </van-notice-bar>
+            <div class="ca">
+              <div class="ls">
+                <div class="lll one" @click="toPoints">
+                  <div class="llTitle">每日签到</div>
+                  <div class="llTitleMS">点击签到增加星币</div>
+
+                </div>
+                <div class="lll two" @click="hd">
+                  <div class="llTitle">每日活动</div>
+                  <div class="llTitleMS">参加活动获取奖励</div>
+                </div>
+
+                <div class="lll three" @click="zl">
+                  <div class="llTitle">优质专栏</div>
+                  <div class="llTitleMS">优质专栏</div>
+                </div>
+                <div class="lll three">
+                  <div class="llTitle">点击设置标签</div>
+                  <div class="llTitleMS">设置标签</div>
                 </div>
               </div>
-            </template>
-          </van-cell>
-          <van-tabs v-if="userList||userList.length>0 && tagUserList|| tagUserList.length>0" v-model:active="activeName"
-                    @click-tab="onClickTag">
-            <van-tab title="全部" name="a">
-
-              <div class="indexUserListCard card">
-                <user-card-list :user-list="userList" @userId="showAddUserOn"/>
-              </div>
-
-            </van-tab>
-            <van-tab class="userTabs" v-for="tag in tagList" :title="tag" :name="tag">
-              <div class="indexUserListCard card">
-                <user-card-list v-if=" tagUserList || tagUserList.length>0" :user-list="tagUserList"/>
-              </div>
-            </van-tab>
-          </van-tabs>
-        </div>
-
-      </van-tab>
-      <van-tab title="首页" name="首页">
-        <div class="sy" @scroll="postScroll">
-          <van-swipe :autoplay="3000" lazy-render class="post-banner">
-            <van-swipe-item>
-              <div class="banner1 ac">
-              </div>
-            </van-swipe-item>
-            <van-swipe-item>
-              <div class="banner2 ac">
-              </div>
-            </van-swipe-item>
-          </van-swipe>
-          <van-notice-bar @click="notices" left-icon="volume-o" :scrollable="false" color="rgb(56 121 186)"
-                          ref="noticeBarRef" background="#f0f9fe">
-            <van-swipe
-                vertical
-                class="notice-swipe"
-                :autoplay="3000"
-                :touchable="false"
-                :show-indicators="false"
-            >
-              <div v-if="notice.length>0">
-                <van-swipe-item :key="key" v-for="(n,key) in notice">{{ n }}</van-swipe-item>
-
-              </div>
-              <div v-else>
-                <van-swipe-item :key="key" v-for="(n,key) in 2">{{ '暂无公告' }}</van-swipe-item>
-
-              </div>
-            </van-swipe>
-          </van-notice-bar>
-          <div class="ca">
-            <div class="ls">
-              <div class="lll one" @click="toPoints">
-                <div class="llTitle">每日签到</div>
-                <div class="llTitleMS">点击签到增加星币</div>
-
-              </div>
-              <div class="lll two" @click="hd">
-                <div class="llTitle">每日活动</div>
-                <div class="llTitleMS">参加活动获取奖励</div>
-              </div>
-
-              <div class="lll three" @click="zl">
-                <div class="llTitle">优质专栏</div>
-                <div class="llTitleMS">优质专栏</div>
-              </div>
-              <div class="lll three">
-                <div class="llTitle">点击设置标签</div>
-                <div class="llTitleMS">设置标签</div>
-              </div>
             </div>
+            <Tabs :tag-list="tgs" @tag="onTag"/>
+            <PostCardList @showPostUser="showUser" :group-id="0" :scope="tag" :is-own="false"/>
           </div>
-          <Tabs :tag-list="tgs" @tag="onTag"/>
-          <PostCardList @showPostUser="showUser" :group-id="0" :scope="tag" :is-own="false"/>
-        </div>
 
-      </van-tab>
-      <van-tab title="队伍" name="队伍">
-        <div :class="{'apply-shake':searchTeamName.value}">
+        </van-tab>
+        <van-tab title="队伍" name="队伍">
+          <div :class="{'apply-shake':searchTeamName.value}">
 
-          <SearchCard @mess="setTxt" @click="onClickButton" :placeholder="'请输入队伍关键词'"/>
-        </div>
-        <team-card-list v-if="teamList && teamList.length>0" :teamList="teamList" @addTeam="addTeam"
-                        @teamShow="isShow"/>
-        <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
-      </van-tab>
-      <template #nav-right>
-        <div style="display: flex;justify-content: space-evenly;align-items: center;width: 84px">
-          <van-icon name="search" size="18" @click="toSearch" style="color:#4a94af;"/>
-          <van-popover v-model:show="showPopover" theme="dark" :actions="actions" @select="onSelect"
-                       placement="bottom-end" style="height: 18vh">
-            <template #reference>
-              <van-icon name="add-o" style="color:#4a94af;"/>
-            </template>
-          </van-popover>
-
-        </div>
-      </template>
-    </van-tabs>
-  </div>
-  <van-overlay :show="isMatchModeLoading">
-    <div class="wrapper" @click.stop>
-      <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
-        <div class="wheel"></div>
-        <div class="hamster">
-          <div class="hamster__body">
-            <div class="hamster__head">
-              <div class="hamster__ear"></div>
-              <div class="hamster__eye"></div>
-              <div class="hamster__nose"></div>
-            </div>
-            <div class="hamster__limb hamster__limb--fr"></div>
-            <div class="hamster__limb hamster__limb--fl"></div>
-            <div class="hamster__limb hamster__limb--br"></div>
-            <div class="hamster__limb hamster__limb--bl"></div>
-            <div class="hamster__tail"></div>
+            <SearchCard @mess="setTxt" @click="onClickButton" :placeholder="'请输入队伍关键词'"/>
           </div>
-        </div>
-        <div class="spoke"></div>
-      </div>
+          <team-card-list v-if="teamList && teamList.length>0" :teamList="teamList" @addTeam="addTeam"
+                          @teamShow="isShow"/>
+          <van-empty v-if="!teamList || teamList.length<1" description="空空如也"/>
+        </van-tab>
+        <template #nav-right>
+          <div style="display: flex;justify-content: space-evenly;align-items: center;width: 84px">
+            <van-icon name="search" size="18" @click="toSearch" style="color:#4a94af;"/>
+            <van-popover v-model:show="showPopover" theme="dark" :actions="actions" @select="onSelect"
+                         placement="bottom-end" style="height: 18vh">
+              <template #reference>
+                <van-icon name="add-o" style="color:#4a94af;"/>
+              </template>
+            </van-popover>
+
+          </div>
+        </template>
+      </van-tabs>
     </div>
-  </van-overlay>
+    <van-overlay :show="isMatchModeLoading">
+      <div class="wrapper" @click.stop>
+        <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
+          <div class="wheel"></div>
+          <div class="hamster">
+            <div class="hamster__body">
+              <div class="hamster__head">
+                <div class="hamster__ear"></div>
+                <div class="hamster__eye"></div>
+                <div class="hamster__nose"></div>
+              </div>
+              <div class="hamster__limb hamster__limb--fr"></div>
+              <div class="hamster__limb hamster__limb--fl"></div>
+              <div class="hamster__limb hamster__limb--br"></div>
+              <div class="hamster__limb hamster__limb--bl"></div>
+              <div class="hamster__tail"></div>
+            </div>
+          </div>
+          <div class="spoke"></div>
+        </div>
+      </div>
+    </van-overlay>
+
 
 </template>
 
@@ -269,7 +271,7 @@ import PostCardList from "@/components/post/PostCardList.vue";
 import {PostSortedEnum} from "@/plugins/request/dao/postEnum";
 import {teamQuery} from "@/plugins/request/dao/TeamQuery";
 
-const tgs: string[] = ["推荐", "最新", "最热"]
+const tgs: string[] = ["推荐", "最新", "最热", "寻金之路"]
 const tag = ref<string>('rec')
 const show = ref(false)
 const addPasswordTeam = ref(false)
@@ -328,6 +330,7 @@ const query: teamQuery = {
 }
 
 onMounted(async () => {
+
   const type = route.query.type;
   const code = route.query.code;
   if (type && code) {
@@ -790,6 +793,9 @@ const onTag = (value: string) => {
       break;
     case "最热":
       tag.value = PostSortedEnum.HOT;
+      break;
+    case "寻金之路":
+      tag.value = "xj";
   }
 }
 </script>

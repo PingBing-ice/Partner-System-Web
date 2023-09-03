@@ -6,33 +6,33 @@ import 'vant/lib/index.css';
 import "/src/style/global.css"
 import "/src/style/var.css"
 // =============================
-import '../public/tinymce/skins/content/dark/content.css'
-import '../public/tinymce/skins/content/dark/content.css'
-import '../public/tinymce/skins/content/default/content.css'
-import '../public/tinymce/skins/content/document/content.css'
-import '../public/tinymce/skins/content/tinymce-5/content.css'
-import '../public/tinymce/skins/content/tinymce-5-dark/content.css'
-import '../public/tinymce/skins/content/writer/content.css'
+import './assets/tinymce/skins/content/dark/content.css'
+import './assets/tinymce/skins/content/dark/content.css'
+import './assets/tinymce/skins/content/default/content.css'
+import './assets/tinymce/skins/content/document/content.css'
+import './assets/tinymce/skins/content/tinymce-5/content.css'
+import './assets/tinymce/skins/content/tinymce-5-dark/content.css'
+import './assets/tinymce/skins/content/writer/content.css'
 
-import '../public/tinymce/skins/ui/oxide/content.css'
-import '../public/tinymce/skins/ui/oxide/content.inline.css'
-import '../public/tinymce/skins/ui/oxide/skin.css'
-import '../public/tinymce/skins/ui/oxide/skin.shadowdom.css'
+import './assets/tinymce/skins/ui/oxide/content.css'
+import './assets/tinymce/skins/ui/oxide/content.inline.css'
+import './assets/tinymce/skins/ui/oxide/skin.css'
+import './assets/tinymce/skins/ui/oxide/skin.shadowdom.css'
 //
-import '../public/tinymce/skins/ui/oxide-dark/content.css'
-import '../public/tinymce/skins/ui/oxide-dark/content.inline.css'
+import './assets/tinymce/skins/ui/oxide-dark/content.css'
+import './assets/tinymce/skins/ui/oxide-dark/content.inline.css'
 // import './assets/tinymce/skins/ui/oxide-dark/skin.css'
-import '../public/tinymce/skins/ui/oxide-dark/skin.shadowdom.css'
+import './assets/tinymce/skins/ui/oxide-dark/skin.shadowdom.css'
 //
-import '../public/tinymce/skins/ui/tinymce-5/content.css'
-import '../public/tinymce/skins/ui/tinymce-5/content.inline.css'
-import '../public/tinymce/skins/ui/tinymce-5/skin.css'
-import '../public/tinymce/skins/ui/tinymce-5/skin.shadowdom.css'
+import './assets/tinymce/skins/ui/tinymce-5/content.css'
+import './assets/tinymce/skins/ui/tinymce-5/content.inline.css'
+import './assets/tinymce/skins/ui/tinymce-5/skin.css'
+import './assets/tinymce/skins/ui/tinymce-5/skin.shadowdom.css'
 //
-import '../public/tinymce/skins/ui/tinymce-5-dark/content.css'
-import '../public/tinymce/skins/ui/tinymce-5-dark/content.inline.css'
+import './assets/tinymce/skins/ui/tinymce-5-dark/content.css'
+import './assets/tinymce/skins/ui/tinymce-5-dark/content.inline.css'
 // import './assets/tinymce/skins/ui/tinymce-5-dark/skin.css'
-import '../public/tinymce/skins/ui/tinymce-5-dark/skin.shadowdom.css'
+import './assets/tinymce/skins/ui/tinymce-5-dark/skin.shadowdom.css'
 
 import '../src/assets/style/prism.css'
 // ============================================
@@ -53,6 +53,8 @@ import 'viewerjs/dist/viewer.css'
 shake(app)
 // app.use(ColorThief)
 app.use(Lazyload);
+// main.ts
+
 app.use(VueViewer, {
     defaultOptions: {
         'inline': false,

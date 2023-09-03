@@ -1,5 +1,4 @@
 <template>
-
   <div v-if="post!=null" id="postDetails">
     <div class="content_detail">
       <div class="auth_info">
@@ -110,7 +109,6 @@
     <MsgInput :placeholder="'围观不如发送...'" @input="setMess" @but="sendCommTxt"/>
   </div>
 
-
 </template>
 
 
@@ -123,7 +121,7 @@ import postRequest from "../../../plugins/request/postRequest";
 import moment from 'moment'
 import MsgInput from "@/components/MsgInput.vue";
 import {CommentVo, PostVoType} from "@/plugins/request/dao/post";
-
+import { Starport } from "vue-starport";
 
 const route = useRoute()
 const router = useRouter()

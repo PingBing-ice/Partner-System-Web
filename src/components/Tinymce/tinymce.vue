@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-
 //JS部分
 //在js中引入所需的主题和组件
 import tinymce from 'tinymce/tinymce';
@@ -35,6 +34,9 @@ import {reactive, ref, onMounted, defineEmits, watch} from 'vue';
 import myAxios from "../../config/myAxios";
 // import { updateImg } from '@/api/order/order'
 const emits = defineEmits(['getContent']);
+onMounted(()=>{
+  console.log();
+})
 //这里我选择将数据定义在props里面，方便在不同的页面也可以配置出不同的编辑器，当然也可以直接在组件中直接定义
 const props = defineProps({
   value: {
@@ -74,14 +76,14 @@ const init = reactive({
   selector: '#' + tinymceId.value, //富文本编辑器的id,
   mobile: true,
   table_grid: true,
-  language_url: '../../public/tinymce/langs/zh-Hans.js', // 语言包的路径，具体路径看自己的项目，文档后面附上中文js文件
+  language_url: new URL('../../assets/tinymce/langs/zh-Hans.js', import.meta.url).href, // 语言包的路径，具体路径看自己的项目，文档后面附上中文js文件
   language: 'zh-Hans', //语言
-  skin_url: '../../public/tinymce/skins/ui/oxide', // skin路径，具体路径看自己的项目
+  skin_url: new URL('../../assets/tinymce/skins/ui/oxide',import.meta.url).href, // skin路径，具体路径看自己的项目
   height: "75%", //编辑器高度
   branding: false, //是否禁用“Powered by TinyMCE”
   menubar: true, //顶部菜单栏显示
   promotion: false,//去点头部Upgrade按钮（注意）
-  emoticons_database_url: '../../public/tinymce/emojis/emojis.min.js',
+  emoticons_database_url: new URL('../../assets/tinymce/emojis/emojis.min.js',import.meta.url).href,
   image_dimensions: false, //去除宽高属性
   plugins: 'emoticons link  codesample searchreplace  lists advlist image code table wordcount insertdatetime', // 富文本插件
   toolbar:
@@ -96,7 +98,8 @@ const init = reactive({
   paste_auto_cleanup_on_paste: false,
   paste_data_images: true, //图片是否可粘贴
   file_picker_types: 'file',
-  content_css: '../../public/tinymce/skins/content/default/content.css', //以css文件方式自定义可编辑区域的css样式，css文件需自己创建并引入
+
+  content_css: new URL('../../assets/tinymce/skins/content/default/content.css',import.meta.url).href, //以css文件方式自定义可编辑区域的css样式，css文件需自己创建并引入
   //图片上传
   images_upload_handler: (blobInfo: any) =>
       new Promise((resolve, reject) => {

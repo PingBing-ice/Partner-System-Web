@@ -1,7 +1,9 @@
 .post_details_content {
     width: 100%;
-    font-size: 15px;
+    font-size: var(--post-szie);
     overflow: auto;
+    padding-bottom: 4vw;
+    letter-spacing: var(--post-spacing);
 }
 
 .auth_info {
@@ -38,7 +40,8 @@
 #postDetails {
     overflow-y: auto;
     overflow-x: auto;
-    height: calc(100% - 94px);
+    height: 100%;
+    /*height: calc(100% - 94px);*/
     padding: 0 14px;
 }
 

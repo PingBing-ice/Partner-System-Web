@@ -196,7 +196,7 @@ const afterRead = (file:Blob) => {
 
 <style>
 #user {
-  height: 90%;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;

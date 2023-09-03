@@ -27,26 +27,27 @@
       <div id="viewContent" class="contents">
         <router-view v-slot="{ Component }">
           <transition>
-            <keep-alive include="Index,teamPost">
-              <component :is="Component"/>
+            <keep-alive>
+              <component :is="Component" v-if="route.meta.keepAlive"/>
             </keep-alive>
           </transition>
+          <component :is="Component" v-if="!route.meta.keepAlive"/>
         </router-view>
       </div>
 
 
     </div>
   </div>
-  <div class="tail">
-        <van-tabbar route>
-          <van-tabbar-item replace to="/" icon="home-o" name="index">主页</van-tabbar-item>
-          <van-tabbar-item replace to="/team"  name="team" icon="friends-o">队伍
-          </van-tabbar-item>
-          <van-tabbar-item replace to="/find" icon="chat-o" name="chat">通讯录</van-tabbar-item>
-          <van-tabbar-item replace to="/space" icon="user-o" name="chat">我的</van-tabbar-item>
-        </van-tabbar>
-
-
+  <div class="tail" v-if="route.meta.tail">
+    <van-tabbar route>
+      <van-tabbar-item replace to="/" icon="home-o" name="index">主页</van-tabbar-item>
+      <van-tabbar-item replace to="/team" name="team" icon="friends-o">队伍</van-tabbar-item>
+      <van-tabbar-item replace to="/post/add" name="add_post ">
+        <van-button icon="plus" round  type="primary" class="index_add_post"/>
+      </van-tabbar-item>
+      <van-tabbar-item replace to="/find" icon="chat-o" name="chat">通讯录</van-tabbar-item>
+      <van-tabbar-item replace to="/space" icon="user-o" name="user">我的</van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 <script setup>

@@ -15,6 +15,8 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchCard: typeof import('./src/components/SearchCard.vue')['default']
+    Starport: typeof import('vue-starport')['Starport']
+    StarportCarrier: typeof import('vue-starport')['StarportCarrier']
     Tabs: typeof import('./src/components/tab/Tabs.vue')['default']
     TeamCardList: typeof import('./src/components/TeamCardList.vue')['default']
     TestCardList: typeof import('./src/components/TestCardList.vue')['default']

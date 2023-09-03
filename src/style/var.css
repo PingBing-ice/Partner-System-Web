@@ -7,4 +7,9 @@
     --gradient: linear-gradient(to left, #fbf7f8, #f5f9fc);
     --card-background: #f0f2f5;
     --input-chat: #f3f3f3;
+    --post-szie: 4vw;
+    --post-spacing: 0.2vw;
+    --tail-h: 10.2vw;
+    --tail-w: 18.2vw;
+
 }

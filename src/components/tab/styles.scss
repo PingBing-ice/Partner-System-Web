@@ -7,6 +7,7 @@
   padding: 8px 0;
   top: 0;
   z-index: 100;
+  font-size: 3.9vw;
   //box-shadow: rgba(99, 99, 99, 0.1) 0 2px 8px 0;
 }
 
@@ -23,7 +24,7 @@
   border-radius: 10px;
   background-color: #f3f5f4;
 
-  padding: 7px 10px;
+  padding: 0.1rem 0.4rem;
 }
 
 .post-tab input[type="radio"]:checked + label{
